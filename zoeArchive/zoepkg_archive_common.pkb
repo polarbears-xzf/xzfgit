@@ -99,7 +99,7 @@ EXCEPTION
 WHEN OTHERS THEN
   RAISE;
 END verify_proof_code;
-  
+
 -- ===================================================
 -- 添加归档表
 -- ===================================================
@@ -115,22 +115,21 @@ END verify_proof_code;
     lv_proof_strings :=  combo_verify_object_data(in_owner,in_table_name,in_system_code,in_data_type);
     ln_return := generate_proof_code(lv_proof_strings,lv_proof_code);
     INSERT INTO ZOEARCHIVE.ARC_OBJECT_INFO 
-      (OWNER,OBJECT_NAME,APPLICATION_SYSTEM_CODE,DATA_TYPE_CODE,PROOF_CODE) 
+      (OWNER,TABLE_NAME,APPLICATION_SYSTEM_CODE,DATA_TYPE_CODE,PROOF_CODE) 
       VALUES 
       (in_owner,in_table_name,in_system_code,in_data_type,lv_proof_code) ;
     COMMIT;
     return ln_return;
     EXCEPTION
     WHEN OTHERS THEN
-    DBMS_OUTPUT.PUT_LINE(2);
+    DBMS_OUTPUT.PUT_LINE(SQLERRM);
       RETURN SQLERRM;
       
-  END;
-  
-  
+  END add_archive_table;
+
 
   
-  FUNCTION ALLOW_ARCHIVE(
+FUNCTION archive_date_limit(
     id_archive_date DATE )
   RETURN NUMBER
 AS
@@ -141,7 +140,7 @@ BEGIN
     RETURN -1;
   END IF;
   RETURN 0;
-END ALLOW_ARCHIVE;
+END archive_date_limit;
 
 END zoepkg_archive_comm;
 /

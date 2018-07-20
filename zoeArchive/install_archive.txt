@@ -12,11 +12,101 @@
 --	修改 - （年-月-日） - 描述
 --
 
---创建数据库归档用户
-@create_user_and_grant.sql
+--生产数据库执行，归档数据库执行
+	--创建数据库归档用户
+		@create_user_and_grant.sql
+	--创建数据库链路，连接作为zoearchive用户
+		conn zoearchive/zoe$2017arch
+		@create_dblink.sql
+--生产数据库执行
+	--创建数据库归档系统相关序列
+		@create_sequence.sql
+	--创建数据库归档系统相关表
+		@create_table.sql
+	--导入基础数据
+		@archive_his_load_data.sql
+	--创建归档相关包
+		@zoepkg_archive_comm.pks
+		@zoepkg_archive_comm.pkb
+		@zoepkg_archive_process.pks
+		@zoepkg_archive_process.pks
+--归档数据库执行
+	--创建归档表空间
+		@create_archive_tablespace.sql
+	--创建HIS归档数据归档表
+		conn zoearchive/zoe$2017arch
+		@create_archive_table_a.sql
+	--创建HIS归档数据在线表
+		@create_archive_table_o.sql
+	--创建HIS数据库表空间
+		@get_create_tablesqlpce.sql
+	--创建HIS数据库归档表联合视图与同义词
+		@create_archive_union_view.sql
+		
+		
+	
+	
+--其它说明
+  --添加归档表
+declare
+ln number;
+lv varchar2(260);
+begin
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('COMM','APPLY_SHEET_DETAIL','1','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('COMM','APPLY_SHEET','1','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('PHYSIC','LAY_PHYSIC_RECORDS','1','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('OUTPSICK','DISPENSARY_PRESCRIBE_DETAIL','1','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('OUTPSICK','DISPENSARY_PRESCRIP_MASTER','1','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('OUTPSICK','DISPENSARY_SICK_PRICE_ITEM','1','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('INPSICK','PRESCRIBE_RECORD','1','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('INPSICK','RESIDENCE_SICK_PRICE_ITEM','1','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('COMM','PREPAYMENT_MONEY','1','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('INPSICK','SICK_SETTLE_DETAIL','1','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('INPSICK','SICK_SETTLE_MASTER','1','2');
+end;
+--查看归档条件配置
+  WITH WT1 AS 
+(SELECT A.*,B.TASK_NAME FROM ZOEARCHIVE.ARC_PROCESS_TASK_CONFIG A,ZOEARCHIVE.ARC_PROCESS_TASK B 
+  WHERE A.TASK_ID=B.TASK_ID)
+select TASK_NAME,PROCESS_ORDER,CONDITION_NAME,CONDITION_VALUE
+  from WT1 
+unpivot
+(
+  CONDITION_VALUE
+    for CONDITION_NAME in ("TABLE_OWNER","TABLE_NAME","ARCHIVE_TABLE_OWNER","ARCHIVE_TABLE_NAME",
+      "ARCHIVE_DB_LINK","DETAIL_TABLE_FLAG","RELATE_MASTER_TABLE_NAME","RELATE_MASTER_TABLE_COLUMN",
+      "RELATE_DETAIL_TABLE_COLUMN","ARCHIVE_DATE_COLUMN","ARCHIVE_CONDITION_C1","ARCHIVE_CONDITION_C2")
+) 
+ORDER BY TASK_ID,PROCESS_ORDER;
 
---创建数据库归档系统相关表
-@create_table.sql
+--执行归档
+	--解决多级视图关联问题，处理申请单细表时不使用索引，全表扫描
+		alter session set "_optimizer_cost_based_transformation"='ON';
+	--执行归档，
+		--参数1：1表示归档门诊已结算病人数据，通过结算号
+			--2表示归档住院已出院病人数据
+			--3表示归档门诊已结算病人数据，通过病人ID
+			--必须先执行3，再执行1
+		--参数2：110表示正式执行，空表示模拟执行
+		set serveroutput on size 1000000
+		declare
+		ln number;
+		lv varchar2(260);
+		begin
+		lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_PROCESS.arc_process_task_exec(3,110);
+		end;
+		/
 
-
+select * from SYS.DBA_POLICIES;
+desc dbms_rls
+exec dbms_rls.DISABLE_GROUPED_POLICY('PHYSIC','LAY_PHYSIC_RECORDS','BATCH','ACLQUERY');
+exec dbms_rls.DISABLE_GROUPED_POLICY('PHYSIC','LAY_PHYSIC_RECORDS','OLTP','ACLQUERY');
+exec dbms_rls.DISABLE_GROUPED_POLICY('INPSICK','RESIDENCE_SICK_PRICE_ITEM','BATCH','ACLQUERY');
+exec dbms_rls.DISABLE_GROUPED_POLICY('INPSICK','RESIDENCE_SICK_PRICE_ITEM','OLTP','ACLQUERY');
+exec dbms_rls.DISABLE_GROUPED_POLICY('OUTPSICK','DISPENSARY_SICK_PRICE_ITEM','BATCH','ACLQUERY');
+exec dbms_rls.DISABLE_GROUPED_POLICY('OUTPSICK','DISPENSARY_SICK_PRICE_ITEM','OLTP','ACLQUERY');
+	
+	
+	
+	
 

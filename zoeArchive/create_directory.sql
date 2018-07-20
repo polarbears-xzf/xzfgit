@@ -15,4 +15,4 @@
 alter session set current_schema=zoearchive;
 
 --在生产数据库和归档数据库创建数据库目录
-create directory zoearchivedir as "PATH" ;
+create directory zoedmpdir as "PATH" ;
