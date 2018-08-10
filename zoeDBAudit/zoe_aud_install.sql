@@ -25,7 +25,8 @@
 --类型：安全访问控制要素     "zoetyp_aud_firewall_factor"
 @@zoe_aud_create_type.sql
 
-
+-- 连接数据库
+conn zoesecurity/zoe5VCDSXXLCU6V@192.168.1.41/zoehdc
 --创建上下文
 --上下文：审计相关           "ZOE_AUDIT_CONTEXT"
 @@zoe_aud_create_context.sql
@@ -51,3 +52,4 @@
 --创建触发器
 --触发器：审计并控制DDL语句  "ZOETRG_AUD_DDL_BEFORE" 
 @@zoetrg_aud_ddl_before.pls
+alter trigger ZOETRG_AUD_DDL_BEFORE enable;

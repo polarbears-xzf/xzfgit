@@ -36,10 +36,10 @@
 	--创建HIS归档数据归档表
 		conn zoearchive/zoe$2017arch
 		@create_archive_table_a.sql
-	--创建HIS归档数据在线表
-		@create_archive_table_o.sql
 	--创建HIS数据库表空间
 		@get_create_tablesqlpce.sql
+	--创建HIS归档数据在线表
+		@create_archive_table_o.sql
 	--创建HIS数据库归档表联合视图与同义词
 		@create_archive_union_view.sql
 		
@@ -80,6 +80,7 @@ unpivot
 ORDER BY TASK_ID,PROCESS_ORDER;
 
 --执行归档
+	export NLS_LANG="SIMPLIFIED CHINESE_CHINA.ZHS16GBK"
 	--解决多级视图关联问题，处理申请单细表时不使用索引，全表扫描
 		alter session set "_optimizer_cost_based_transformation"='ON';
 	--执行归档，
@@ -93,10 +94,18 @@ ORDER BY TASK_ID,PROCESS_ORDER;
 		ln number;
 		lv varchar2(260);
 		begin
-		lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_PROCESS.arc_process_task_exec(3,110);
+		lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_PROCESS.arc_process_task_exec(2,110);
 		end;
 		/
+--查询归档进度
+	ALTER SESSION SET NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS';
+	select * from ZOEARCHIVE.ARC_PROCESS_TASK_RECORD 
+	ORDER BY Archive_Date DESC, Process_Order;
 
+	select b.* from gv$session a,gv$sql b where program like 'sqlp%'  
+	and a.inst_id=b.inst_id and a.sql_Id=b.sql_id;
+
+--临时关闭美创审计
 select * from SYS.DBA_POLICIES;
 desc dbms_rls
 exec dbms_rls.DISABLE_GROUPED_POLICY('PHYSIC','LAY_PHYSIC_RECORDS','BATCH','ACLQUERY');
@@ -105,6 +114,13 @@ exec dbms_rls.DISABLE_GROUPED_POLICY('INPSICK','RESIDENCE_SICK_PRICE_ITEM','BATC
 exec dbms_rls.DISABLE_GROUPED_POLICY('INPSICK','RESIDENCE_SICK_PRICE_ITEM','OLTP','ACLQUERY');
 exec dbms_rls.DISABLE_GROUPED_POLICY('OUTPSICK','DISPENSARY_SICK_PRICE_ITEM','BATCH','ACLQUERY');
 exec dbms_rls.DISABLE_GROUPED_POLICY('OUTPSICK','DISPENSARY_SICK_PRICE_ITEM','OLTP','ACLQUERY');
+	
+exec dbms_rls.ENABLE_GROUPED_POLICY('PHYSIC','LAY_PHYSIC_RECORDS','BATCH','ACLQUERY');
+exec dbms_rls.ENABLE_GROUPED_POLICY('PHYSIC','LAY_PHYSIC_RECORDS','OLTP','ACLQUERY');
+exec dbms_rls.ENABLE_GROUPED_POLICY('INPSICK','RESIDENCE_SICK_PRICE_ITEM','BATCH','ACLQUERY');
+exec dbms_rls.ENABLE_GROUPED_POLICY('INPSICK','RESIDENCE_SICK_PRICE_ITEM','OLTP','ACLQUERY');
+exec dbms_rls.ENABLE_GROUPED_POLICY('OUTPSICK','DISPENSARY_SICK_PRICE_ITEM','BATCH','ACLQUERY');
+exec dbms_rls.ENABLE_GROUPED_POLICY('OUTPSICK','DISPENSARY_SICK_PRICE_ITEM','OLTP','ACLQUERY');
 	
 	
 	

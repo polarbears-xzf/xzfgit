@@ -25,7 +25,7 @@ AS
     UPDATE META_USER$
     SET USER_SOURCE ='ORACLE'
     WHERE USERNAME IN
-      (SELECT COLUMN_VALUE FROM TABLE(zoefun_get_oracle_user)
+      (SELECT COLUMN_VALUE FROM TABLE(ZOESYSMAN.Zoepkg_Utility.Get_Oracle_User)
       );
     COMMIT;
   END init_db_user;
@@ -43,7 +43,7 @@ AS
     INSERT
     INTO ZOESTD.META_OBJ$
       (
-        OBJ#,USER#,OBJ_NAME,OBJ_TYPE#,
+        DB_OBJ#,USER#,OBJ_NAME,OBJ_TYPE#,
         CREATOR,CREATED_TIME,MODIFIER,MODIFIED_TIME
       )
     SELECT OBJECT_ID,
@@ -53,7 +53,7 @@ AS
       CREATED,SYS_CONTEXT('USERENV','SESSION_USER') AS MODIFIER,TO_DATE(TIMESTAMP,'YYYY-MM-DD HH24:MI:SS')
     FROM DBA_OBJECTS o
     WHERE OWNER NOT IN
-      ( SELECT COLUMN_VALUE FROM TABLE(zoefun_get_oracle_user)
+      ( SELECT COLUMN_VALUE FROM TABLE(ZOESYSMAN.Zoepkg_Utility.Get_Oracle_User)
       )
       AND OBJECT_TYPE IN ('TABLE','VIEW','SEQUENCE');
       COMMIT;
@@ -70,15 +70,28 @@ AS
       EXECUTE IMMEDIATE 'TRUNCATE TABLE META_TAB$';
     END IF;
     INSERT INTO META_TAB$
-      (obj#,user#,tab_name,tab_chn_name,memo
+      (obj#,user#,tab_name,tab_chn_name,tab_checksum,memo
       )
     SELECT o.OBJ#,o.USER#,o.OBJ_NAME, SUBSTR(tm.COMMENTS,1,DECODE(INSTR(tm.COMMENTS,'#|'),0,LENGTH(tm.COMMENTS),INSTR(tm.COMMENTS,'#|')-1)) AS COLUMN_CHN_NAME,
-      SUBSTR(tm.COMMENTS,DECODE(INSTR(tm.COMMENTS,'#|'),0,LENGTH(tm.COMMENTS)+1,INSTR(tm.COMMENTS,'#|')+2),LENGTH(tm.COMMENTS)) AS MEMO
-    FROM META_OBJ$ o , META_USER$ u , DBA_TAB_COMMENTS tm
-    WHERE o.OBJ_TYPE#  =1
-      AND o.USER#      =u.USER#
-      AND tm.OWNER     =u.USERNAME
-      AND tm.TABLE_NAME=o.OBJ_NAME;
+          (SELECT ZOESYSMAN.ZOEPKG_UTILITY.VERIFY_SH1(TABLE_INFO||TABLE_PK_INFO）
+          FROM
+            (SELECT 
+              LISTAGG(COLUMN_NAME||DATA_TYPE||DATA_LENGTH||DATA_PRECISION) within GROUP (ORDER BY COLUMN_ID) AS TABLE_INFO
+            FROM DBA_TAB_COLUMNS where owner=tm.OWNER and table_name=tm.TABLE_NAME) a,
+            (SELECT 
+              LISTAGG(B.COLUMN_NAME) within GROUP (ORDER BY B.POSITION) AS TABLE_PK_INFO
+            FROM DBA_CONSTRAINTS a, DBA_CONS_COLUMNS B
+            WHERE a.OWNER = B.OWNER AND a.TABLE_NAME =B.TABLE_NAME
+              AND a.CONSTRAINT_NAME = B.CONSTRAINT_NAME AND a.CONSTRAINT_TYPE ='P'
+              and A.owner=tm.OWNER and A.table_name=tm.TABLE_NAME
+            ) B
+       ),
+          SUBSTR(tm.COMMENTS,DECODE(INSTR(tm.COMMENTS,'#|'),0,LENGTH(tm.COMMENTS)+1,INSTR(tm.COMMENTS,'#|')+2),LENGTH(tm.COMMENTS)) AS MEMO
+        FROM ZOESTD.META_OBJ$ o , ZOESTD.META_USER$ u , DBA_TAB_COMMENTS tm
+        WHERE o.OBJ_TYPE#  =1
+          AND o.USER#      =u.USER#
+          AND tm.OWNER     =u.USERNAME
+          AND tm.TABLE_NAME=o.OBJ_NAME;
     COMMIT;
   END init_db_table;
 ----初始化列

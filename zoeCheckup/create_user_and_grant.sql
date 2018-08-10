@@ -1,18 +1,21 @@
--- Created in 2017.10.10 by polarbears
+-- Created in 2018.06.03 by polarbears
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
 --	Name:
--- 		zoe_aud_create_user.sql
+-- 		create_user_and_grant.sql
 --	Description:
--- 		创建智业安全系统数据库用户
+-- 		创建健康检查表空间、用户并授权
 --  Relation:
---      
+--      对象关联
 --	Notes:
---		
+--		基本注意事项
 --	修改 - （年-月-日） - 描述
+--
 
-DEFINE sv_username = ZOESECURITY
-DEFINE sv_tablespace_name = ZOESECURITY_TAB
+
+SET SERVEROUTPUT ON SIZE 1000000
+DEFINE sv_username = ZOECHECKUP
+DEFINE sv_tablespace_name = ZOECHECKUP_TAB
 
 -- ===================================================
 -- 创建表空间: ZOECHECKUP_TAB 
@@ -63,7 +66,7 @@ END;
 /
 
 -- ===================================================
--- 创建用户                                        
+-- 创建数据库健康检查用户                                        
 -- ===================================================
 VAR sv_password         VARCHAR2(128)
 DECLARE
@@ -78,12 +81,15 @@ EXECUTE IMMEDIATE lv_sql_ddl;
 END;
 /
 
+-- ===================================================
+-- 授权系统权限给数据库归档用户
+--
+   --在生产数据库和归档数据库都要执行                                             
+-- ===================================================
+GRANT DBA TO ZOECHECKUP;
+GRANT EXECUTE ON ZOESYSMAN.ZOEPKG_UTILITY TO ZOECHECKUP;
 
---授权系统权限
-grant ADMINISTER DATABASE TRIGGER,CREATE JOB,
-	CREATE PROCEDURE,CREATE SESSION,CREATE TABLE,
-	CREATE TRIGGER,CREATE VIEW,CREATE TYPE,
-	CREATE ANY CONTEXT,DROP ANY CONTEXT,
-	UNLIMITED TABLESPACE to ZOESECURITY;
---授权包执行权限	
-GRANT EXECUTE ON SYS.DBMS_RLS TO ZOESECURITY;
+
+
+
+

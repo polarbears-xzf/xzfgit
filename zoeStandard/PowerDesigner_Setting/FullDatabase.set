@@ -16,13 +16,13 @@ GenScriptTitle=Yes
 GenScriptNamLabl=No
 GenScriptQDtbs=No
 GenScriptQOwnr=Yes
-GenScriptCase=0
-GenScriptEncoding=ANSI
+GenScriptCase=1
+GenScriptEncoding=UTF8
 GenScriptNAcct=No
 IdentifierDelimiter=&quot;
 
 [Physical Objects\Database Generation\Database]
-Create=Yes
+Create=No
 Open=Yes
 Close=Yes
 Drop=Yes
@@ -34,7 +34,7 @@ Header=Yes
 Footer=Yes
 
 [Physical Objects\Database Generation\Tablespace]
-Create=No
+Create=Yes
 Drop=No
 Comment=Yes
 
@@ -98,10 +98,10 @@ Comment=Yes
 Drop=Yes
 
 [Physical Objects\Database Generation\Sequence]
-Create=No
+Create=Yes
 Drop=No
 Comment=Yes
-Permission=No
+Permission=Yes
 
 [Physical Objects\Database Generation\Table&amp;&amp;Column\Table]
 Create=Yes

@@ -15,3 +15,4 @@ BEGIN
     --DBMS_OUTPUT.PUT_LINE(SQLERRM);
 		RETURN 'ERR.zoefun_aud_get_sql';
 END zoefun_aud_get_sql;
+/
