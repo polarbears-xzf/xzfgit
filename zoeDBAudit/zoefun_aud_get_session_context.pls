@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION zoefun_aud_get_session_context
+CREATE OR REPLACE FUNCTION ZOESECURITY.zoefun_aud_get_session_context
 (ot_session_context out zoetyp_aud_session_context)
 RETURN INTEGER
 AS

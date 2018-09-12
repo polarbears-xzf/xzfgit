@@ -10,8 +10,8 @@ CURRENT_USER              VARCHAR2(64)
 /
 
 --  用于DDL审计日志
-CREATE OR REPLACE TYPE ZOESECURITY.zoetyp_audit_log AS OBJECT
-(LOG_ID                   VARCHAR2(36) , 
+CREATE OR REPLACE TYPE ZOESECURITY.zoetyp_aud_log AS OBJECT
+(LOG_ID                   VARCHAR2(64) , 
 USERNAME                  VARCHAR2(128) ,
 OS_USERNAME               VARCHAR2(255) ,
 HOST                      VARCHAR2(255) ,

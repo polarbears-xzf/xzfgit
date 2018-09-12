@@ -1,0 +1,9 @@
+--添加归档数据库大表抽取进程
+add extract exarch1, tranlog, begin now, threads 2
+add exttrail ./dirdat/archivetable/ef, extract exarch1
+
+--添加归档数据库除大表外的所有表抽取进程
+add extract exarch2, tranlog, begin now, threads 2
+add exttrail ./dirdat/archivetable/eg, extract exarch2
+
+

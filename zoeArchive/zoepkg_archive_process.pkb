@@ -15,6 +15,7 @@ AS
   ln_return       NUMBER;
   ln_process_task_exist_flag        NUMBER;
   ln_process_task_unend_flag        NUMBER;
+  lv_task_data_sql              VARCHAR2(32766);
 BEGIN
   --强制限制不允许归档1年内数据
   ln_return := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.ARCHIVE_DATE_LIMIT(id_archive_date);
@@ -64,46 +65,60 @@ BEGIN
         WHERE TASK_ID = in_task_id ORDER BY PROCESS_ORDER;
     CASE 
       WHEN in_task_id = 1 THEN 
-        INSERT INTO ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE
-          (SEQ_NO,TASK_ID, ARCHIVE_DATE, ARCHIVE_CONDITION_VALUE1, ARCHIVE_CONDITION_VALUE2)
-          SELECT ZOEARCHIVE.SEQ_ARC_PROC_TASK_DATA_CACHE.nextval,in_task_id, ld_archive_exec_date, SETTLE_NO, 0
-          FROM SICK_SETTLE_MASTER WHERE SETTLE_DATE < ld_archive_exec_date AND SETTLE_MODE = 0 ;
+        lv_task_data_sql := '';
+        lv_task_data_sql := lv_task_data_sql||'INSERT INTO ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE ';
+        lv_task_data_sql := lv_task_data_sql||' (SEQ_NO,TASK_ID, ARCHIVE_DATE, ARCHIVE_CONDITION_VALUE1, ARCHIVE_CONDITION_VALUE2) ';
+        lv_task_data_sql := lv_task_data_sql||' SELECT ZOEARCHIVE.SEQ_ARC_PROC_TASK_DATA_CACHE.nextval,'||in_task_id||', '||to_date(to_char(to_date(to_char(ld_archive_exec_date,'yyyy-mm-dd'),'yyyy-mm-dd'),'yyyy-mm-dd'),'yyyy-mm-dd')||', SETTLE_NO, 0 ';
+        lv_task_data_sql := lv_task_data_sql||' FROM SICK_SETTLE_MASTER WHERE SETTLE_DATE < to_date('''||to_char(ld_archive_exec_date,'yyyy-mm-dd')||''',''yyyy-mm-dd'') AND SETTLE_MODE = 0 ';
+        EXECUTE IMMEDIATE lv_task_data_sql;
       WHEN in_task_id = 2 THEN 
-        INSERT INTO ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE
-          ( SEQ_NO,TASK_ID, ARCHIVE_DATE, ARCHIVE_CONDITION_VALUE1, ARCHIVE_CONDITION_VALUE2, ARCHIVE_CONDITION_VALUE3)
-          SELECT ZOEARCHIVE.SEQ_ARC_PROC_TASK_DATA_CACHE.nextval, in_task_id, ld_archive_exec_date, SICK_ID, VISIT_NUMBER, RESIDENCE_NO
-          FROM (SELECT  in_task_id, ld_archive_exec_date, a.SICK_ID, a.VISIT_NUMBER, b.RESIDENCE_NO
-            FROM SICK_VISIT_INFO a, SICK_SETTLE_MASTER b
-            WHERE a.SICK_ID              = b.SICK_ID
-              AND a.RESIDENCE_NO         = b.RESIDENCE_NO
-              AND b.SETTLE_DATE          < ld_archive_exec_date
-              AND b.SETTLE_MODE          = '1'
-              AND b.OUT_WARD_SETTLE_TYPE = '1'
-              AND b.settle_type          = '1'
-              AND b.back_receipt_no     IS NULL
-              AND a.STATE                = '9'
-              AND NOT EXISTS
-                (SELECT   1
-                  FROM (SELECT SICK_ID,VISIT_NUMBER 
-                        FROM prepayment_money
-                        WHERE OPERATION_DATE < ld_archive_exec_date AND VISIT_NUMBER > 0
-                          AND settle_receipt_no IS NULL AND receipt_no IS NOT NULL AND operation_type = '1'
-                        GROUP BY SICK_ID,VISIT_NUMBER) c
-                  WHERE a.sick_id        = c.sick_id
-                    AND a.visit_number   = c.visit_number
-                )
-              GROUP BY in_task_id, ld_archive_exec_date, a.SICK_ID, a.VISIT_NUMBER, b.RESIDENCE_NO); 
-        WHEN in_task_id = 3 THEN 
-          INSERT INTO ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE
-            (SEQ_NO,TASK_ID, ARCHIVE_DATE, ARCHIVE_CONDITION_VALUE1, ARCHIVE_CONDITION_VALUE2)
-            SELECT ZOEARCHIVE.SEQ_ARC_PROC_TASK_DATA_CACHE.nextval, in_task_id, ld_archive_exec_date, SICK_ID, 0
-            FROM (SELECT  in_task_id, ld_archive_exec_date, SICK_ID, 0
-            FROM SICK_SETTLE_MASTER WHERE SETTLE_DATE < ld_archive_exec_date AND SETTLE_MODE = 0 AND SICK_ID IS NOT NULL
-            GROUP BY in_task_id, ld_archive_exec_date, SICK_ID, 0);
-      END CASE;
-      COMMIT;
-      od_archive_exec_date := ld_archive_exec_date;
-      RETURN 1;
+        lv_task_data_sql := '';
+        lv_task_data_sql := lv_task_data_sql||'INSERT INTO ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE ';
+        lv_task_data_sql := lv_task_data_sql||' ( SEQ_NO,TASK_ID, ARCHIVE_DATE, ARCHIVE_CONDITION_VALUE1, ARCHIVE_CONDITION_VALUE2, ARCHIVE_CONDITION_VALUE3) ';
+        lv_task_data_sql := lv_task_data_sql||'  SELECT ZOEARCHIVE.SEQ_ARC_PROC_TASK_DATA_CACHE.nextval, '||in_task_id||', to_date('''||to_char(ld_archive_exec_date,'yyyy-mm-dd')||''',''yyyy-mm-dd''), SICK_ID, VISIT_NUMBER, RESIDENCE_NO ';
+        lv_task_data_sql := lv_task_data_sql||'  FROM (SELECT  '||in_task_id||', to_date('''||to_char(ld_archive_exec_date,'yyyy-mm-dd')||''',''yyyy-mm-dd''), a.SICK_ID, a.VISIT_NUMBER, b.RESIDENCE_NO ';
+        lv_task_data_sql := lv_task_data_sql||'    FROM SICK_VISIT_INFO a, SICK_SETTLE_MASTER b ';
+        lv_task_data_sql := lv_task_data_sql||'    WHERE a.SICK_ID              = b.SICK_ID ';
+        lv_task_data_sql := lv_task_data_sql||'      AND a.RESIDENCE_NO         = b.RESIDENCE_NO ';
+        lv_task_data_sql := lv_task_data_sql||'      AND b.SETTLE_DATE          < to_date('''||to_char(ld_archive_exec_date,'yyyy-mm-dd')||''',''yyyy-mm-dd'') ';
+        lv_task_data_sql := lv_task_data_sql||'      AND b.SETTLE_MODE          = ''1'' ';
+        lv_task_data_sql := lv_task_data_sql||'      AND b.OUT_WARD_SETTLE_TYPE = ''1'' ';
+        lv_task_data_sql := lv_task_data_sql||'      AND b.settle_type          = ''1'' ';
+        lv_task_data_sql := lv_task_data_sql||'      AND b.back_receipt_no     IS NULL ';
+        lv_task_data_sql := lv_task_data_sql||'      AND a.STATE                = ''9'' ';
+        lv_task_data_sql := lv_task_data_sql||'      AND NOT EXISTS ';
+        lv_task_data_sql := lv_task_data_sql||'        (SELECT   1 ';
+        lv_task_data_sql := lv_task_data_sql||'          FROM (SELECT SICK_ID,VISIT_NUMBER ';
+        lv_task_data_sql := lv_task_data_sql||'                FROM prepayment_money ';
+        lv_task_data_sql := lv_task_data_sql||'                WHERE OPERATION_DATE < to_date('''||to_char(ld_archive_exec_date,'yyyy-mm-dd')||''',''yyyy-mm-dd'') AND VISIT_NUMBER > 0 ';
+        lv_task_data_sql := lv_task_data_sql||'                  AND settle_receipt_no IS NULL AND receipt_no IS NOT NULL AND operation_type = ''1'' ';
+        lv_task_data_sql := lv_task_data_sql||'                GROUP BY SICK_ID,VISIT_NUMBER) c ';
+        lv_task_data_sql := lv_task_data_sql||'          WHERE a.sick_id        = c.sick_id ';
+        lv_task_data_sql := lv_task_data_sql||'            AND a.visit_number   = c.visit_number ';
+        lv_task_data_sql := lv_task_data_sql||'        ) ';
+        lv_task_data_sql := lv_task_data_sql||'      GROUP BY '||in_task_id||', to_date('''||to_char(ld_archive_exec_date,'yyyy-mm-dd')||''',''yyyy-mm-dd''), a.SICK_ID, a.VISIT_NUMBER, b.RESIDENCE_NO) '; 
+        EXECUTE IMMEDIATE lv_task_data_sql;
+      WHEN in_task_id = 3 THEN 
+        lv_task_data_sql := '';
+        lv_task_data_sql := lv_task_data_sql||'INSERT INTO ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE ';
+        lv_task_data_sql := lv_task_data_sql||'  (SEQ_NO,TASK_ID, ARCHIVE_DATE, ARCHIVE_CONDITION_VALUE1, ARCHIVE_CONDITION_VALUE2) ';
+        lv_task_data_sql := lv_task_data_sql||'  SELECT ZOEARCHIVE.SEQ_ARC_PROC_TASK_DATA_CACHE.nextval, '||in_task_id||', to_date('''||to_char(ld_archive_exec_date,'yyyy-mm-dd')||''',''yyyy-mm-dd''), SICK_ID, 0 ';
+        lv_task_data_sql := lv_task_data_sql||'  FROM (SELECT  '||in_task_id||', to_date('''||to_char(ld_archive_exec_date,'yyyy-mm-dd')||''',''yyyy-mm-dd''), SICK_ID, 0 ';
+        lv_task_data_sql := lv_task_data_sql||'  FROM SICK_SETTLE_MASTER WHERE SETTLE_DATE < to_date('''||to_char(ld_archive_exec_date,'yyyy-mm-dd')||''',''yyyy-mm-dd'') AND SETTLE_MODE = 0 AND SICK_ID IS NOT NULL ';
+        lv_task_data_sql := lv_task_data_sql||'  GROUP BY '||in_task_id||', to_date('''||to_char(ld_archive_exec_date,'yyyy-mm-dd')||''',''yyyy-mm-dd''), SICK_ID, 0) ';
+       EXECUTE IMMEDIATE lv_task_data_sql;
+      WHEN in_task_id = 4 THEN 
+        lv_task_data_sql := '';
+        lv_task_data_sql := lv_task_data_sql||'INSERT INTO ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE ';
+        lv_task_data_sql := lv_task_data_sql||'  (SEQ_NO,TASK_ID, ARCHIVE_DATE, ARCHIVE_CONDITION_VALUE1, ARCHIVE_CONDITION_VALUE2) ';
+        lv_task_data_sql := lv_task_data_sql||'  SELECT ZOEARCHIVE.SEQ_ARC_PROC_TASK_DATA_CACHE.nextval, '||in_task_id||', to_date('''||to_char(ld_archive_exec_date,'yyyy-mm-dd')||''',''yyyy-mm-dd''), PATIENT_ID, EVENT_NO ';
+        lv_task_data_sql := lv_task_data_sql||'  FROM ZEMR.ZEMR_VISIT_RECORD WHERE ARCHIVE_TIME < to_date('''||to_char(ld_archive_exec_date,'yyyy-mm-dd')||''',''yyyy-mm-dd'') ';
+        lv_task_data_sql := lv_task_data_sql||'  AND ARCHIVE_TIME >= (SELECT DECODE(MAX(ARCHIVE_DATE),NULL,TO_DATE(''2000-01-01'',''yyyy-mm-dd''),MAX(ARCHIVE_DATE)) FROM ZOEARCHIVE.ARC_PROCESS_TASK_RECORD WHERE INSERT_COMPLETED_FLAG=''Y'') ';
+      EXECUTE IMMEDIATE lv_task_data_sql;
+    END CASE;
+    COMMIT;
+    od_archive_exec_date := ld_archive_exec_date;
+    RETURN 1;
   EXCEPTION
       WHEN OTHERS THEN
         ROLLBACK;
@@ -160,7 +175,7 @@ AS
   lv_db_link              VARCHAR2(64);
   lv_archive_date         VARCHAR2(10);
   ld_archive_date         DATE;
-  
+  ln_has_xmltype          NUMBER;
 BEGIN
   lv_db_link := ir_task_condition.ARCHIVE_DB_LINK;
   ld_archive_date := ir_task_condition.ARCHIVE_DATE_VALUE;
@@ -183,66 +198,176 @@ BEGIN
   --源表与归档表的结构一致性判断
   
     lv_archive_date  := TO_CHAR(ld_archive_date,'yyyy-mm-dd');
-  --处理归档条件2
-    IF ir_task_condition.ARCHIVE_TABLE_C2 IS NULL THEN
-      --生成Insert SQL语句
-      IF ir_task_condition.DETAIL_TABLE_FLAG = '1' THEN --细表
-        lv_insert_sql := 'insert into /*+ APPEND */ '||ir_task_condition.ARCHIVE_TABLE_NAME||'@'||lv_db_link||' nologging ';
-        lv_insert_sql := lv_insert_sql||' select a.* from '||ir_task_condition.TABLE_NAME||' a, '|| ir_task_condition.RELATE_MASTER_TABLE_NAME||' b';
-        lv_insert_sql := lv_insert_sql||' where  b.'||ir_task_condition.RELATE_MASTER_TABLE_COLUMN||' = a.'|| ir_task_condition.RELATE_DETAIL_TABLE_COLUMN;
-        lv_insert_sql := lv_insert_sql||' and b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
-        lv_insert_sql := lv_insert_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1||')';
+    SELECT COUNT(*) INTO ln_has_xmltype FROM SYS.DBA_TAB_COLUMNS
+    WHERE OWNER = ir_task_condition.TABLE_OWNER
+      AND TABLE_NAME = ir_task_condition.TABLE_NAME
+      AND DATA_TYPE = 'XMLTYPE';
+    --包含XMLTYPE类型字段的表，发送到远程数据库执行
+    IF ln_has_xmltype > 0 THEN  
+      IF ir_task_condition.ARCHIVE_TABLE_C2 IS NULL THEN
+        --生成Insert SQL语句
+        IF ir_task_condition.DETAIL_TABLE_FLAG = '1' THEN --细表
+          lv_insert_sql := 'insert into /*+ APPEND */ '||ir_task_condition.ARCHIVE_TABLE_NAME||' nologging ';
+          lv_insert_sql := lv_insert_sql||' select a.* from '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||'@'||lv_db_link||' a, '|| ir_task_condition.RELATE_MASTER_TABLE_NAME||'@'||lv_db_link||' b';
+          lv_insert_sql := lv_insert_sql||' where  b.'||ir_task_condition.RELATE_MASTER_TABLE_COLUMN||' = a.'|| ir_task_condition.RELATE_DETAIL_TABLE_COLUMN;
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_insert_sql := lv_insert_sql||' and b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
+          END IF;
+          lv_insert_sql := lv_insert_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE@'||lv_db_link||' c WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1||')';
+        ELSE
+          lv_insert_sql := 'insert into /*+ APPEND */ '||ir_task_condition.ARCHIVE_TABLE_NAME||' nologging ';
+          lv_insert_sql := lv_insert_sql||' select b.* from '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||'@'||lv_db_link||' b';
+          lv_insert_sql := lv_insert_sql||' where  ';
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_insert_sql := lv_insert_sql||' b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'') and ';
+          END IF;
+          lv_insert_sql := lv_insert_sql||' EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE@'||lv_db_link||' c WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1||')';
+        END IF;
+        --生成Delete SQL语句
+        IF ir_task_condition.DETAIL_TABLE_FLAG = '1' THEN --细表
+          lv_delete_sql := 'delete from  '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||'@'||lv_db_link||' a';
+          lv_delete_sql := lv_delete_sql||' where exists ( select 1 from '|| ir_task_condition.RELATE_MASTER_TABLE_NAME||'@'||lv_db_link||' b';
+          lv_delete_sql := lv_delete_sql||' where  b.'||ir_task_condition.RELATE_MASTER_TABLE_COLUMN||' = a.'|| ir_task_condition.RELATE_DETAIL_TABLE_COLUMN;
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_delete_sql := lv_delete_sql||' and b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
+          END IF;
+          lv_delete_sql := lv_delete_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE@'||lv_db_link||' c WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1||'))';
+        ELSE
+          lv_delete_sql                     := lv_delete_sql||'delete from '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||'@'||lv_db_link||' b';
+          lv_delete_sql := lv_delete_sql||' where  ';
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_delete_sql := lv_delete_sql||' b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'') and ';
+          END IF;
+          lv_delete_sql := lv_delete_sql||' EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE@'||lv_db_link||' c WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1||')';
+        END IF;
       ELSE
-        lv_insert_sql := 'insert into /*+ APPEND */ '||ir_task_condition.ARCHIVE_TABLE_NAME||'@'||lv_db_link||' nologging ';
-        lv_insert_sql := lv_insert_sql||' select b.* from '||ir_task_condition.TABLE_NAME||' b';
-        lv_insert_sql := lv_insert_sql||' where  b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
-        lv_insert_sql := lv_insert_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1||')';
+        --生成Insert SQL语句
+        IF ir_task_condition.DETAIL_TABLE_FLAG = '1' THEN --细表
+          lv_insert_sql := 'insert into /*+ APPEND */ '||ir_task_condition.ARCHIVE_TABLE_NAME||' nologging ';
+          lv_insert_sql := lv_insert_sql||' select a.* from '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||'@'||lv_db_link||' a, '|| ir_task_condition.RELATE_MASTER_TABLE_NAME||'@'||lv_db_link||' b';
+          lv_insert_sql := lv_insert_sql||' where  b.'||ir_task_condition.RELATE_MASTER_TABLE_COLUMN||' = a.'|| ir_task_condition.RELATE_DETAIL_TABLE_COLUMN;
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_insert_sql := lv_insert_sql||' and b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
+          END IF;
+          lv_insert_sql := lv_insert_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE@'||lv_db_link||' c ';
+          lv_insert_sql := lv_insert_sql||' WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1;
+          lv_insert_sql := lv_insert_sql||' AND c.'||ir_task_condition.ARCHIVE_CONDITION_C2|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C2||')';
+        ELSE
+          lv_insert_sql := 'insert into /*+ APPEND */ '||ir_task_condition.ARCHIVE_TABLE_NAME||' nologging ';
+          lv_insert_sql := lv_insert_sql||' select b.* from '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||'@'||lv_db_link||' b';
+          lv_insert_sql := lv_insert_sql||' where  ';
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_delete_sql := lv_delete_sql||'   b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'') and ';
+          END IF;
+          lv_insert_sql := lv_insert_sql||' EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE@'||lv_db_link||' c ';
+          lv_insert_sql := lv_insert_sql||' WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1;
+          lv_insert_sql := lv_insert_sql||' AND c.'||ir_task_condition.ARCHIVE_CONDITION_C2|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C2||')';
+        END IF;
+        --生成Delete SQL语句
+        IF ir_task_condition.DETAIL_TABLE_FLAG = '1' THEN --细表
+          lv_delete_sql                  := 'delete from  '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||'@'||lv_db_link||' a';
+          lv_delete_sql                  := lv_delete_sql||' where exists ( select 1 from '|| ir_task_condition.RELATE_MASTER_TABLE_NAME||'@'||lv_db_link||' b';
+          lv_delete_sql := lv_delete_sql||' where  b.'||ir_task_condition.RELATE_MASTER_TABLE_COLUMN||' = a.'|| ir_task_condition.RELATE_DETAIL_TABLE_COLUMN;
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_delete_sql := lv_delete_sql||' and b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
+          END IF;
+          lv_delete_sql := lv_delete_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE@'||lv_db_link||' c ';
+          lv_delete_sql := lv_delete_sql||' WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1;
+          lv_delete_sql := lv_delete_sql||' AND c.'||ir_task_condition.ARCHIVE_CONDITION_C2|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C2||'))';
+        ELSE
+          lv_delete_sql                     := lv_delete_sql||'delete from '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||'@'||lv_db_link||' b';
+          lv_delete_sql := lv_delete_sql||' where  ';
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_delete_sql := lv_delete_sql||'   b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'') and ';
+          END IF;
+          lv_delete_sql := lv_delete_sql||' EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE@'||lv_db_link||' c ';
+          lv_delete_sql := lv_delete_sql||' WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1;
+          lv_delete_sql := lv_delete_sql||' AND c.'||ir_task_condition.ARCHIVE_CONDITION_C2|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C2||')';
+        END IF;
       END IF;
-      --生成Delete SQL语句
-      IF ir_task_condition.DETAIL_TABLE_FLAG = '1' THEN --细表
-        lv_delete_sql := 'delete from  '||ir_task_condition.TABLE_NAME||' a';
-        lv_delete_sql := lv_delete_sql||' where exists ( select 1 from '|| ir_task_condition.RELATE_MASTER_TABLE_NAME||' b';
-        lv_delete_sql := lv_delete_sql||' where  b.'||ir_task_condition.RELATE_MASTER_TABLE_COLUMN||' = a.'|| ir_task_condition.RELATE_DETAIL_TABLE_COLUMN;
-        lv_delete_sql := lv_delete_sql||' and b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
-        lv_delete_sql := lv_delete_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1||'))';
-      ELSE
-        lv_delete_sql                     := lv_delete_sql||'delete from '||ir_task_condition.TABLE_NAME||' b';
-        lv_delete_sql := lv_delete_sql||' where  b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
-        lv_delete_sql := lv_delete_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1||')';
-      END IF;
+    --不包含XMLTYPE类型字段的表，本地数据库执行
     ELSE
-      --生成Insert SQL语句
-      IF ir_task_condition.DETAIL_TABLE_FLAG = '1' THEN --细表
-        lv_insert_sql := 'insert into /*+ APPEND */ '||ir_task_condition.ARCHIVE_TABLE_NAME||'@'||lv_db_link||' nologging ';
-        lv_insert_sql := lv_insert_sql||' select a.* from '||ir_task_condition.TABLE_NAME||' a, '|| ir_task_condition.RELATE_MASTER_TABLE_NAME||' b';
-        lv_insert_sql := lv_insert_sql||' where  b.'||ir_task_condition.RELATE_MASTER_TABLE_COLUMN||' = a.'|| ir_task_condition.RELATE_DETAIL_TABLE_COLUMN;
-        lv_insert_sql := lv_insert_sql||' and b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
-        lv_insert_sql := lv_insert_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c ';
-        lv_insert_sql := lv_insert_sql||' WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1;
-        lv_insert_sql := lv_insert_sql||' AND c.'||ir_task_condition.ARCHIVE_CONDITION_C2|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C2||')';
+    --处理归档条件2
+      IF ir_task_condition.ARCHIVE_TABLE_C2 IS NULL THEN
+        --生成Insert SQL语句
+        IF ir_task_condition.DETAIL_TABLE_FLAG = '1' THEN --细表
+          lv_insert_sql := 'insert into /*+ APPEND */ '||ir_task_condition.ARCHIVE_TABLE_NAME||'@'||lv_db_link||' nologging ';
+          lv_insert_sql := lv_insert_sql||' select a.* from '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||' a, '|| ir_task_condition.RELATE_MASTER_TABLE_NAME||' b';
+          lv_insert_sql := lv_insert_sql||' where  b.'||ir_task_condition.RELATE_MASTER_TABLE_COLUMN||' = a.'|| ir_task_condition.RELATE_DETAIL_TABLE_COLUMN;
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_insert_sql := lv_insert_sql||' and b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
+          END IF;
+          lv_insert_sql := lv_insert_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1||')';
+        ELSE
+          lv_insert_sql := 'insert into /*+ APPEND */ '||ir_task_condition.ARCHIVE_TABLE_NAME||'@'||lv_db_link||' nologging ';
+          lv_insert_sql := lv_insert_sql||' select b.* from '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||' b';
+          lv_insert_sql := lv_insert_sql||' where  ';
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_insert_sql := lv_insert_sql||' b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'') and ';
+          END IF;
+          lv_insert_sql := lv_insert_sql||' EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1||')';
+        END IF;
+        --生成Delete SQL语句
+        IF ir_task_condition.DETAIL_TABLE_FLAG = '1' THEN --细表
+          lv_delete_sql := 'delete from  '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||' a';
+          lv_delete_sql := lv_delete_sql||' where exists ( select 1 from '|| ir_task_condition.RELATE_MASTER_TABLE_NAME||' b';
+          lv_delete_sql := lv_delete_sql||' where  b.'||ir_task_condition.RELATE_MASTER_TABLE_COLUMN||' = a.'|| ir_task_condition.RELATE_DETAIL_TABLE_COLUMN;
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_delete_sql := lv_delete_sql||' and b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
+          END IF;
+          lv_delete_sql := lv_delete_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1||'))';
+        ELSE
+          lv_delete_sql                     := lv_delete_sql||'delete from '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||' b';
+          lv_delete_sql := lv_delete_sql||' where  ';
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_delete_sql := lv_delete_sql||' b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'') and ';
+          END IF;
+          lv_delete_sql := lv_delete_sql||' EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1||')';
+        END IF;
       ELSE
-        lv_insert_sql := 'insert into /*+ APPEND */ '||ir_task_condition.ARCHIVE_TABLE_NAME||'@'||lv_db_link||' nologging ';
-        lv_insert_sql := lv_insert_sql||' select b.* from '||ir_task_condition.TABLE_NAME||' b';
-        lv_insert_sql := lv_insert_sql||' where  b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
-        lv_insert_sql := lv_insert_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c ';
-        lv_insert_sql := lv_insert_sql||' WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1;
-        lv_insert_sql := lv_insert_sql||' AND c.'||ir_task_condition.ARCHIVE_CONDITION_C2|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C2||')';
-      END IF;
-      --生成Delete SQL语句
-      IF ir_task_condition.DETAIL_TABLE_FLAG = '1' THEN --细表
-        lv_delete_sql                  := 'delete from  '||ir_task_condition.TABLE_NAME||' a';
-        lv_delete_sql                  := lv_delete_sql||' where exists ( select 1 from '|| ir_task_condition.RELATE_MASTER_TABLE_NAME||' b';
-        lv_delete_sql := lv_delete_sql||' where  b.'||ir_task_condition.RELATE_MASTER_TABLE_COLUMN||' = a.'|| ir_task_condition.RELATE_DETAIL_TABLE_COLUMN;
-        lv_delete_sql := lv_delete_sql||' and b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
-        lv_delete_sql := lv_delete_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c ';
-        lv_delete_sql := lv_delete_sql||' WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1;
-        lv_delete_sql := lv_delete_sql||' AND c.'||ir_task_condition.ARCHIVE_CONDITION_C2|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C2||'))';
-      ELSE
-        lv_delete_sql                     := lv_delete_sql||'delete from '||ir_task_condition.TABLE_NAME||' b';
-        lv_delete_sql := lv_delete_sql||' where  b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
-        lv_delete_sql := lv_delete_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c ';
-        lv_delete_sql := lv_delete_sql||' WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1;
-        lv_delete_sql := lv_delete_sql||' AND c.'||ir_task_condition.ARCHIVE_CONDITION_C2|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C2||')';
+        --生成Insert SQL语句
+        IF ir_task_condition.DETAIL_TABLE_FLAG = '1' THEN --细表
+          lv_insert_sql := 'insert into /*+ APPEND */ '||ir_task_condition.ARCHIVE_TABLE_NAME||'@'||lv_db_link||' nologging ';
+          lv_insert_sql := lv_insert_sql||' select a.* from '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||' a, '|| ir_task_condition.RELATE_MASTER_TABLE_NAME||' b';
+          lv_insert_sql := lv_insert_sql||' where  b.'||ir_task_condition.RELATE_MASTER_TABLE_COLUMN||' = a.'|| ir_task_condition.RELATE_DETAIL_TABLE_COLUMN;
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_insert_sql := lv_insert_sql||' and b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
+          END IF;
+          lv_insert_sql := lv_insert_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c ';
+          lv_insert_sql := lv_insert_sql||' WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1;
+          lv_insert_sql := lv_insert_sql||' AND c.'||ir_task_condition.ARCHIVE_CONDITION_C2|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C2||')';
+        ELSE
+          lv_insert_sql := 'insert into /*+ APPEND */ '||ir_task_condition.ARCHIVE_TABLE_NAME||'@'||lv_db_link||' nologging ';
+          lv_insert_sql := lv_insert_sql||' select b.* from '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||' b';
+          lv_insert_sql := lv_insert_sql||' where  ';
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_delete_sql := lv_delete_sql||'   b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'') and ';
+          END IF;
+          lv_insert_sql := lv_insert_sql||' EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c ';
+          lv_insert_sql := lv_insert_sql||' WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1;
+          lv_insert_sql := lv_insert_sql||' AND c.'||ir_task_condition.ARCHIVE_CONDITION_C2|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C2||')';
+        END IF;
+        --生成Delete SQL语句
+        IF ir_task_condition.DETAIL_TABLE_FLAG = '1' THEN --细表
+          lv_delete_sql                  := 'delete from  '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||' a';
+          lv_delete_sql                  := lv_delete_sql||' where exists ( select 1 from '|| ir_task_condition.RELATE_MASTER_TABLE_NAME||' b';
+          lv_delete_sql := lv_delete_sql||' where  b.'||ir_task_condition.RELATE_MASTER_TABLE_COLUMN||' = a.'|| ir_task_condition.RELATE_DETAIL_TABLE_COLUMN;
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_delete_sql := lv_delete_sql||' and b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'')';
+          END IF;
+          lv_delete_sql := lv_delete_sql||' and EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c ';
+          lv_delete_sql := lv_delete_sql||' WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1;
+          lv_delete_sql := lv_delete_sql||' AND c.'||ir_task_condition.ARCHIVE_CONDITION_C2|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C2||'))';
+        ELSE
+          lv_delete_sql                     := lv_delete_sql||'delete from '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||' b';
+          lv_delete_sql := lv_delete_sql||' where  ';
+          IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
+            lv_delete_sql := lv_delete_sql||'   b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'') and ';
+          END IF;
+          lv_delete_sql := lv_delete_sql||' EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c ';
+          lv_delete_sql := lv_delete_sql||' WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1;
+          lv_delete_sql := lv_delete_sql||' AND c.'||ir_task_condition.ARCHIVE_CONDITION_C2|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C2||')';
+        END IF;
       END IF;
     END IF;
     ov_insert_sql := lv_insert_sql;
@@ -258,6 +383,8 @@ FUNCTION arc_process_task_exec(in_task_id IN NUMBER, in_exec_flag IN NUMBER DEFA
     lt_arc_process_task_config  gt_arc_process_task_config;
     lv_insert_sql     VARCHAR2(4000);
     lv_delete_sql     VARCHAR2(4000);
+    lv_remote_insert_sql     VARCHAR2(4000);
+    lv_remote_delete_sql     VARCHAR2(4000);
     ln_return         NUMBER;
     lv_return         VARCHAR2(128);
     lv_db_link        VARCHAR2(128);
@@ -274,6 +401,7 @@ FUNCTION arc_process_task_exec(in_task_id IN NUMBER, in_exec_flag IN NUMBER DEFA
     lv_run_time_begin  VARCHAR2(8);
     lv_run_time_end    VARCHAR2(8);
     lv_run_stop_time   VARCHAR2(19);
+    ln_has_xmltype     NUMBER;
     
     
  BEGIN
@@ -379,7 +507,16 @@ FUNCTION arc_process_task_exec(in_task_id IN NUMBER, in_exec_flag IN NUMBER DEFA
                 WHERE TASK_ID = in_task_id AND ARCHIVE_DATE = lr_task_condition.ARCHIVE_DATE_VALUE
                   AND TABLE_OWNER = lr_task_condition.TABLE_OWNER AND TABLE_NAME = lr_task_condition.TABLE_NAME
                   AND INSERT_COMPLETED_FLAG = 'N';
-                EXECUTE IMMEDIATE lv_insert_sql;
+                SELECT COUNT(*) INTO ln_has_xmltype FROM SYS.DBA_TAB_COLUMNS
+                WHERE OWNER = lr_task_condition.TABLE_OWNER
+                  AND TABLE_NAME = lr_task_condition.TABLE_NAME
+                  AND DATA_TYPE = 'XMLTYPE';
+                IF ln_has_xmltype > 0 THEN
+                  lv_remote_insert_sql := 'begin zoeprc_archive_execsql@'||lv_db_link||'('''||lv_insert_sql||'''); end;';
+                  EXECUTE IMMEDIATE lv_remote_insert_sql; 
+                ELSE
+                  EXECUTE IMMEDIATE lv_insert_sql;
+                END IF;  
                 ln_insert_count := SQL%ROWCOUNT;
                 UPDATE ZOEARCHIVE.ARC_PROCESS_TASK_RECORD 
                 SET INSERT_END_TIME = SYSDATE, INSERT_COUNT = ln_insert_count, INSERT_COMPLETED_FLAG = 'Y' ,INSERT_SQL = lv_insert_sql
@@ -406,7 +543,16 @@ FUNCTION arc_process_task_exec(in_task_id IN NUMBER, in_exec_flag IN NUMBER DEFA
                   WHERE TASK_ID = in_task_id AND ARCHIVE_DATE = lr_task_condition.ARCHIVE_DATE_VALUE
                     AND TABLE_OWNER = lr_task_condition.TABLE_OWNER AND TABLE_NAME = lr_task_condition.TABLE_NAME
                     AND DELETE_COMPLETED_FLAG = 'N';
-                  EXECUTE IMMEDIATE lv_delete_sql;
+                SELECT COUNT(*) INTO ln_has_xmltype FROM SYS.DBA_TAB_COLUMNS
+                WHERE OWNER = lr_task_condition.TABLE_OWNER
+                  AND TABLE_NAME = lr_task_condition.TABLE_NAME
+                  AND DATA_TYPE = 'XMLTYPE';
+                IF ln_has_xmltype > 0 THEN
+                  lv_remote_delete_sql := 'begin zoeprc_archive_execsql@'||lv_db_link||'('''||lv_delete_sql||'''); end;';
+                  EXECUTE IMMEDIATE lv_remote_delete_sql; 
+                ELSE
+                   EXECUTE IMMEDIATE lv_delete_sql;
+                END IF;
                   ln_delete_count := SQL%ROWCOUNT;
                   UPDATE ZOEARCHIVE.ARC_PROCESS_TASK_RECORD 
                   SET DELETE_END_TIME = SYSDATE, DELETE_COUNT = ln_delete_count, DELETE_COMPLETED_FLAG = 'Y', DELETE_SQL = lv_delete_sql
@@ -429,7 +575,16 @@ FUNCTION arc_process_task_exec(in_task_id IN NUMBER, in_exec_flag IN NUMBER DEFA
                 WHERE TASK_ID = in_task_id AND ARCHIVE_DATE = lr_task_condition.ARCHIVE_DATE_VALUE
                   AND TABLE_OWNER = lr_task_condition.TABLE_OWNER AND TABLE_NAME = lr_task_condition.TABLE_NAME
                   AND INSERT_COMPLETED_FLAG = 'N';
-                DBMS_OUTPUT.PUT_LINE(lv_insert_sql);
+                SELECT COUNT(*) INTO ln_has_xmltype FROM SYS.DBA_TAB_COLUMNS
+                WHERE OWNER = lr_task_condition.TABLE_OWNER
+                  AND TABLE_NAME = lr_task_condition.TABLE_NAME
+                  AND DATA_TYPE = 'XMLTYPE';
+                IF ln_has_xmltype > 0 THEN
+                  lv_remote_insert_sql := 'begin zoeprc_archive_execsql@'||lv_db_link||'('''||lv_insert_sql||'''); end;';
+                  DBMS_OUTPUT.PUT_LINE(lv_remote_insert_sql); 
+                ELSE
+                  DBMS_OUTPUT.PUT_LINE(lv_insert_sql);
+                END IF;
                 ln_insert_count := SQL%ROWCOUNT;
                 UPDATE ZOEARCHIVE.ARC_PROCESS_TASK_RECORD 
                 SET INSERT_END_TIME = SYSDATE, INSERT_COUNT = ln_insert_count, INSERT_COMPLETED_FLAG = 'Y', INSERT_SQL = lv_insert_sql
@@ -456,7 +611,16 @@ FUNCTION arc_process_task_exec(in_task_id IN NUMBER, in_exec_flag IN NUMBER DEFA
                   WHERE TASK_ID = in_task_id AND ARCHIVE_DATE = lr_task_condition.ARCHIVE_DATE_VALUE
                     AND TABLE_OWNER = lr_task_condition.TABLE_OWNER AND TABLE_NAME = lr_task_condition.TABLE_NAME
                     AND DELETE_COMPLETED_FLAG = 'N';
+                SELECT COUNT(*) INTO ln_has_xmltype FROM SYS.DBA_TAB_COLUMNS
+                WHERE OWNER = lr_task_condition.TABLE_OWNER
+                  AND TABLE_NAME = lr_task_condition.TABLE_NAME
+                  AND DATA_TYPE = 'XMLTYPE';
+                IF ln_has_xmltype > 0 THEN
+                  lv_remote_delete_sql := 'begin zoeprc_archive_execsql@'||lv_db_link||'('''||lv_delete_sql||'''); end;';
+                  DBMS_OUTPUT.PUT_LINE(lv_remote_delete_sql); 
+                ELSE
                   DBMS_OUTPUT.PUT_LINE(lv_delete_sql);
+                END IF;
                   ln_delete_count := SQL%ROWCOUNT;
                   UPDATE ZOEARCHIVE.ARC_PROCESS_TASK_RECORD 
                   SET DELETE_END_TIME = SYSDATE, DELETE_COUNT = ln_delete_count, DELETE_COMPLETED_FLAG = 'Y', DELETE_SQL = lv_delete_sql

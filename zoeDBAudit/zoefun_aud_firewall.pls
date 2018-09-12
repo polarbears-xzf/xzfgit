@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION zoefun_aud_firewall
+CREATE OR REPLACE FUNCTION ZOESECURITY.zoefun_aud_firewall
 (ot_aud_firewall in zoetyp_aud_firewall)
 RETURN INTEGER
 AS

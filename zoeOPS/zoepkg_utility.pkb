@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE BODY ZOESYSMAN.ZOEPKG_UTILITY 
+CREATE OR REPLACE PACKAGE BODY ZOEDEVOPS.ZOEPKG_UTILITY 
 AS
 
   FUNCTION ENCRYPT_DES(iv_text VARCHAR2)
@@ -122,7 +122,7 @@ AS
       WHERE a.owner     =b.owner
         AND a.table_name=b.table_name AND LENGTH(TABLE_INFO||TABLE_PK_INFO)>2000 AND ROWNUM=1 ;
         --lt_split_string.extend;
-        select ZOESYSMAN.ZOEPKG_UTILITY.split_string(lv_table_info) into lt_split_string from dual;
+        select ZOEPKG_UTILITY.split_string(lv_table_info) into lt_split_string from dual;
         RETURN lt_split_string;
     END SPLIT_TABLE;  
 

@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE ZOESYSMAN.ZOEPKG_UTILITY AS
+CREATE OR REPLACE PACKAGE ZOEDEVOPS.ZOEPKG_UTILITY AS
 -- Created in 2017.10.10 by polarbears
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
@@ -51,13 +51,13 @@ CREATE OR REPLACE PACKAGE ZOESYSMAN.ZOEPKG_UTILITY AS
 -- 文本校验，SH1校验
 -- ===================================================
 --	参数：传入参数及类型：
-  FUNCTION split_table(iv_text IN VARCHAR2)
+  FUNCTION SPLIT_TABLE(iv_text IN VARCHAR2)
     RETURN zoetyp_utility_split_strings;
 
 -- ===================================================
 -- 获取Oracle自身产品用户列表
 -- ===================================================
-  FUNCTION get_oracle_user 
+  FUNCTION GET_ORACLE_USER 
     RETURN zoetyp_db_object_list;
 
 		

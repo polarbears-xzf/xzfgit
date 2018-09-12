@@ -114,7 +114,7 @@ BEGIN
 		    IF ln_tablespace_use_blocks IS NULL THEN
 			    DBMS_OUTPUT.PUT_LINE('CREATE TABLESPACE '||lv2_tablespace_name);
 			    DBMS_OUTPUT.PUT_LINE('LOGGING DATAFILE');
-			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'01.ora'''||' SIZE 10M AUTOEXTEND ON NEXT  5M MAXSIZE 16000M');
+			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'01.ora'''||' SIZE 10M AUTOEXTEND ON NEXT  10M MAXSIZE 30000M');
 			    DBMS_OUTPUT.PUT_LINE('EXTENT MANAGEMENT LOCAL;');
 		    ELSE
 -- ===================================================
@@ -129,9 +129,9 @@ BEGIN
                         for i in 1..ln_tbs_files_count LOOP
                             SELECT lpad(i,3,0) INTO lv2_tbs_file_seq FROM DUAL;
                             IF i = ln_tbs_files_count THEN
-			       DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||lv2_tbs_file_seq||'.ora'''||' SIZE '||ln_datafile_size||'M AUTOEXTEND ON NEXT  5M MAXSIZE 16000M');
+			       DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||lv2_tbs_file_seq||'.ora'''||' SIZE 10M AUTOEXTEND ON NEXT  10M MAXSIZE 30000M');
                              ELSE
-			       DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||lv2_tbs_file_seq||'.ora'''||' SIZE '||ln_datafile_size||'M AUTOEXTEND ON NEXT  5M MAXSIZE 16000M,');
+			       DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||lv2_tbs_file_seq||'.ora'''||' SIZE 10M AUTOEXTEND ON NEXT  10M MAXSIZE 30000M,');
                             END IF;
                         END LOOP;
 			    DBMS_OUTPUT.PUT_LINE('EXTENT MANAGEMENT LOCAL;');
@@ -148,37 +148,37 @@ BEGIN
 		    IF ln_tablespace_use_blocks IS NULL  THEN
 			    DBMS_OUTPUT.PUT_LINE('CREATE TABLESPACE '||lv2_tablespace_name);
 			    DBMS_OUTPUT.PUT_LINE('LOGGING DATAFILE');
-			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'01.ora'''||' SIZE 10M AUTOEXTEND ON NEXT  5M MAXSIZE 16000M');
+			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'01.ora'''||' SIZE 10M AUTOEXTEND ON NEXT  10M MAXSIZE 30000M');
 			    DBMS_OUTPUT.PUT_LINE('EXTENT MANAGEMENT LOCAL;');
 		    ELSE
 			IF  ln_file_size < 600000000 THEN
 			    DBMS_OUTPUT.PUT_LINE('CREATE TABLESPACE '||lv2_tablespace_name);
 			    DBMS_OUTPUT.PUT_LINE('LOGGING DATAFILE');
-			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'01.ora'''||' SIZE '||ln_file_size||' AUTOEXTEND ON NEXT  5M MAXSIZE 16000M');
+			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'01.ora'''||' SIZE '||ln_file_size||' AUTOEXTEND ON NEXT  10M MAXSIZE 30000M');
 			    DBMS_OUTPUT.PUT_LINE('DEFAULT STORAGE (INITIAL '||ln_init_extent||' NEXT ||ln_next_extent MINEXTENTS 1 MAXEXTENTS UNLIMITED PCTINCREASE 0 );');
 			END IF;
 			IF  (ln_file_size >= 600000000 AND ln_file_size < 1200000000) THEN
 			    DBMS_OUTPUT.PUT_LINE('CREATE TABLESPACE '||lv2_tablespace_name);
 			    DBMS_OUTPUT.PUT_LINE('LOGGING DATAFILE');
-			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'01.ora'''||' SIZE '||CEIL(ln_file_size/2)||' AUTOEXTEND ON NEXT  5M MAXSIZE 16000M,');
-			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'02.ora'''||' SIZE '||CEIL(ln_file_size/2)||' AUTOEXTEND ON NEXT  5M MAXSIZE 16000M');
+			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'01.ora'''||' SIZE '||CEIL(ln_file_size/2)||' AUTOEXTEND ON NEXT  10M MAXSIZE 30000M,');
+			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'02.ora'''||' SIZE '||CEIL(ln_file_size/2)||' AUTOEXTEND ON NEXT  10M MAXSIZE 30000M');
 			    DBMS_OUTPUT.PUT_LINE('DEFAULT STORAGE (INITIAL '||ln_init_extent||' NEXT ||ln_next_extent MINEXTENTS 1 MAXEXTENTS UNLIMITED PCTINCREASE 0 );');
 			END IF;
 			IF  (ln_file_size >= 1200000000 AND ln_file_size < 1800000000) THEN
 			    DBMS_OUTPUT.PUT_LINE('CREATE TABLESPACE '||lv2_tablespace_name);
 			    DBMS_OUTPUT.PUT_LINE('LOGGING DATAFILE');
-			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'01.ora'''||' SIZE '||CEIL(ln_file_size/3)||' AUTOEXTEND ON NEXT  5M MAXSIZE 16000M,');
-			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'02.ora'''||' SIZE '||CEIL(ln_file_size/3)||' AUTOEXTEND ON NEXT  5M MAXSIZE 16000M,');
-			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'03.ora'''||' SIZE '||CEIL(ln_file_size/3)||' AUTOEXTEND ON NEXT  5M MAXSIZE 16000M');
+			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'01.ora'''||' SIZE '||CEIL(ln_file_size/3)||' AUTOEXTEND ON NEXT  10M MAXSIZE 30000M,');
+			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'02.ora'''||' SIZE '||CEIL(ln_file_size/3)||' AUTOEXTEND ON NEXT  10M MAXSIZE 30000M,');
+			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'03.ora'''||' SIZE '||CEIL(ln_file_size/3)||' AUTOEXTEND ON NEXT  10M MAXSIZE 30000M');
 			    DBMS_OUTPUT.PUT_LINE('DEFAULT STORAGE (INITIAL '||ln_init_extent||' NEXT ||ln_next_extent MINEXTENTS 1 MAXEXTENTS UNLIMITED PCTINCREASE 0 );');
 			END IF; 
 			IF  ln_file_size >= 1800000000  THEN
 			    DBMS_OUTPUT.PUT_LINE('CREATE TABLESPACE '||lv2_tablespace_name);
 			    DBMS_OUTPUT.PUT_LINE('LOGGING DATAFILE');
-			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'01.ora'''||' SIZE '||CEIL(ln_file_size/4)||' AUTOEXTEND ON NEXT  5M MAXSIZE 16000M,');
-			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'02.ora'''||' SIZE '||CEIL(ln_file_size/4)||' AUTOEXTEND ON NEXT  5M MAXSIZE 16000M,');
-			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'03.ora'''||' SIZE '||CEIL(ln_file_size/4)||' AUTOEXTEND ON NEXT  5M MAXSIZE 16000M,');
-			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'04.ora'''||' SIZE '||CEIL(ln_file_size/4)||' AUTOEXTEND ON NEXT  5M MAXSIZE 16000M');
+			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'01.ora'''||' SIZE '||CEIL(ln_file_size/4)||' AUTOEXTEND ON NEXT  10M MAXSIZE 30000M,');
+			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'02.ora'''||' SIZE '||CEIL(ln_file_size/4)||' AUTOEXTEND ON NEXT  10M MAXSIZE 30000M,');
+			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'03.ora'''||' SIZE '||CEIL(ln_file_size/4)||' AUTOEXTEND ON NEXT  10M MAXSIZE 30000M,');
+			    DBMS_OUTPUT.PUT_LINE('''PATH\'||lv2_tablespace_name||'04.ora'''||' SIZE '||CEIL(ln_file_size/4)||' AUTOEXTEND ON NEXT  10M MAXSIZE 30000M');
 			    DBMS_OUTPUT.PUT_LINE('DEFAULT STORAGE (INITIAL '||ln_init_extent||' NEXT ||ln_next_extent MINEXTENTS 1 MAXEXTENTS UNLIMITED PCTINCREASE 0 );');
 			END IF;   
 		    END IF;

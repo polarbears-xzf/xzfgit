@@ -2,9 +2,9 @@
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
 --	Name:
--- 		install_archive
+-- 		install_emr_archive.txt
 --	Description:
--- 		安装数据库归档
+-- 		安装EMR数据库归档
 --  Relation:
 --      对象关联
 --	Notes:
@@ -24,7 +24,7 @@
 	--创建数据库归档系统相关表
 		@create_table.sql
 	--导入基础数据
-		@archive_his_load_data.sql
+		@archive_emr_load_data.sql
 	--创建归档相关包
 		@zoepkg_archive_comm.pks
 		@zoepkg_archive_comm.pkb
@@ -33,21 +33,25 @@
 --归档数据库执行
 	--创建归档表空间
 		@create_archive_tablespace.sql
-	--创建HIS归档数据归档表
+	--创建emr归档数据归档表
 		conn zoearchive/zoe$2017arch
-		@create_archive_table_a.sql
-	--创建HIS数据库表空间
+		@create_archive_emr_table_a.sql
+	--创建emr数据库表空间
 		@get_create_tablesqlpce.sql
-	--创建HIS归档数据在线表
-		@create_archive_table_o.sql
-	--创建HIS数据库归档表联合视图与同义词
-		@create_archive_union_view.sql
+	--创建emr归档数据在线表
+		@create_archive_emr_table_o.sql
+	--创建emr数据库归档表联合视图与同义词
+		@create_archive_emr_union_view.sql
 		
 		
-	
-	
+--EMR数据库改造
+	--增加主键
+		alter table "ZEMR"."ZEMR_STD_PATIENT_INFO_DOMAIN" add constraint 
+			PK_STD_PATIENT_INFO_DOMAIN primary key("PATIENT_ID","EVENT_NO","PATIENT_INFO_NODE_ID"); 	
+	--增加索引
+		CREATE INDEX ZEMR.INX_STD_PATIENT_DOMAIN_TIME ON ZEMR.ZEMR_STD_PATIENT_INFO_DOMAIN (CREATE_TIME);
 --其它说明
-  --添加归档表
+  --添加HIS归档表
 declare
 ln number;
 lv varchar2(260);
@@ -64,6 +68,35 @@ lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('COMM','PREPAYMENT_MONEY'
 lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('INPSICK','SICK_SETTLE_DETAIL','1','2');
 lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('INPSICK','SICK_SETTLE_MASTER','1','2');
 end;
+  --添加EMR归档表
+declare
+ln number;
+lv varchar2(260);
+begin
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_EMR_CONTENT','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_STD_PATIENT_INFO_DOMAIN','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_NURSE_MASTER','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_NURSE_MASTER_ARCHIVE','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_NURSE_DETAIL','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_NURSE_DETAIL_ARCHIVE','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_EMR_PRINTLOG','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_NURSE_TEMP_ARCHIVE','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_TEMPERATURE_POINT_RECORD','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_TEMPERATURE_FEVER','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_TEMPERATURE_ENTIRE_RECORD','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_PATIENT_DIAGNOSIS','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_PATIENT_OPERATION','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_NURSESTAT_DETAIL','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_NURSE_BABY_MASTER','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_NURSE_PATIENT_INFO','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_TEMPERATURE_DAY_RECORD','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_TEMPERATURE_WEEK_EMR','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_BABYTP_RECORD','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZQC_TIME_RULE_RECORD','2','2');
+lv := ZOEARCHIVE.ZOEPKG_ARCHIVE_COMM.add_archive_table('ZEMR','ZEMR_REGISTER_EVENT_RECORD','2','2');
+end;
+
+
 --查看归档条件配置
   WITH WT1 AS 
 (SELECT A.*,B.TASK_NAME FROM ZOEARCHIVE.ARC_PROCESS_TASK_CONFIG A,ZOEARCHIVE.ARC_PROCESS_TASK B 
@@ -87,9 +120,10 @@ ORDER BY TASK_ID,PROCESS_ORDER;
 		--参数1：1表示归档门诊已结算病人数据，通过结算号
 			--2表示归档住院已出院病人数据
 			--3表示归档门诊已结算病人数据，通过病人ID
+			--4表示归档住院已归档病历数据，通过病人ID，事件号
 			--必须先执行3，再执行1
 		--参数2：110表示正式执行，空表示模拟执行
-		set serveroutput on size 1000000
+		set serveroutput on 
 		declare
 		ln number;
 		lv varchar2(260);

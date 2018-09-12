@@ -11,3 +11,30 @@
 --		基本注意事项
 --	修改 - （年-月-日） - 描述
 --
+-- SQLPLUS环境设置说明
+	-- set echo off        关闭执行的SQL语句回显，缺省为on
+	-- set feedback off    关闭执行的SQL语句执行返回结果函数显示，缺省为on
+	-- set termout off     关闭在屏幕上的输出，这样可以加快spool执行速度
+	-- set verity off      关闭显示替换变量后的语句，缺省为on
+	-- set wrap off        关闭超过行宽度是自动换行，缺省为on
+	-- set trimout off     去掉标准输出行尾空格，缺省为off
+	-- set trimspool on    去掉重定向（spool）输出行尾空格，缺省为off
+	-- set heading on      显示标题，缺省为on
+	-- set colsep' '       设置输出分隔符
+	-- set long  1000      设置LONG, BLOB, BFILE, CLOB, NCLOB and XML行宽度为1000
+	-- set linesize 200    设置行宽度为200
+	-- set pagesize 1000   设置一页显示1000行，0为不分页
+-- HTML格式配置说明
+	-- entmap [on|off]     用于打开或关闭Sqlplus中指定标示替换，如 <, >, " and & 替换 &lt;, &gt;, &quot; and &amp; 默认值为on
+	-- spool [on|off]      是否自动添加<html> <body>标志，如果是在spool filename 和 spool off时添加
+	-- pre[format][on|off] 是否使用<pre>标志还是使用html table，默认为off（即html table）
+	-- markup   
+		-- pagesize 表示一个html table的行数，TTITLE, BTITLE and column headings 在pagesize row 重复
+		-- lizesize 在wrapping is on或很长的数据时有影响，输出可能生成分离的行，并且浏览器可能[把换行]理解成空字符
+		-- TTITLE and BTITLE content is output to three line positions: left, 
+			--center and right, and the maximum line width is preset to 90% of the browser window. 
+			--These elements may not align with the main output as expected due to the way they are handled for web output. 
+			--Entity mapping in TTITLE and BTITLE is the same as the general ENTMAP setting specified in the MARKUP command 
+			-- If you use a title in your output, then SQL*Plus starts a new HTML table for output rows that appear after the title. 
+			--Your browser may format column widths of each table differently, depending on the width of data in each column.
+		-- SET COLSEP, RECSEP and UNDERLINE only produce output in HTML reports when PREFORMAT is ON

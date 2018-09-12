@@ -4,21 +4,26 @@
 --	Name:
 -- 		create_user_and_grant.sql
 --	Description:
--- 		创建健康检查表空间、用户并授权
+-- 		创建运维相关用户（ZOEDBA,ZOEDEVOPS,ZOECHECKUP）并授权
 --  Relation:
---      对象关联
+--      zoeUtility
 --	Notes:
---		基本注意事项
+--		首先安装zoeUtility工具包
 --	修改 - （年-月-日） - 描述
 --
 
 
-SET SERVEROUTPUT ON SIZE 1000000
-DEFINE sv_username = ZOECHECKUP
-DEFINE sv_tablespace_name = ZOECHECKUP_TAB
-
+SET SERVEROUTPUT ON 
+--定义运维管理存储表空间
+DEFINE sv_tablespace_name = ZOEOPS_TAB
+--运维管理DBA用户
+DEFINE sv_dbauser = ZOEDBA
+--运维管理基本用户
+DEFINE sv_opsusername = ZOEDEVOPS
+--运维管理健康检查用户
+DEFINE sv_checkupusername = ZOECHECKUP
 -- ===================================================
--- 创建表空间: ZOECHECKUP_TAB 
+-- 创建表空间: ZOEOPS_TAB 
 --
    --不支持裸设备，仅支持文件系统                                             
 -- ===================================================
@@ -66,6 +71,22 @@ END;
 /
 
 -- ===================================================
+-- 创建DBA用户                                        
+-- ===================================================
+VAR sv_password         VARCHAR2(128)
+DECLARE
+lv_password VARCHAR2(128);
+lv_sql_ddl  VARCHAR2(400);
+BEGIN
+SELECT  DBMS_RANDOM.STRING('X',12) INTO :sv_password FROM DUAL;
+lv_password := 'zoe'||:sv_password;
+lv_sql_ddl := 'CREATE USER &sv_dbauser IDENTIFIED BY '||lv_password||' DEFAULT TABLESPACE &sv_tablespace_name';
+DBMS_OUTPUT.PUT_LINE(lv_password);
+EXECUTE IMMEDIATE lv_sql_ddl;
+END;
+/
+
+-- ===================================================
 -- 创建数据库健康检查用户                                        
 -- ===================================================
 VAR sv_password         VARCHAR2(128)
@@ -75,20 +96,45 @@ lv_sql_ddl  VARCHAR2(400);
 BEGIN
 SELECT  DBMS_RANDOM.STRING('X',12) INTO :sv_password FROM DUAL;
 lv_password := 'zoe'||:sv_password;
-lv_sql_ddl := 'CREATE USER &sv_username IDENTIFIED BY '||lv_password||' DEFAULT TABLESPACE &sv_tablespace_name';
+lv_sql_ddl := 'CREATE USER &sv_checkupusername IDENTIFIED BY '||lv_password||' DEFAULT TABLESPACE &sv_tablespace_name';
 DBMS_OUTPUT.PUT_LINE(lv_password);
 EXECUTE IMMEDIATE lv_sql_ddl;
 END;
 /
 
 -- ===================================================
--- 授权系统权限给数据库归档用户
---
-   --在生产数据库和归档数据库都要执行                                             
+-- 创建敏捷运维用户                                        
 -- ===================================================
-GRANT DBA TO ZOECHECKUP;
-GRANT EXECUTE ON ZOESYSMAN.ZOEPKG_UTILITY TO ZOECHECKUP;
+VAR sv_password         VARCHAR2(128)
+DECLARE
+lv_password VARCHAR2(128);
+lv_sql_ddl  VARCHAR2(400);
+BEGIN
+SELECT  DBMS_RANDOM.STRING('X',12) INTO :sv_password FROM DUAL;
+lv_password := 'zoe'||:sv_password;
+lv_sql_ddl := 'CREATE USER &sv_opsusername IDENTIFIED BY '||lv_password||' DEFAULT TABLESPACE &sv_tablespace_name';
+DBMS_OUTPUT.PUT_LINE(lv_password);
+EXECUTE IMMEDIATE lv_sql_ddl;
+END;
+/
 
+
+-- ===================================================
+-- 授权系统权限给运维用户
+--
+   --                                           
+-- ===================================================
+GRANT DBA TO ZOEDBA;
+
+ALTER USER ZOEDEVOPS QUOTA UNLIMITED ON ZOEOPS_TAB;
+ALTER USER ZOECHECKUP QUOTA UNLIMITED ON ZOEOPS_TAB;
+GRANT EXECUTE ON  SYS.DBMS_CRYPTO                 TO ZOEDEVOPS;
+GRANT EXECUTE ON  SYS.UTL_I18N                    TO ZOEDEVOPS;
+GRANT EXECUTE ON  SYS.UTL_RAW                     TO ZOEDEVOPS;
+GRANT EXECUTE ON  SYS.DBMS_OBFUSCATION_TOOLKIT    TO ZOEDEVOPS;
+GRANT SELECT  ON  DBA_CONSTRAINTS                 TO ZOEDEVOPS;
+GRANT SELECT  ON  DBA_CONS_COLUMNS                TO ZOEDEVOPS;
+GRANT SELECT  ON  DBA_TAB_COLUMNS                 TO ZOEDEVOPS;
 
 
 
