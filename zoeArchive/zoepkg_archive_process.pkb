@@ -427,15 +427,17 @@ FUNCTION arc_process_task_exec(in_task_id IN NUMBER, in_exec_flag IN NUMBER DEFA
         SELECT PARAM_VALUE INTO lv_run_stop_time  FROM ZOEARCHIVE.ARC_PROCESS_TASK_PARAM WHERE TASK_ID = 0 AND PARAM_NAME = 'RUN_STOP_TIME';
         SELECT PARAM_VALUE INTO lv_run_time_begin FROM ZOEARCHIVE.ARC_PROCESS_TASK_PARAM WHERE TASK_ID = 0 AND PARAM_NAME = 'RUN_TIME_BEGIN';
         SELECT PARAM_VALUE INTO lv_run_time_end   FROM ZOEARCHIVE.ARC_PROCESS_TASK_PARAM WHERE TASK_ID = 0 AND PARAM_NAME = 'RUN_TIME_END';
-        IF SYSDATE > TO_DATE(lv_run_stop_time,'YYYY-MM-DD HH24:MI:SS') THEN 
-          DBMS_OUTPUT.PUT_LINE('超过设定停止时间：'||lv_run_stop_time);
-          RETURN -1;
-        ELSE 
+        IF lv_run_stop_time IS NULL THEN
           IF  lv_now_time > lv_run_time_end AND lv_now_time < lv_run_time_begin THEN
             DBMS_OUTPUT.PUT_LINE('超过允许运行时间范围：'||lv_run_time_begin||'::'||lv_run_time_end);
             RETURN -1;
           END IF;
-        END IF;
+ 		ELSE 
+		  IF SYSDATE > TO_DATE(lv_run_stop_time,'YYYY-MM-DD HH24:MI:SS') THEN 
+            DBMS_OUTPUT.PUT_LINE('超过设定停止时间：'||lv_run_stop_time);
+            RETURN -1;
+		  END IF;
+       END IF;
         --生成归档处理任务数据缓存
          lv_return := arc_process_task_prepay(in_task_id,ld_archive_date,ld_archive_exec_date);
         IF lv_return = 1 THEN
@@ -512,12 +514,12 @@ FUNCTION arc_process_task_exec(in_task_id IN NUMBER, in_exec_flag IN NUMBER DEFA
                   AND TABLE_NAME = lr_task_condition.TABLE_NAME
                   AND DATA_TYPE = 'XMLTYPE';
                 IF ln_has_xmltype > 0 THEN
-                  lv_remote_insert_sql := 'begin zoeprc_archive_execsql@'||lv_db_link||'('''||lv_insert_sql||'''); end;';
-                  EXECUTE IMMEDIATE lv_remote_insert_sql; 
+                  lv_remote_insert_sql := 'begin zoeprc_archive_execsql@'||lv_db_link||'('''||lv_insert_sql||''', :1); end;';
+                  EXECUTE IMMEDIATE lv_remote_insert_sql using OUT ln_insert_count; 
                 ELSE
                   EXECUTE IMMEDIATE lv_insert_sql;
+                  ln_insert_count := SQL%ROWCOUNT;
                 END IF;  
-                ln_insert_count := SQL%ROWCOUNT;
                 UPDATE ZOEARCHIVE.ARC_PROCESS_TASK_RECORD 
                 SET INSERT_END_TIME = SYSDATE, INSERT_COUNT = ln_insert_count, INSERT_COMPLETED_FLAG = 'Y' ,INSERT_SQL = lv_insert_sql
                 WHERE TASK_ID = in_task_id AND ARCHIVE_DATE = lr_task_condition.ARCHIVE_DATE_VALUE
@@ -548,12 +550,12 @@ FUNCTION arc_process_task_exec(in_task_id IN NUMBER, in_exec_flag IN NUMBER DEFA
                   AND TABLE_NAME = lr_task_condition.TABLE_NAME
                   AND DATA_TYPE = 'XMLTYPE';
                 IF ln_has_xmltype > 0 THEN
-                  lv_remote_delete_sql := 'begin zoeprc_archive_execsql@'||lv_db_link||'('''||lv_delete_sql||'''); end;';
-                  EXECUTE IMMEDIATE lv_remote_delete_sql; 
+                  lv_remote_delete_sql := 'begin zoeprc_archive_execsql@'||lv_db_link||'('''||lv_delete_sql||''', :1); end;';
+                  EXECUTE IMMEDIATE lv_remote_delete_sql using OUT ln_delete_count; 
                 ELSE
-                   EXECUTE IMMEDIATE lv_delete_sql;
-                END IF;
+                  EXECUTE IMMEDIATE lv_delete_sql;
                   ln_delete_count := SQL%ROWCOUNT;
+                END IF;
                   UPDATE ZOEARCHIVE.ARC_PROCESS_TASK_RECORD 
                   SET DELETE_END_TIME = SYSDATE, DELETE_COUNT = ln_delete_count, DELETE_COMPLETED_FLAG = 'Y', DELETE_SQL = lv_delete_sql
                   WHERE TASK_ID = in_task_id AND ARCHIVE_DATE = lr_task_condition.ARCHIVE_DATE_VALUE
@@ -580,8 +582,8 @@ FUNCTION arc_process_task_exec(in_task_id IN NUMBER, in_exec_flag IN NUMBER DEFA
                   AND TABLE_NAME = lr_task_condition.TABLE_NAME
                   AND DATA_TYPE = 'XMLTYPE';
                 IF ln_has_xmltype > 0 THEN
-                  lv_remote_insert_sql := 'begin zoeprc_archive_execsql@'||lv_db_link||'('''||lv_insert_sql||'''); end;';
-                  DBMS_OUTPUT.PUT_LINE(lv_remote_insert_sql); 
+                  lv_remote_insert_sql := 'begin zoeprc_archive_execsql@'||lv_db_link||'('''||lv_insert_sql||''' , :1); end;';
+                  DBMS_OUTPUT.PUT_LINE(lv_remote_insert_sql) ; 
                 ELSE
                   DBMS_OUTPUT.PUT_LINE(lv_insert_sql);
                 END IF;
@@ -616,7 +618,7 @@ FUNCTION arc_process_task_exec(in_task_id IN NUMBER, in_exec_flag IN NUMBER DEFA
                   AND TABLE_NAME = lr_task_condition.TABLE_NAME
                   AND DATA_TYPE = 'XMLTYPE';
                 IF ln_has_xmltype > 0 THEN
-                  lv_remote_delete_sql := 'begin zoeprc_archive_execsql@'||lv_db_link||'('''||lv_delete_sql||'''); end;';
+                  lv_remote_delete_sql := 'begin zoeprc_archive_execsql@'||lv_db_link||'('''||lv_delete_sql||''', :1); end;';
                   DBMS_OUTPUT.PUT_LINE(lv_remote_delete_sql); 
                 ELSE
                   DBMS_OUTPUT.PUT_LINE(lv_delete_sql);

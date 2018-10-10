@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE zoearchive.zoeprc_archive_execsql(iv_sql IN varchar2)
+CREATE OR REPLACE PROCEDURE zoearchive.zoeprc_archive_execsql(iv_sql IN varchar2, on_sql_count OUT number)
  AS
 -- Created in 2017.10.10 by polarbears
 -- Copyright (c) 20xx, CHINA and/or affiliates.
@@ -16,6 +16,7 @@ CREATE OR REPLACE PROCEDURE zoearchive.zoeprc_archive_execsql(iv_sql IN varchar2
 BEGIN
 
 	EXECUTE IMMEDIATE iv_sql;
+	on_sql_count := SQL%ROWCOUNT;
 
 		
 END zoeprc_archive_execsql;

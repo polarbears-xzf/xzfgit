@@ -2,9 +2,9 @@
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
 --	Name:
--- 		create_user_and_grant.sql
+-- 		create_ops_user.sql
 --	Description:
--- 		创建运维相关用户（ZOEDBA,ZOEDEVOPS,ZOECHECKUP）并授权
+-- 		创建运维用户（ZOEDBA,ZOEDEVOPS,ZOECHECKUP）并授权
 --  Relation:
 --      zoeUtility
 --	Notes:
@@ -16,12 +16,8 @@
 SET SERVEROUTPUT ON 
 --定义运维管理存储表空间
 DEFINE sv_tablespace_name = ZOEOPS_TAB
---运维管理DBA用户
-DEFINE sv_dbauser = ZOEDBA
 --运维管理基本用户
 DEFINE sv_opsusername = ZOEDEVOPS
---运维管理健康检查用户
-DEFINE sv_checkupusername = ZOECHECKUP
 -- ===================================================
 -- 创建表空间: ZOEOPS_TAB 
 --
@@ -70,37 +66,6 @@ WHEN OTHERS THEN
 END;
 /
 
--- ===================================================
--- 创建DBA用户                                        
--- ===================================================
-VAR sv_password         VARCHAR2(128)
-DECLARE
-lv_password VARCHAR2(128);
-lv_sql_ddl  VARCHAR2(400);
-BEGIN
-SELECT  DBMS_RANDOM.STRING('X',12) INTO :sv_password FROM DUAL;
-lv_password := 'zoe'||:sv_password;
-lv_sql_ddl := 'CREATE USER &sv_dbauser IDENTIFIED BY '||lv_password||' DEFAULT TABLESPACE &sv_tablespace_name';
-DBMS_OUTPUT.PUT_LINE(lv_password);
-EXECUTE IMMEDIATE lv_sql_ddl;
-END;
-/
-
--- ===================================================
--- 创建数据库健康检查用户                                        
--- ===================================================
-VAR sv_password         VARCHAR2(128)
-DECLARE
-lv_password VARCHAR2(128);
-lv_sql_ddl  VARCHAR2(400);
-BEGIN
-SELECT  DBMS_RANDOM.STRING('X',12) INTO :sv_password FROM DUAL;
-lv_password := 'zoe'||:sv_password;
-lv_sql_ddl := 'CREATE USER &sv_checkupusername IDENTIFIED BY '||lv_password||' DEFAULT TABLESPACE &sv_tablespace_name';
-DBMS_OUTPUT.PUT_LINE(lv_password);
-EXECUTE IMMEDIATE lv_sql_ddl;
-END;
-/
 
 -- ===================================================
 -- 创建敏捷运维用户                                        
@@ -118,23 +83,22 @@ EXECUTE IMMEDIATE lv_sql_ddl;
 END;
 /
 
-
 -- ===================================================
--- 授权系统权限给运维用户
---
-   --                                           
+-- 授权敏捷运维用户    
 -- ===================================================
-GRANT DBA TO ZOEDBA;
 
 ALTER USER ZOEDEVOPS QUOTA UNLIMITED ON ZOEOPS_TAB;
-ALTER USER ZOECHECKUP QUOTA UNLIMITED ON ZOEOPS_TAB;
+
 GRANT EXECUTE ON  SYS.DBMS_CRYPTO                 TO ZOEDEVOPS;
 GRANT EXECUTE ON  SYS.UTL_I18N                    TO ZOEDEVOPS;
 GRANT EXECUTE ON  SYS.UTL_RAW                     TO ZOEDEVOPS;
 GRANT EXECUTE ON  SYS.DBMS_OBFUSCATION_TOOLKIT    TO ZOEDEVOPS;
+
 GRANT SELECT  ON  DBA_CONSTRAINTS                 TO ZOEDEVOPS;
 GRANT SELECT  ON  DBA_CONS_COLUMNS                TO ZOEDEVOPS;
 GRANT SELECT  ON  DBA_TAB_COLUMNS                 TO ZOEDEVOPS;
+GRANT SELECT  ON  V_$DATABASE                     TO ZOEDEVOPS;
+GRANT SELECT  ON  V_$PDBS                         TO ZOEDEVOPS;
 
 
 
