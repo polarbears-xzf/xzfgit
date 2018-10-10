@@ -14,51 +14,39 @@ CREATE OR REPLACE PACKAGE ZOEDEVOPS.ZOEPKG_UTILITY AS
 --
 	
 -- ===================================================
--- 加密字符串
+-- 拆分字符串：按长度
 -- ===================================================
---	参数：传入参数及类型：
-	FUNCTION ENCRYPT_DES(iv_text VARCHAR2)
-		RETURN VARCHAR2;
--- ===================================================
--- 解密字符串
--- ===================================================
---	参数：传入参数及类型：
-	FUNCTION DECRYPT_DES(iv_encrypted_text VARCHAR2)
-		RETURN VARCHAR2;
-    
--- ===================================================
--- 文本校验，SH1校验
--- ===================================================
---	参数：传入参数及类型：
-  FUNCTION VERIFY_SH1(iv_text IN VARCHAR2)
-    RETURN VARCHAR2;
-
--- ===================================================
--- 拆分字符串
--- ===================================================
---  按长度
+--  
 --	参数：传入参数及类型：
   FUNCTION SPLIT_STRING(iv_string IN VARCHAR2, in_split_length IN NUMBER DEFAULT 1872)
     RETURN zoetyp_utility_split_strings;
 -- ===================================================
---  按分割符
+--  拆分字符串：按分割符
+-- ===================================================
 --	参数：传入参数及类型：
   FUNCTION SPLIT_STRING(iv_string IN VARCHAR2, in_split_delimiter IN VARCHAR2)
     RETURN zoetyp_utility_split_strings
     PIPELINED;
 
 -- ===================================================
--- 文本校验，SH1校验
+-- 拆分字符串：所有数据库表列拼接拆分
 -- ===================================================
 --	参数：传入参数及类型：
   FUNCTION SPLIT_TABLE(iv_text IN VARCHAR2)
     RETURN zoetyp_utility_split_strings;
 
 -- ===================================================
--- 获取Oracle自身产品用户列表
+-- 枚举Oracle自身产品用户列表
 -- ===================================================
   FUNCTION GET_ORACLE_USER 
     RETURN zoetyp_db_object_list;
+    
+-- ===================================================
+-- 返回动态表
+-- ===================================================
+type ref_dyntable is ref cursor;
+  FUNCTION SELECT_DYNTABLE(iv_owner VARCHAR2 DEFAULT 'SYS', iv_table_name VARCHAR2 DEFAULT 'DUAL')
+    RETURN ref_dyntable;
 
 		
 END ZOEPKG_UTILITY;
