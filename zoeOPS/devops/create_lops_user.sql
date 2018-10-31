@@ -18,6 +18,7 @@ SET SERVEROUTPUT ON
 DEFINE sv_tablespace_name = ZOEOPS_TAB
 --运维管理基本用户
 DEFINE sv_opsusername = ZOEDEVOPS
+
 -- ===================================================
 -- 创建表空间: ZOEOPS_TAB 
 --
@@ -88,6 +89,9 @@ END;
 -- ===================================================
 
 ALTER USER ZOEDEVOPS QUOTA UNLIMITED ON ZOEOPS_TAB;
+GRANT CONNECT                                     TO ZOEDEVOPS;
+GRANT ALTER USER, CREATE USER                     TO ZOEDEVOPS;
+GRANT CREATE DATABASE LINK                        TO ZOEDEVOPS;
 
 GRANT EXECUTE ON  SYS.DBMS_CRYPTO                 TO ZOEDEVOPS;
 GRANT EXECUTE ON  SYS.UTL_I18N                    TO ZOEDEVOPS;
@@ -96,10 +100,40 @@ GRANT EXECUTE ON  SYS.DBMS_OBFUSCATION_TOOLKIT    TO ZOEDEVOPS;
 
 GRANT SELECT  ON  DBA_CONSTRAINTS                 TO ZOEDEVOPS;
 GRANT SELECT  ON  DBA_CONS_COLUMNS                TO ZOEDEVOPS;
+GRANT SELECT  ON  DBA_DB_LINKS                    TO ZOEDEVOPS;
 GRANT SELECT  ON  DBA_TAB_COLUMNS                 TO ZOEDEVOPS;
 GRANT SELECT  ON  V_$DATABASE                     TO ZOEDEVOPS;
 GRANT SELECT  ON  V_$PDBS                         TO ZOEDEVOPS;
+GRANT SELECT  ON  DBA_USERS                       TO ZOEDEVOPS;
 
+begin
+  dbms_network_acl_admin.create_acl (       -- 创建访问控制文件（ACL）
+	acl         => 'user_zoedevops.xml',          -- 文件名称
+	description => 'zoedevops Network Access',    -- 描述
+	principal   => 'ZOEDEVOPS',                   -- 授权或者取消授权账号，大小写敏感
+	is_grant    => TRUE,                    -- 授权还是取消授权
+	privilege   => 'connect',               -- 授权或者取消授权的权限列表
+	start_date  => null,                    -- 起始日期
+	end_date    => null                     -- 结束日期
+  );
+ dbms_network_acl_admin.add_privilege (     -- 添加访问权限列表项
+	acl        => 'user_zoedevops.xml',     -- 刚才创建的acl名称 
+	principal  => 'ZOEDEVOPS',              -- 授权或取消授权用户
+	is_grant   => TRUE,                     -- 与上同 
+	privilege  => 'resolve',                -- 权限列表
+	start_date => null,                     
+	end_date   => null
+  );
+ dbms_network_acl_admin.assign_acl ( -- 允许访问acl名为utl_http.xml下授权的用户，所允许访问的目的主机，及其端口范围。,可以授权多个主机，或者多个主机的多个端口
+	acl        => 'user_zoedevops.xml',
+	host       => 'localhost',              -- ip地址或者域名   
+	lower_port => NULL,                     -- 允许访问的起始端口号
+	upper_port =>NULL                      -- 允许访问的截止端口号
+  );
+  commit;
+end;
+/
 
-
+UNDEFINE sv_tablespace_name
+UNDEFINE sv_opsusername
 
