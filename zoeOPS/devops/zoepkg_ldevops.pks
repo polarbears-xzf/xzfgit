@@ -1,18 +1,25 @@
-CREATE OR REPLACE PACKAGE ZOEDEVOPS.ZOEPKG_DEVOPS AS
+--
+CREATE OR REPLACE PACKAGE ZOEDEVOPS.ZOEPKG_LDEVOPS AS
 -- Created in 2017.10.10 by polarbears
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
 --	Name:
--- 		zoepkg_devops.pks
+-- 		zoepkg_ldevops.pks
 --	Description:
 -- 		运维管理基础包
 --  Relation:
---    zoedevops.zoepkg_utility  
+--      
 --	Notes:
 --		基本注意事项
 --	修改 - （年-月-日） - 描述
 --
 
+-- ===================================================
+-- 枚举Oracle自身产品用户列表
+-- ===================================================
+  FUNCTION GET_ORACLE_USER 
+    RETURN zoetyp_db_object_list;
+	
 -- ===================================================
 --  获取数据库基本信息，区分唯一数据库
 -- ===================================================
@@ -24,19 +31,22 @@ CREATE OR REPLACE PACKAGE ZOEDEVOPS.ZOEPKG_DEVOPS AS
   FUNCTION GET_DB_ID RETURN VARCHAR2;
 
 -- ===================================================
---  保存数据库管理用户信息
+--  创建数据库用户或修改用户密码
 -- ===================================================
-  PROCEDURE SAVE_DB_USER_INFO (iv_db_id IN VARCHAR2, iv_username IN VARCHAR2, iv_password VARCHAR2);
--- ===================================================
---  修改数据库管理用户信息
--- ===================================================
-  PROCEDURE MODIFY_DB_USER_INFO (iv_db_id IN VARCHAR2, iv_username IN VARCHAR2, iv_password VARCHAR2);
+  PROCEDURE ALTER_DB_USER(iv_username IN VARCHAR2, iv_password IN VARCHAR2 DEFAULT NULL);
+
 
 -- ===================================================
---  初始化本地数据库信息
+--  数据库基本信息设置
 -- ===================================================
+--  	初始化本地数据库信息
   PROCEDURE INIT_LOCAL_DB_BASIC_INFO;
+--		保存数据库管理用户信息
+  PROCEDURE SAVE_DB_USER_INFO (iv_db_id IN VARCHAR2, iv_username IN VARCHAR2, iv_password VARCHAR2);
+--  	修改数据库管理用户信息
+  PROCEDURE MODIFY_DB_USER_INFO (iv_db_id IN VARCHAR2, iv_username IN VARCHAR2, iv_password VARCHAR2);
 
   
 
-END ZOEPKG_DEVOPS;
+END ZOEPKG_LDEVOPS;
+/

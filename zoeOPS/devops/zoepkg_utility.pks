@@ -34,12 +34,6 @@ CREATE OR REPLACE PACKAGE ZOEDEVOPS.ZOEPKG_UTILITY AS
 --	参数：传入参数及类型：
   FUNCTION SPLIT_TABLE(iv_text IN VARCHAR2)
     RETURN zoetyp_utility_split_strings;
-
--- ===================================================
--- 枚举Oracle自身产品用户列表
--- ===================================================
-  FUNCTION GET_ORACLE_USER 
-    RETURN zoetyp_db_object_list;
     
 -- ===================================================
 -- 返回动态表
