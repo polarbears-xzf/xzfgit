@@ -6,7 +6,7 @@
 --	Description:
 -- 		基本说明
 --  Relation:
---      对象关联
+--      对象关联 
 --	Notes:
 --		基本注意事项
 --	修改 - （年-月-日） - 描述
@@ -15,7 +15,7 @@
 	-- set echo off        关闭执行的SQL语句回显，缺省为on
 	-- set feedback off    关闭执行的SQL语句执行返回结果函数显示，缺省为on
 	-- set termout off     关闭在屏幕上的输出，这样可以加快spool执行速度
-	-- set verity off      关闭显示替换变量后的语句，缺省为on
+	-- set verify off      关闭显示替换变量后的语句，缺省为on
 	-- set wrap off        关闭超过行宽度是自动换行，缺省为on
 	-- set trimout off     去掉标准输出行尾空格，缺省为off
 	-- set trimspool on    去掉重定向（spool）输出行尾空格，缺省为off

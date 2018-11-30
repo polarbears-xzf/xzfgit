@@ -2,106 +2,6 @@
 CREATE OR REPLACE PACKAGE BODY ZOEDEVOPS.ZOEPKG_LDEVOPS
 AS
 
-FUNCTION GET_ORACLE_USER 
-RETURN zoetyp_db_object_list
-IS
-	lt_oracle_user zoetyp_db_object_list:=zoetyp_db_object_list();
-BEGIN
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'SYS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'SYSTEM';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'ANONYMOUS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'APEX_030200';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'APEX_PUBLIC_USER';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'APPQOSSYS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'AUDSYS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'CTXSYS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'DBSNMP';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'DIP';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'DVF';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'DVSYS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'EXFSYS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'FLOWS_FILES';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'GSMADMIN_INTERNAL';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'GSMCATUSER';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'GSMUSER';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'LBACSYS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'MDDATA';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'MDSYS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'MGMT_VIEW';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'OJVMSYS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'OLAPSYS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'ORACLE_OCM';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'ORDDATA';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'ORDPLUGINS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'ORDSYS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'OUTLN';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'OWBSYS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'OWBSYS_AUDIT';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'SCOTT';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'SI_INFORMTN_SCHEMA';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'SPATIAL_CSW_ADMIN_USR';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'SPATIAL_WFS_ADMIN_USR';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'SYSBACKUP';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'SYSDG';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'SYSKM';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'WMSYS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'XDB';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'XS$NULL';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'SYSRAC';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'REMOTE_SCHEDULER_AGENT';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'DBSFWUSER';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'SYS$UMF';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'GGSYS';
-	lt_oracle_user.extend;
-	lt_oracle_user(lt_oracle_user.count) := 'SYSMAN';
-	RETURN lt_oracle_user;
-END GET_ORACLE_USER;
-
 -- ===================================================
 --  获取数据库版本
 -- ===================================================
@@ -140,9 +40,10 @@ END GET_ORACLE_USER;
   BEGIN
     lv_db_version := SUBSTR(GET_DB_VERSION(), 17,3);
     IF lv_db_version = '12c' THEN
-      select cdb into lv_is_cdb from v$database;
+      lv_sql := 'select cdb from v$database';
+      EXECUTE IMMEDIATE lv_sql INTO lv_is_cdb;
       IF lv_is_cdb = 'YES' THEN
-       lv_sql := 'select creation_time from v$pdbs';
+        lv_sql := 'select creation_time from v$pdbs';
         EXECUTE IMMEDIATE lv_sql INTO ld_db_created_time;
       END IF;
     ELSE 
@@ -166,7 +67,7 @@ END GET_ORACLE_USER;
   BEGIN
     IF iv_password is null THEN
       SELECT  DBMS_RANDOM.STRING('X',12) INTO lv_password FROM DUAL;
-      lv_password := 'zoe$'||lv_password;
+      lv_password := 'Zoe$'||lv_password;
     ELSE 
       lv_password := iv_password;
     END IF;
@@ -223,8 +124,12 @@ END GET_ORACLE_USER;
       insert into ZOEDEVOPS.DVP_DB_BASIC_INFO(db_id,db_name,host_name,ip_address,db_created_time,db_version) 
         values (lv_db_id,lv_db_name,lv_host_name,lv_ip_address,ld_db_created_time,lv_db_version);
       commit;
+  EXCEPTION
+  WHEN OTHERS THEN
+    ROLLBACK;
+    RAISE;
   END INIT_LOCAL_DB_BASIC_INFO;
-
+  
 
 END ZOEPKG_LDEVOPS;
 /

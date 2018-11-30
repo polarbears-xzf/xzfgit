@@ -11,9 +11,13 @@
 --		基本注意事项
 -- 修改 - （年-月-日） - 描述
 --
-
 -- 依赖安装
 	-- 
+SET SERVEROUTPUT ON	
+SET ECHO OFF
+SET VERIFY OFF
+
+	
 -- 创建运维管理用户
 @@create_lops_user.sql
  --创建运维管理相关对象
@@ -34,11 +38,8 @@
 --加密安全函数
 DECLARE 
 	lv_ddl_text VARCHAR2(32767);
-  lv_ddl_pkg  VARCHAR2(32767);
+    lv_ddl_pkg  VARCHAR2(32767);
 BEGIN
---	SELECT DBMS_METADATA.GET_DDL('FUNCTION','DECRYPT_USER','ZOEDEVOPS') INTO lv_ddl_text FROM DUAL;
---  lv_ddl_text := replace(lv_ddl_text,'EDITIONABLE','');
---	dbms_ddl.create_wrapped(lv_ddl_text);
 	SELECT DBMS_METADATA.GET_DDL('FUNCTION','ENCRYPT_USER','ZOEDEVOPS') INTO lv_ddl_text FROM DUAL;
   lv_ddl_text := replace(lv_ddl_text,'EDITIONABLE','');
 	dbms_ddl.create_wrapped(lv_ddl_text);
@@ -51,6 +52,9 @@ BEGIN
 END;
 /
 
+	--公用功能包
+@@zoepkg_comm.pks
+@@zoepkg_comm.pkb
 	--远程执行SQL
 @@zoeprc_exec_sql.pls
 	--基本功能包

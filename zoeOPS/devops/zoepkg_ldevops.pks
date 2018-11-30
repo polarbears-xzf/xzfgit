@@ -15,12 +15,6 @@ CREATE OR REPLACE PACKAGE ZOEDEVOPS.ZOEPKG_LDEVOPS AS
 --
 
 -- ===================================================
--- 枚举Oracle自身产品用户列表
--- ===================================================
-  FUNCTION GET_ORACLE_USER 
-    RETURN zoetyp_db_object_list;
-	
--- ===================================================
 --  获取数据库基本信息，区分唯一数据库
 -- ===================================================
   FUNCTION GET_DB_BASIC_INFO RETURN zoetyp_db_basic_info;

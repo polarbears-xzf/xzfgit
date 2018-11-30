@@ -65,7 +65,7 @@ AS
       END IF;
       
       lv_sql  :=         'INSERT INTO  ZOEDEVOPS.DVP_PROJ_DB_USER_ADMIN_INFO ';
-      lv_sql  := lv_sql||' (SELECT 1, B.*, '''' FROM ZOEDEVOPS.DVP_DB_USER_INFO@'||lv_db_link||' B WHERE NOT EXISTS ';
+      lv_sql  := lv_sql||' (SELECT '||iv_project_id||', B.*, '''' FROM ZOEDEVOPS.DVP_DB_USER_INFO@'||lv_db_link||' B WHERE NOT EXISTS ';
       lv_sql  := lv_sql||' (SELECT 1 FROM ZOEDEVOPS.DVP_PROJ_DB_USER_ADMIN_INFO A ';
       lv_sql  := lv_sql||' WHERE A.DB_ID#=B.DB_ID# AND A.USERNAME=B.USERNAME AND A.PROJECT_ID#=:1))';
       EXECUTE IMMEDIATE lv_sql USING iv_project_id;
@@ -76,12 +76,14 @@ AS
       lv_sql  := lv_sql||' WHERE EXISTS (SELECT 1 FROM ZOEDEVOPS.DVP_DB_USER_INFO@'||lv_db_link||' B ';
       lv_sql  := lv_sql||'     WHERE A.DB_ID#=B.DB_ID# AND A.USERNAME=B.USERNAME AND A.PROJECT_ID#=:2)';
       EXECUTE IMMEDIATE lv_sql USING iv_project_id,iv_project_id;
+      COMMIT;
+      DBMS_SESSION.CLOSE_DATABASE_LINK(lv_db_link);
     END LOOP;
-    COMMIT;
-  EXCEPTION
+   EXCEPTION
     WHEN OTHERS THEN
       ROLLBACK;
       RAISE;
   END SYNC_PROJ_DB_INFO;
   
 END ZOEPKG_DEVOPS;
+/

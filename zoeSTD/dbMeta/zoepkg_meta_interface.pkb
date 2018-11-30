@@ -27,14 +27,14 @@ AS
     FROM JSON_TABLE(lv_json_data ,'$.UPDATE_COLUMN[*]' COLUMNS(COLUMN_NAME PATH '$.COLUMN_NAME' , COLUMN_VALUE PATH '$.COLUMN_VALUE'));
 	BEGIN 
     lv_json_data := iv_json_data;
- 		FOR c_meta_key IN lc_meta_key LOOP
+ 	FOR c_meta_key IN lc_meta_key LOOP
       lv_owner := c_meta_key.OWNER;
       lv_table := c_meta_key.TABLE_NAME;
       lt_key_name(ln_key_index) := c_meta_key.COLUMN_NAME;
       lt_key_value(ln_key_index) := c_meta_key.COLUMN_VALUE;
       ln_key_index := ln_key_index + 1;
     END LOOP;
-		FOR c_meta_value IN lc_meta_value LOOP
+	FOR c_meta_value IN lc_meta_value LOOP
       lt_column_name(ln_column_index) := c_meta_value.COLUMN_NAME;
       lt_column_value(ln_column_index) := c_meta_value.COLUMN_VALUE;
       ln_column_index := ln_column_index + 1;

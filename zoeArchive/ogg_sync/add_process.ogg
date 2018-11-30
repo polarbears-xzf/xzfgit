@@ -6,4 +6,29 @@ add exttrail ./dirdat/archivetable/ef, extract exarch1
 add extract exarch2, tranlog, begin now, threads 2
 add exttrail ./dirdat/archivetable/eg, extract exarch2
 
+--添加归档数据库大表PUMP进程
+add extract eparch11, exttrailsource ./dirdat/ef
+add rmttrail ./dirdat/archivetable/pf, megabytes 2000, extract eparch11
 
+--添加归档数据库除大表外的所有表PUMP进程
+add extract eparch2, exttrailsource ./dirdat/eg
+add rmttrail ./dirdat/archivetable/pg, megabytes 2000 ,extract eparch2
+
+
+--添加归档数据库大表复制进程
+add replicat rparch1, exttrail ./dirdat/archivetable/pf, checkpointtable ggsadmin.chkpoint
+
+--添加归档数据库除大表外的所有表复制进程
+
+
+--跳过记录
+ALTER EXTRACT ex01, EXTSEQNO 0, EXTRBA 0
+ALTER REPLICAT	 ex01, EXTSEQNO 0, EXTRBA 0
+ALTER EXTRACT MYDP ETROLLOVER
+ALTER EXTRACT MYEXT BEGIN YYYY-MM-DD:HH:MI:SS
+ALTER EXTRACT MYEXT BEGIN NOW
+
+打包ogg
+tar -cvf ogg.tar /ggs11 --exclude=dir*
+解压ogg
+tar -xvf ogg.tar
