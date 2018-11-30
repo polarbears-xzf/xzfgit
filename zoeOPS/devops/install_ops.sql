@@ -14,14 +14,25 @@
 
 -- 依赖安装
 	-- 
+
+SET SERVEROUTPUT ON	
+SET ECHO OFF
+SET VERIFY OFF
+	
 -- 安装运维管理node对象
-@@intall_lops.sql
+@@install_lops.sql
  --创建运维管理master对象
 	--表
 @@create_ops_table.sql
 	--类型
 		--集合类型：数据库对象、字符串
 @@create_type.sql
+
+	--基础功能包
+@@zoepkg_devops.pks
+@@zoepkg_devops.pkb
+@@zoefun_decrypt_user.pls
+
 
 	--公共工具包
 		--函数：分割字符串
@@ -32,7 +43,20 @@
 @@zoepkg_devops.pkb
 @@zoefun_decrypt_user.pls
 
-conn zoedevops/zoe$Y406FCFK8Z6J@192.168.1.41/zoemops	
-create database link zoetmpl41zoeagent connect to zoeagent identified by zoe4S3YOS37F9A5 using '192.168.1.41/zoetmpl';
-INSERT INTO ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS (project_id#,db_id#,db_link_name,connect_to_user,CREATOR_CODE,CREATED_TIME) VALUES (1,1,'ZOETMPL41ZOEAGENT','ZOEAGENT','xzf',SYSDATE);
-exec zoedevops.zoepkg_devops.SYNC_PROJ_DB_INFO(1);
+	--数据采集包
+@@zoepkg_sqlldr.pks
+@@zoepkg_sqlldr.pkb
+
+
+DECLARE 
+	lv_ddl_text VARCHAR2(32767);
+    lv_ddl_pkg  VARCHAR2(32767);
+BEGIN
+	SELECT DBMS_METADATA.GET_DDL('FUNCTION','DECRYPT_USER','ZOEDEVOPS') INTO lv_ddl_text FROM DUAL;
+  lv_ddl_text := replace(lv_ddl_text,'EDITIONABLE','');
+	dbms_ddl.create_wrapped(lv_ddl_text);
+END;
+/
+
+
+

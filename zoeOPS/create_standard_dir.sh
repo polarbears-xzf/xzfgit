@@ -21,8 +21,8 @@
 	mkdir c:\zoedir\zoerpt
 
 # Linux 平台
-	mkdir /var/log/zoedir
-	mkdir /var/log/zoedir/log 
-	mkdir /var/log/zoedir/scripts
-	mkdir /var/log/zoedir/orarpt
-	mkdir /var/log/zoedir/zoerpt
+	mkdir /home/oracle/zoedir
+	mkdir /home/oracle/zoedir/log 
+	mkdir /home/oracle/zoedir/scripts
+	mkdir /home/oracle/zoedir/orarpt
+	mkdir /home/oracle/zoedir/zoerpt

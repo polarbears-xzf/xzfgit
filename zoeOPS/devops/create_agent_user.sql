@@ -29,7 +29,7 @@ ln_user_exist NUMBER;
 lv_dbid     VARCHAR2(64);
 BEGIN
 SELECT  DBMS_RANDOM.STRING('X',12) INTO :sv_password FROM DUAL;
-lv_password := 'zoe'||:sv_password;
+lv_password := 'Zoe$'||:sv_password;
 DBMS_OUTPUT.PUT_LINE('&sv_dbauser : '||lv_password);
 select count(1) INTO ln_user_exist from dba_users where username='&sv_dbauser';
 IF ln_user_exist = 1 THEN

@@ -1,0 +1,106 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="zh-cn">
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<title>sqlloader使用手册</title>
+<!--mstheme--><link rel="stylesheet" href="../iris1011-106.css">
+<meta name="Microsoft Theme" content="iris 1011">
+</head>
+
+<body>
+
+<p><a href="../zoedocs_index.html">运维管理说明</a></p>
+<p>　</p>
+<h3 align="center"><font color="#0000FF">sqlloader使用简要说明：</font></h3>
+<h3><font color="#0000FF">&nbsp;&nbsp;&nbsp; sqlloader用于将文本文件数据加载到Oracle表中。</font></h3>
+<h3><font color="#0000FF">&nbsp;&nbsp;&nbsp; sqlloader使用方式：<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+通过sqlldr命令连接数据库，使用.ctl控制文件申明的内容，将文本文件数据加载到Oracle表中</font></h3>
+<h3><font color="#0000FF">&nbsp;&nbsp;&nbsp; sqlloader命令：<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sqlldr 
+ZOEADMIN/zoe$2017a@192.168.1.41/zoenew loadtable.ctl</font></h3>
+<h3><font color="#0000FF">&nbsp;&nbsp;&nbsp; sqlloader命令参数说明：<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; userid -- Oracle 的 
+username/password[@servicename]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; control -- 控制文件，可能包含表的数据<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; log -- 记录导入时的日志文件，默认为 控制文件(去除扩展名).log<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bad -- 坏数据文件，默认为 控制文件(去除扩展名).bad<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; data -- 
+数据文件，一般在控制文件中指定。用参数控制文件中不指定数据文件更适于自动操作<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; errors -- 允许的错误记录数，可以用他来控制一条记录都不能错<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; rows -- 多少条记录提交一次，默认为 64<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; skip -- 跳过的行数，比如导出的数据文件前面几行是表头或其他描述</font></h3>
+<h3><font color="#0000FF">&nbsp;&nbsp;&nbsp; sqlloader控制文件参数说明：<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OPTIONS (skip=1,rows=128) --skip=1 
+跳过数据中的第一行，128行提交一次<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LOAD DATA --控制文件标识 <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INFILE 'test.txt' --指定外部数据文件，可以写多个 
+INFILE &quot;another_data_file.csv&quot; 指定多个数据文件<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BADFILE 'test.bad' --指定错误数据输出文件<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DISCARDFILE 'test.dsc' --指定错误记录文件<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; APPEND --操作类型<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+a、INSERT，为缺省方式，在数据装载开始时要求表为空 <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+b、APPEND，在表中追加新记录 <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+c、REPLACE，删除旧记录，替换成新装载的记录 <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; d、TRUNCATE，同上<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INTO TABLE test WHEN 
+user_name&lt;&gt;'system'--向表test中添加记录，还可以用 WHEN 子句选择导入符合条件的记录<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FIELDS TERMINATED BY ',' --数据中每行记录用 
+&quot;,&quot; 分隔<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OPTIONALLY ENCLOSED BY '&quot;' --数据中每个字段用 
+'&quot;' 框起，比如字段中有 &quot;,&quot; 分隔符时<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TRAILING NULLCOLS --表的字段没有对应的值时允许为空<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (VIRTUAL_COLUMN FILLER, 
+--这是一个虚拟字段，用来跳过由 PL/SQL Developer 生成的第一列序号 <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user_id 
+&quot;user_seq.nextval&quot;, --这一列直接取序列的下一值，而不用数据中提供的值 <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user_name 
+&quot;'Hi '||upper(:user_name)&quot;, --能用SQL函数或运算对数据进行加工处理<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; login_times 
+terminated by&quot;,&quot;, NULLIF(login_times='NULL') --可为列单独指定分隔符 <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; last_login 
+DATE&quot;YYYY-MM-DD HH24:MI:SS&quot; --指定接受日期的格式，相当用 to_date() 函数转换<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user_sort 
+NUMBER, --字段可以指定类型，否则认为是 CHARACTER 类型, log 文件中有显示 <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ) <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CHARACTERSET --字符集</font></h3>
+<h3><font color="#0000FF">&nbsp;&nbsp;&nbsp; sqlloader性能与其它说明<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1）ROWS 的默认值为 64，可以根据实际指定更合适的 ROWS 
+参数来指定每次提交记录数。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2）常规导入可以通过使用 INSERT语句来导入数据。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+Direct导入可以跳过数据库的相关逻辑(DIRECT=TRUE)，而直接将数据导入到数据文件中，可以提高导入数据的性能。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+有些情况下，不能使用此参数(如果主键重复的话会使索引的状态变成UNUSABLE!)。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3) 通过指定 
+UNRECOVERABLE选项，可以关闭数据库的日志，这个选项只能和 direct 一起使用。<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+同时执行：SQL&gt;ALTER TABLE test nologging;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4) 使用多个控制文件运行多个导入任务.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sqlldr 
+userid=/ control=result1.ctl direct=true parallel=true <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sqlldr 
+userid=/ control=result2.ctl direct=true parallel=true <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sqlldr 
+userid=/ control=result3.ctl direct=true parallel=true <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5）使用bind array提升性能，bind 
+array大小评估为，rows*行长度。OPTIONS (bindsize=512000)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+（注意：一般只能用ASCII码形式，切记要转换编码，不然导入数据为空）(ftp上传csv文件的传输类型选择ascii)<br>
+&nbsp;&nbsp;&nbsp; sqlloader错误处理<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 错误：Field in data file exceeds maximum 
+length<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 处理：列的长度和类型 
+如char(4000)<br>
+</font><br>
+　</h3>
+<p><a href="../zoedocs_index.html">运维管理说明</a></p>
+<p>　</p>
+
+</body>
+
+</html>
