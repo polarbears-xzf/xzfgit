@@ -21,14 +21,16 @@ SET HEADING OFF
 set pagesize 0
 set linesize 121
 
-define porjectName="厦门市卫计委"
-define porjectCode="xmswjw"
+define porjectName="项目名称"
+--define porjectCode="sqdyyy"
+prompt &&porjectCode
 define reportType="awr"
 define checkupSystem="his"
 define scriptPath="c:\zoedir\scripts\"
 -- "
 define reportPath="c:\zoedir\orarpt\"
 -- "
+prompt &&double_interval_time
 column report_time NEW_VALUE reportTime noprint
 select to_char(sysdate,'yyyymmdd') as "report_time" from dual;
 
@@ -44,11 +46,13 @@ DECLARE
 	ln_end_snap_id    NUMBER;
 	ln_db_time        NUMBER;
 	ln_interval_time  NUMBER;
-	ln_double_interval_time NUMBER := 0.1;
+	ln_double_interval_time NUMBER := 2;
 	lv_begin_interval_time  VARCHAR2(13);
 	lv_end_interval_time    VARCHAR2(2);
 	lv_db_name              VARCHAR2(64);
 BEGIN
+	--设置awr统计时间间隔倍数，决定获取AWR报告条件，如： HIS系统一般超过2倍统计时间表示负载较高，则设置为2
+	ln_double_interval_time := 4;
 	DBMS_OUTPUT.PUT_LINE('SET SERVEROUTPUT ON');
 	DBMS_OUTPUT.PUT_LINE('SET ECHO OFF  ');
 	DBMS_OUTPUT.PUT_LINE('SET VERI OFF');
@@ -58,8 +62,8 @@ BEGIN
 	DBMS_OUTPUT.PUT_LINE('set pagesize 0;');
 	DBMS_OUTPUT.PUT_LINE('set linesize 121;');
 	lv_db_name := sys_context('USERENV','DB_NAME');
-	FOR c1 IN (SELECT A.DBID , A.INSTANCE_NUMBER, LEAD(SNAP_ID) OVER (ORDER BY A.DBID,A.SNAP_ID) NEXT_SNAP_ID,
-		  SNAP_ID SNAP_ID, LEAD(SYS_TIME_VALUE) OVER (ORDER BY A.DBID,A.SNAP_ID) - SYS_TIME_VALUE SYS_TIME_VALUE
+	FOR c1 IN (SELECT A.DBID , A.INSTANCE_NUMBER, LEAD(SNAP_ID) OVER (ORDER BY A.DBID,A.INSTANCE_NUMBER,A.SNAP_ID) NEXT_SNAP_ID,
+		  SNAP_ID SNAP_ID, LEAD(SYS_TIME_VALUE) OVER (ORDER BY A.DBID,A.INSTANCE_NUMBER,A.SNAP_ID) - SYS_TIME_VALUE SYS_TIME_VALUE
 		FROM
 		  (SELECT A.DBID, A.INSTANCE_NUMBER, A.SNAP_ID,
 			A.STAT_NAME , A.VALUE SYS_TIME_VALUE
@@ -82,8 +86,8 @@ BEGIN
 		INTO lv_begin_interval_time,lv_end_interval_time,ln_interval_time 
 		FROM DBA_HIST_SNAPSHOT
 		WHERE DBID=ln_dbid AND INSTANCE_NUMBER = ln_inst_number AND SNAP_ID = ln_begin_snap_id;
-		IF ln_db_time < ln_interval_time * ln_double_interval_time THEN 
-			DBMS_OUTPUT.PUT_LINE('SPOOL c:\zoedir\orarpt\&reportType._&checkupSystem._&porjectCode._'||lv_db_name||'_'||lv_begin_interval_time||'_'||lv_end_interval_time||'.html');
+		IF ln_db_time > ln_interval_time * ln_double_interval_time THEN 
+			DBMS_OUTPUT.PUT_LINE('SPOOL c:\zoedir\orarpt\&reportType._&checkupSystem._&porjectCode._'||lv_db_name||'_'||lv_begin_interval_time||'_'||lv_end_interval_time||'_'||ln_db_time||'.html');
 			DBMS_OUTPUT.PUT_LINE('SELECT output FROM TABLE (DBMS_WORKLOAD_REPOSITORY.awr_report_html('||
 				ln_dbid||', '||ln_inst_number||', '||ln_begin_snap_id||', '||ln_end_snap_id||'));');
 			DBMS_OUTPUT.PUT_LINE('SPOOL OFF');
@@ -106,4 +110,10 @@ TTITLE OFF;
 BTITLE OFF;  
 REPFOOTER OFF;  
   
-UNDEFINE report_name
+UNDEFINE porjectName
+UNDEFINE porjectCode
+UNDEFINE reportType
+UNDEFINE checkupSystem
+UNDEFINE scriptPath
+UNDEFINE reportPath
+UNDEFINE double_interval_time

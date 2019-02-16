@@ -4,14 +4,19 @@
 --	Name:
 -- 		zoesql_create_user.sql
 --	Description:
--- 		创建智业安全系统数据库用户
+-- 		创建智业标准管理数据库用户
 --  Relation:
 --      
 --	Notes:
 --		
 --	修改 - （年-月-日） - 描述
 
-SET SERVEROUTPUT ON SIZE 1000000
+SET SERVEROUTPUT ON 
+--定义标准管理存储表空间
+DEFINE sv_tablespace_name = ZOESTD_TAB
+--运维管理DBA用户
+DEFINE sv_dbauser = ZOESTD
+
 -- ===================================================
 -- 创建表空间: ZOESTD_TAB 
 --
@@ -24,7 +29,7 @@ DECLARE
   lv_sysfile_name     VARCHAR2(513);
   lv_tablespace_name  VARCHAR2(64);
 BEGIN
-  lv_tablespace_name := 'ZOESYSMAN_TAB';
+  lv_tablespace_name := '&sv_tablespace_name';
   SELECT file_name INTO lv_sysfile_name FROM dba_data_files where tablespace_name = 'SYSTEM' AND ROWNUM=1;
   IF SUBSTR(lv_sysfile_name,1,1) = '+' or SUBSTR(lv_sysfile_name,1,1) = '/' THEN
     SELECT file_name      
@@ -61,29 +66,29 @@ END;
 /
 
 --创建用户
-CREATE USER ZOESTD IDENTIFIED BY "ZOE$2017STD" DEFAULT TABLESPACE ZOESTD_TAB;
+CREATE USER &sv_dbauser IDENTIFIED BY "ZOE$2017STD" DEFAULT TABLESPACE &sv_tablespace_name;
 
 --授权系统权限
 grant ADMINISTER DATABASE TRIGGER,CREATE JOB,
 	CREATE PROCEDURE,CREATE SESSION,CREATE TABLE,
 	CREATE TRIGGER,CREATE VIEW,CREATE TYPE,
 	CREATE ANY CONTEXT,DROP ANY CONTEXT,
-	UNLIMITED TABLESPACE to ZOESTD;
+	UNLIMITED TABLESPACE to &sv_dbauser;
 --授权对象权限
-grant SELECT on DBA_USERS to ZOESTD;
-grant SELECT on DBA_OBJECTS to ZOESTD;
-grant SELECT on DBA_TABLES to ZOESTD;
-grant SELECT on DBA_TAB_COMMENTS to ZOESTD;
-grant SELECT on DBA_TAB_COLS to ZOESTD;
-grant SELECT on DBA_COL_COMMENTS to ZOESTD;
-grant SELECT on DBA_CONSTRAINTS to ZOESTD;
-grant SELECT on DBA_CONS_COLUMNS to ZOESTD;
-grant SELECT on DBA_TAB_COLUMNS to ZOESTD;
+grant SELECT on DBA_USERS        to &sv_dbauser;
+grant SELECT on DBA_OBJECTS      to &sv_dbauser;
+grant SELECT on DBA_TABLES       to &sv_dbauser;
+grant SELECT on DBA_TAB_COMMENTS to &sv_dbauser;
+grant SELECT on DBA_TAB_COLS     to &sv_dbauser;
+grant SELECT on DBA_COL_COMMENTS to &sv_dbauser;
+grant SELECT on DBA_CONSTRAINTS  to &sv_dbauser;
+grant SELECT on DBA_CONS_COLUMNS to &sv_dbauser;
+grant SELECT on DBA_TAB_COLUMNS  to &sv_dbauser;
 
 
 --授权执行权限
-grant execute on DBMS_CRYPTO to ZOESTD;
-grant execute on ZOEDEVOPS.ZOEPKG_COMM to ZOESTD;
+grant execute on DBMS_CRYPTO           to &sv_dbauser;
+grant execute on ZOEDEVOPS.ZOEPKG_COMM to &sv_dbauser;
 
 
-EXEC ZOESTD.ZOEPKG_META_INTERFACE.SET_META_DATA('{"OWNER":"所有者名","TABLE_NAME":"表名","PRIMARY_KEY":[{"COLUMN_NAME":"键名1","COLUMN_VALUE":"键值1"},{"COLUMN_NAME":"键名2","COLUMN_VALUE":"键值2"}],"UPDATE_COLUMN":[{"COLUMN_NAME":"列名1","COLUMN_VALUE":"列值1"},{"COLUMN_NAME":"列名2","COLUMN_VALUE":"列值2"}]}')
+--EXEC ZOESTD.ZOEPKG_META_INTERFACE.SET_META_DATA('{"OWNER":"所有者名","TABLE_NAME":"表名","PRIMARY_KEY":[{"COLUMN_NAME":"键名1","COLUMN_VALUE":"键值1"},{"COLUMN_NAME":"键名2","COLUMN_VALUE":"键值2"}],"UPDATE_COLUMN":[{"COLUMN_NAME":"列名1","COLUMN_VALUE":"列值1"},{"COLUMN_NAME":"列名2","COLUMN_VALUE":"列值2"}]}')

@@ -19,3 +19,11 @@ create database link zoedblink_hisarch connect to zoearchive identified by zoe$2
 
 --创建HIS归档库到生产库的数据库链路
 create database link zoedblink_his connect to zoearchive identified by zoe$2017arch using '192.168.1.1/his';
+
+
+--创建EMR生产库到归档库的数据库链路
+create database link zoedblink_emrarch connect to zoearchive identified by zoe$2017arch using '168.2.5.173/fjfyarch';
+
+--创建EMR归档库到生产库的数据库链路
+create database link zoedblink_emr connect to zoearchive identified by zoe$2017arch using '168.2.5.172/fyzemr';
+create database link zoedblink_emrarch connect to zoearchive identified by zoe$2017arch using '168.2.5.172/fyzemr';

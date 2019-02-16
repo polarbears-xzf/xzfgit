@@ -257,7 +257,7 @@ BEGIN
           lv_insert_sql := lv_insert_sql||' select b.* from '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||'@'||lv_db_link||' b';
           lv_insert_sql := lv_insert_sql||' where  ';
           IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
-            lv_delete_sql := lv_delete_sql||'   b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'') and ';
+            lv_insert_sql := lv_insert_sql||'   b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'') and ';
           END IF;
           lv_insert_sql := lv_insert_sql||' EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE@'||lv_db_link||' c ';
           lv_insert_sql := lv_insert_sql||' WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1;
@@ -342,7 +342,7 @@ BEGIN
           lv_insert_sql := lv_insert_sql||' select b.* from '||ir_task_condition.TABLE_OWNER||'.'||ir_task_condition.TABLE_NAME||' b';
           lv_insert_sql := lv_insert_sql||' where  ';
           IF ir_task_condition.ARCHIVE_DATE_COLUMN IS NOT NULL THEN
-            lv_delete_sql := lv_delete_sql||'   b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'') and ';
+            lv_insert_sql := lv_insert_sql||'   b.'||ir_task_condition.ARCHIVE_DATE_COLUMN||' < to_date('''||lv_archive_date|| ''',''yyyy-mm-dd'') and ';
           END IF;
           lv_insert_sql := lv_insert_sql||' EXISTS (SELECT 1 FROM ZOEARCHIVE.ARC_PROCESS_TASK_DATA_CACHE c ';
           lv_insert_sql := lv_insert_sql||' WHERE c.'||ir_task_condition.ARCHIVE_CONDITION_C1|| ' = b.'|| ir_task_condition.ARCHIVE_TABLE_C1;
