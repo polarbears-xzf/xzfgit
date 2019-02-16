@@ -1,4 +1,4 @@
-extract eparch11
+extract eparch1
 userid ggsadmin , password zy02v4_ip
 passthru
 rmthost 168.1.1.95, mgrport 7809
