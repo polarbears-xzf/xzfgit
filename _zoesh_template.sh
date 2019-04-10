@@ -1,13 +1,13 @@
-# Created in 2018.06.03 by polarbears
-# Copyright (c) 20xx, CHINA and/or affiliates.
-# All rights reserved.
-#	Name:
+# 北极熊创建于： 2019.03.15
+# 版权 2019 中国
+# 保留所有权利
+#	文件名:
 # 		文件名
-#	Description:
+#	描述:
 # 		基本说明
-#  Relation:
+#   对象关联:
 #      对象关联
-#	Notes:
+#	注意事项:
 #		基本注意事项
 #	修改 - （年-月-日） - 描述
 #
