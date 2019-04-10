@@ -4,22 +4,22 @@ add exttrail ./dirdat/ef, extract exarch1, megabytes 2000
 
 --添加归档数据库除大表外的所有表抽取进程
 add extract exarch2, tranlog, begin now, threads 2
-add exttrail ./dirdat/eg, extract exarch2, megabytes 2000
+add exttrail ./dirdat/archivetable/eg, extract exarch2, megabytes 2000
 
 --添加归档数据库大表PUMP进程
-add extract eparch1, exttrailsource ./dirdat/ef
-add rmttrail ./dirdat/pf, megabytes 2000, extract eparch1
+add extract eparch1, exttrailsource ./dirdat/archivetable/ef
+add rmttrail ./dirdat/archivetable/pf, megabytes 2000, extract eparch1
 
 --添加归档数据库除大表外的所有表PUMP进程
-add extract eparch2, exttrailsource ./dirdat/eg
-add rmttrail ./dirdat/pg, megabytes 2000 ,extract eparch2
+add extract eparch2, exttrailsource ./dirdat/archivetable/eg
+add rmttrail ./dirdat/archivetable/pg, megabytes 2000 ,extract eparch2
 
 
 --添加归档数据库大表复制进程
-add replicat rparch1, exttrail ./dirdat/pf, checkpointtable ggsadmin.chkpoint
+add replicat rparch1, exttrail ./dirdat/archivetable/pf, checkpointtable ggsadmin.chkpoint
 
 --添加归档数据库除大表外的所有表复制进程
-add replicat rparch2, exttrail ./dirdat/pf, checkpointtable ggsadmin.chkpoint
+add replicat rparch2, exttrail ./dirdat/archivetable/pg, checkpointtable ggsadmin.chkpoint
 
 
 --FAQ

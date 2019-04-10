@@ -1,15 +1,16 @@
--- Created in 2018.06.03 by polarbears
--- Copyright (c) 20xx, CHINA and/or affiliates.
--- All rights reserved.
---	Name:
--- 		release_step.sql
---	Description:
--- 		HIS5.0发布步骤
---  Relation:
+-- 北极熊创建于： 2019.03.15
+-- 版权 2019 中国
+-- 保留所有权利
+--	文件名:
+-- 		文件名
+--	描述:
+-- 		基本说明
+--   对象关联:
 --      对象关联
---	Notes:
+--	注意事项:
 --		基本注意事项
 --	修改 - （年-月-日） - 描述
+--
 --
 
 -- 同步问题汇总
