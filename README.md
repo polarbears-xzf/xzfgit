@@ -1,3 +1,2 @@
 # xzfgit
-xuzhifeng git repository
-脚本管理
+北极熊的脚本库
