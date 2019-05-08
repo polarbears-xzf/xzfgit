@@ -1,6 +1,0 @@
-运维用户权限
-	grant select on GV_$SESSION to zoeapex;
-	grant select any table to zoeapex;
-	grant insert any table to zoeapex;
-	grant update any table to zoeapex;
-	grant delete any table to zoeapex;
