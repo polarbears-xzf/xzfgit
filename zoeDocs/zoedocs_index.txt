@@ -8,6 +8,6 @@
 2.	[项目巡检指标列表](monitor/mnt_checkup.htm)
 3.	[运维监控设计](monitor/mnt_design.htm)
 ###	使用手册
-1.	[sqloader使用手册](manual/manual_sqlloader.htm)
+1.	[sqloader使用手册](manual/manual_sqlloader.html)
 2.	[parkdown使用手册](manual/manual_parkdown.html)
 	
