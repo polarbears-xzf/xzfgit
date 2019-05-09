@@ -1,0 +1,15 @@
+[文档主页](../zoedocs_index.html)
+
+1. 创建标准目录
+    create_standard_dir.sh
+
+2. 管理数据库-组件部署（以sysdba角色执行）：
+    @install.ops.sql
+
+3. 节点数据库-本地组件部署（在所有需要管理的数据库上以sysdba角色执行）：
+    @install_lops.sql
+    记录zoeagent密码：
+
+
+
+[文档主页](../zoedocs_index.html)
