@@ -1,0 +1,52 @@
+<!DOCTYPE html []>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="MarkdownViewer++" />
+    <title>manual_sqlloader.txt</title>
+    <style type="text/css">
+            
+/* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
+td, h1, h2, h3, h4, h5, p, ul, ol, li {
+    page-break-inside: avoid; 
+}
+
+        </style>
+  </head>
+  <body>
+    <p>
+      <a href="../zoedocs_index.html">文档主页</a>
+    </p>
+    <h3 id="sqlloader">sqlloader使用说明</h3>
+    <blockquote>
+      <p>sqlloader用于将文本文件数据加载到Oracle表中</p>
+    </blockquote>
+    <ol>
+      <li>sqlloader使用方式
+<blockquote><p>通过sqlldr命令连接数据库，使用.ctl控制文件申明的内容，将文本文件数据加载到Oracle表中</p></blockquote></li>
+      <li>sqlloader命令
+<blockquote><p>sqlldr ZOEADMIN/zoe$2017a@192.168.1.41/zoenew loadtable.ctl</p></blockquote></li>
+      <li>sqlloader命令参数说明
+<ul><li>userid -- Oracle 的 username/password[@servicename]</li><li>control -- 控制文件，可能包含表的数据</li><li>log -- 记录导入时的日志文件，默认为 控制文件(去除扩展名).log</li><li>bad -- 坏数据文件，默认为 控制文件(去除扩展名).bad</li><li>data -- 数据文件，一般在控制文件中指定。用参数控制文件中不指定数据文件更适于自动操作</li><li>errors -- 允许的错误记录数，可以用他来控制一条记录都不能错</li><li>rows -- 多少条记录提交一次，默认为 64</li><li>skip -- 跳过的行数，比如导出的数据文件前面几行是表头或其他描述</li></ul></li>
+      <li>sqlloader控制文件参数说明
+<ul><li>OPTIONS (skip=1,rows=128) --skip=1 跳过数据中的第一行，128行提交一次</li><li>LOAD DATA --控制文件标识</li><li>INFILE 'test.txt' --指定外部数据文件，可以写多个 INFILE "another_data_file.csv" 指定多个数据文件</li><li>BADFILE 'test.bad' --指定错误数据输出文件</li><li>DISCARDFILE 'test.dsc' --指定错误记录文件</li><li>APPEND --操作类型
+<ul><li>INSERT，为缺省方式，在数据装载开始时要求表为空</li><li>APPEND，在表中追加新记录</li><li>REPLACE，删除旧记录，替换成新装载的记录</li><li>TRUNCATE，同上</li></ul></li><li>INTO TABLE test WHEN user_name&lt;&gt;'system'--向表test中添加记录，还可以用 WHEN 子句选择导入符合条件的记录</li><li>FIELDS TERMINATED BY ',' --数据中每行记录用 "," 分隔</li><li>OPTIONALLY ENCLOSED BY '"' --数据中每个字段用 '"' 框起，比如字段中有 "," 分隔符时</li><li>TRAILING NULLCOLS --表的字段没有对应的值时允许为空</li><li>(VIRTUAL_COLUMN FILLER, --这是一个虚拟字段，用来跳过由 PL/SQL Developer 生成的第一列序号
+user_id "user_seq.nextval", --这一列直接取序列的下一值，而不用数据中提供的值
+user_name "'Hi '||upper(:user_name)", --能用SQL函数或运算对数据进行加工处理
+login_times terminated by",", NULLIF(login_times='NULL') --可为列单独指定分隔符
+last_login DATE"YYYY-MM-DD HH24:MI:SS" --指定接受日期的格式，相当用 to_date() 函数转换
+user_sort NUMBER, --字段可以指定类型，否则认为是 CHARACTER 类型, log 文件中有显示
+)</li><li>CHARACTERSET --字符集</li></ul></li>
+      <li>sqlloader性能与其它说明
+<ul><li>ROWS 的默认值为 64，可以根据实际指定更合适的 ROWS 参数来指定每次提交记录数。</li><li>常规导入可以通过使用 INSERT语句来导入数据。
+<blockquote><p>Direct导入可以跳过数据库的相关逻辑(DIRECT=TRUE)，而直接将数据导入到数据文件中，可以提高导入数据的性能。
+有些情况下，不能使用此参数(如果主键重复的话会使索引的状态变成UNUSABLE!)。</p></blockquote></li><li>通过指定 UNRECOVERABLE选项，可以关闭数据库的日志，这个选项只能和 direct 一起使用。
+<blockquote><p>同时执行：SQL&gt;ALTER TABLE test nologging;</p></blockquote></li><li>使用多个控制文件运行多个导入任务.
+<ul><li>sqlldr userid=/ control=result1.ctl direct=true parallel=true</li><li>sqlldr userid=/ control=result2.ctl direct=true parallel=true</li><li>sqlldr userid=/ control=result3.ctl direct=true parallel=true</li></ul></li><li>使用bind array提升性能，bind array大小评估为，rows*行长度。OPTIONS (bindsize=512000)
+（注意：一般只能用ASCII码形式，切记要转换编码，不然导入数据为空）(ftp上传csv文件的传输类型选择ascii)</li></ul></li>
+    </ol>
+    <p>
+      <a href="../zoedocs_index.html">文档主页</a>
+    </p>
+  </body>
+</html>

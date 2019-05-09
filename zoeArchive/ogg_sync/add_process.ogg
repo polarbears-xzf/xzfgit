@@ -1,0 +1,42 @@
+--添加归档数据库大表抽取进程
+add extract exarch1, tranlog, begin now, threads 2
+add exttrail ./dirdat/ef, extract exarch1, megabytes 2000
+
+--添加归档数据库除大表外的所有表抽取进程
+add extract exarch2, tranlog, begin now, threads 2
+add exttrail ./dirdat/archivetable/eg, extract exarch2, megabytes 2000
+
+--添加归档数据库大表PUMP进程
+add extract eparch1, exttrailsource ./dirdat/archivetable/ef
+add rmttrail ./dirdat/archivetable/pf, megabytes 2000, extract eparch1
+
+--添加归档数据库除大表外的所有表PUMP进程
+add extract eparch2, exttrailsource ./dirdat/archivetable/eg
+add rmttrail ./dirdat/archivetable/pg, megabytes 2000 ,extract eparch2
+
+
+--添加归档数据库大表复制进程
+add replicat rparch1, exttrail ./dirdat/archivetable/pf, checkpointtable ggsadmin.chkpoint
+
+--添加归档数据库除大表外的所有表复制进程
+add replicat rparch2, exttrail ./dirdat/archivetable/pg, checkpointtable ggsadmin.chkpoint
+
+
+--FAQ
+----跳过记录
+ALTER EXTRACT ex01, EXTSEQNO 0, EXTRBA 0
+ALTER REPLICAT	 ex01, EXTSEQNO 0, EXTRBA 0
+ALTER EXTRACT MYDP ETROLLOVER
+ALTER EXTRACT MYEXT BEGIN YYYY-MM-DD:HH:MI:SS
+ALTER EXTRACT MYEXT BEGIN NOW
+----打包ogg
+tar -cvf ogg.tar /ggs11 --exclude=dir*
+----解压ogg
+tar -xvf ogg.tar
+----ggsadmin权限
+grant connect,resource to ggsadmin;
+grant select any dictionary, select any table to ggsadmin;
+grant create table, create sequence to ggsadmin;
+grant flashback any table to ggsadmin;
+grant execute on dbms_flashback to ggsadmin;
+grant execute on utl_file to ggsadmin;

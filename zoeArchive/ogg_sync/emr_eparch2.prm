@@ -1,0 +1,7 @@
+extract eparch2
+userid ggsadmin , password ggsdba11
+passthru
+rmthost 168.2.5.172, mgrport 7809
+rmttrail ./dirdat/pg, megabytes 2000
+
+TABLE ZEMR.*;
