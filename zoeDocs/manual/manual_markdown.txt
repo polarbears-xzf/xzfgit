@@ -1,4 +1,4 @@
-##	parkdown使用手册
+##	markdown使用手册
 ###	基础语法
 *	标题：
 >	Markdown支持6种级别的标题，对应html标签 h1 ~ h6  
