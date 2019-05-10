@@ -1,8 +1,8 @@
 [文档主页](../zoedocs_index.html)
 
 1.	用户密码加解密
-	>	ZOEDEVOPS.ENCRYPT_USER('username' , 'password')
-	>	ZOEDEVOPS.DECRYPT_USER('username' , 'password')
+	*	ZOEDEVOPS.ENCRYPT_USER('username' , 'password')
+	*	ZOEDEVOPS.DECRYPT_USER('username' , 'password')
 2.	安全工具包：ZOEPKG_SECURITY
 3.	公用工具包：ZOEPKG_UTILITY
 	*	枚举Orale用户，返回嵌套表zoetyp_db_object_list

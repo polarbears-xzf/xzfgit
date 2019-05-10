@@ -2,7 +2,7 @@
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
 --	Name:
--- 		alert_db_params.sql
+-- 		alert_db_deploy.sql
 --	Description:
 -- 		基本说明
 --  Relation:
@@ -10,9 +10,8 @@
 --	Notes:
 --		基本注意事项
 --	修改 - （年-月-日） - 描述
---
 
---检查指标
-	--processes：
-	--memory_target：
-	--open_cursors：
+
+set markup html off
+prompt <br />
+prompt 这里是我自己写的

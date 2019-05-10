@@ -2,7 +2,7 @@
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
 --	Name:
--- 		alert_db_deploy.sql
+-- 		alert_db_params.sql
 --	Description:
 -- 		基本说明
 --  Relation:
@@ -13,10 +13,12 @@
 --
 
 --检查指标
-	--是否RAC：      为"否" 时进行提示处理
-	--是否开启归档： 为"否" 时进行提示处理
-
+	--processes：
+	--memory_target：
+	--open_cursors：
+	
 set markup html off
+prompt <br />
 
 DECLARE
 	lv_is_rac  VARCHAR2(3);
@@ -39,4 +41,3 @@ BEGIN
 	
 END;
 /
-

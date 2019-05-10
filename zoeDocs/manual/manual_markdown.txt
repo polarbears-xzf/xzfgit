@@ -62,7 +62,7 @@ Markdown使用反斜杠\插入语法中用到的特殊符号。
 ###	$$表示整行公式
 >$$f(x_1,x_x,\ldots,x_n) = x_1^2 + x_2^2 + \cdots + x_n^2 $$
 ###	流程图
-flow
+```flow
 st=>start: Start:>https://www.zybuluo.com
 io=>inputoutput: verification
 op=>operation: Your Operation
@@ -72,6 +72,6 @@ e=>end
 st->io->op->cond
 cond(yes)->e
 cond(no)->sub->io
-
+```
 
 

@@ -1,0 +1,50 @@
+<!DOCTYPE html []>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="MarkdownViewer++" />
+    <title>new 1</title>
+    <style type="text/css">
+            
+/* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
+td, h1, h2, h3, h4, h5, p, ul, ol, li {
+    page-break-inside: avoid; 
+}
+
+        </style>
+  </head>
+  <body>
+    <p>
+      <a href="../zoedocs_index.html">文档主页</a>
+    </p>
+    <ol>
+      <li>操作系统目录命名规则
+<ul><li>Windows平台根目录：c:\zoedir</li><li>Linux平台根目录：/home/oracle/zoedir</li><li>二级目录：
+<ul><li>日志目录： log 权限： chmod 777 /home/oracle/zoedir/log</li><li>数据目录： data</li><li>脚本目录： scripts</li><li>Oracle性能报告： orarpt</li><li>自定义报告： zoerpt</li></ul></li></ul></li>
+      <li>数据库性能报告命名规则
+<ul><li>命名： <em>报告类型</em> + <em>系统简称</em> + <em>项目简称</em> + <em>日期</em><blockquote><p>例：2018年10月10日福建医科大学附属第一医院HIS系统AWR报告： awr_his_fjfy_20181010</p></blockquote></li><li>报告类型：
+<blockquote><p>Oracle AWR： awr
+Oracle ADDM： addm
+Oracle ASH： ash
+Oracle数据库健康巡检： zoeOradb</p></blockquote></li><li>系统简称
+<blockquote><p>HIS： his
+电子病历： emr
+健康档案： smjk</p></blockquote></li></ul></li>
+      <li>远程管理DB LINK命名规则
+<ul><li>DB LINK命名：数据库名 + IP最后一位 + 连接用户名
+<blockquote><p>例：HIS50主数据库，IP：192.168.1.41，连接用户：zoeagent。命名：zoemdb41zoeagent
+create database link zoemdb41zoeagent connect to zoeagent identified by zoeY6FG0PL943Z8 using '192.168.1.41/zoemdb';</p></blockquote></li></ul></li>
+      <li>部署脚本语言配置
+<ul><li>Windows平台下字符集为UTF8
+<blockquote><p>SQLPLUS 设置
+&gt;	set NLS_LANG=SIMPLIFIED CHINESE_CHINA.AL32UTF8
+cmd设置
+chcp 65001
+字体选择：lucida console 字号：14</p></blockquote></li><li>NOTEPAD++ 设置
+<blockquote><p>编码 - 以UTF8无BOM编码方式</p></blockquote></li></ul><h6 id="cmdbomcmdutf8bomsqlplusbom">注：cmd会自动查找bom，因此在cmd下如果使用utf8格式，需要用BOM方式保存。sqlplus执行BOM方式保存文件时，第一行会报错</h6></li>
+    </ol>
+    <p>
+      <a href="../zoedocs_index.html">文档主页</a>
+    </p>
+  </body>
+</html>
