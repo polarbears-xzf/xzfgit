@@ -2,7 +2,7 @@
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
 --	Name:
--- 		content_basic_status.sql
+-- 		content_db_basic_status.sql
 --	Description:
 -- 		基本说明
 --  Relation:
@@ -13,7 +13,7 @@
 --
 
 -- =======================================
--- Oracle基本状态信息
+-- 数据库基本状态信息
 -- =======================================
 	--是否RAC数据库状态
 	--数据库归档状态

@@ -165,22 +165,21 @@ set markup html on entmap off
 set markup html on entmap off
 
 -- =======================================
--- Oracle基本状态信息
+-- 操作系统基本状态信息
 -- =======================================
-	--是否RAC数据库状态
-	--数据库归档状态
-	--当前表空间数、数据文件数与控制文件数
-	--当前热备状态文件数
-@@content_basic_status.sql
+@@content_os_basic_status.sql
+set markup html on entmap off
+
+-- =======================================
+-- 数据库基本状态信息
+-- =======================================
+@@content_db_basic_status.sql
 set markup html on entmap off
 
 
 -- =======================================
 -- Oracle空间状态信息
 -- =======================================
-	--数据库已分配空间大小与使用率
-	--日志文件日均增长量
-	--归档日志最大切换时间，最小切换时间和高峰期日志平均切换时间
 @@content_space_status.sql	
 set markup html on entmap off
 
