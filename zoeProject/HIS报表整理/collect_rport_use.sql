@@ -1,16 +1,35 @@
--- 北极熊创建于： 2019.04.19
+-- 北极熊创建于： 2019.05.15
 -- 版权 2019 中国
 -- 保留所有权利
 --	文件名:
--- 		analyze_report.sql
+-- 		collect_report_use.sql
 --	描述:
--- 		分析HIS4报表使用语法
+-- 		用于收集HIS4报表使用情况的SQL
 --   对象关联:
 --      对象关联
 --	注意事项:
 --		基本注意事项
 --	修改 - （年-月-日） - 描述
+--
+--
 
+--	收集报表使用分类
+select level as "level", LPAD(' ',2*(LEVEL-1))||a.class_name as "class_name",a.class_code as "class_code"
+from COMM.general_class_dict a
+start with a.super_class = '##' and a.class_type = 'A'
+connect by prior a.class_code = a.super_class;
+
+--	收集报表使用分类归属
+with report_class as
+(select level , LPAD(' ',2*(LEVEL-1))||a.class_name as class_name,a.class_code 
+from COMM.general_class_dict a
+start with a.super_class = '##' and a.class_type = 'A'
+connect by prior a.class_code = a.super_class)
+select a.class_code,a.class_name,b.report_id,b.report_name
+from report_class a, REPORT.qr_report b
+where a.class_code = b.class_code; 
+
+--	收集报表使用频率
 --统计报表日使用频率
 select operate_data1 as report_id, b.report_name, to_char(a.operation_time,'yyyy-mm-dd') as stat_date, COUNT(1) as count 
 from COMM.DATA_OPERATE_LOG a, REPORT.qr_report b
@@ -77,4 +96,3 @@ select b.report_id, b.report_type, b.class_code, b.report_name,
 from report_use a , COMM.qr_report b
 WHERE a.report_id = b.report_id
 order by b.report_id;
-
