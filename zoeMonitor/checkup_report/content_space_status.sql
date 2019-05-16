@@ -73,7 +73,32 @@ FROM
     )
   ) a,
   (SELECT MAX(completion_time)-MIN(completion_time) days FROM gv$archived_log
-  ) b;
+  ) b
+union all
+select '表空间使用率：'||tablespace_name,pct_used||'%' from
+(select tablespace_name,
+       max_gb,
+       used_gb,
+       round(100 * used_gb / max_gb) pct_used
+  from (select a.tablespace_name tablespace_name,
+               round((a.bytes_alloc - nvl(b.bytes_free, 0)) / power(2, 30),
+                     2) used_gb,
+               round(a.maxbytes / power(2, 30), 2) max_gb
+          from (select f.tablespace_name,
+                       sum(f.bytes) bytes_alloc,
+                       sum(decode(f.autoextensible,
+                                  'YES',
+                                  f.maxbytes,
+                                  'NO',
+                                  f.bytes)) maxbytes
+                  from dba_data_files f
+                 group by tablespace_name) a,
+               (select f.tablespace_name, sum(f.bytes) bytes_free
+                  from dba_free_space f
+                 group by tablespace_name) b
+         where a.tablespace_name = b.tablespace_name(+)) )
+where pct_used>70 and  max_gb<used_gb+100;
+
 
 prompt  </center>
 
