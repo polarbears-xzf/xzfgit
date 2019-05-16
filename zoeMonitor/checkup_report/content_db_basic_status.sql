@@ -17,6 +17,7 @@
 -- =======================================
 	--是否RAC数据库状态
 	--数据库归档状态
+	--当前进程数、会话数
 	--当前表空间数、数据文件数与控制文件数
 	--当前热备状态文件数
 	
@@ -38,6 +39,10 @@ from gv$parameter
 where name = 'cluster_database'
 union all
 select '是否开启归档', decode(log_mode,'ARCHIVELOG','是','否') from v$database
+union all
+select '当前进程数',to_char(count(*)) from v$process
+union all
+select '当前会话数',to_char(count(*)) from v$session
 union all
 select '当前表空间数',to_char(count(*)) from v$tablespace
 union all
