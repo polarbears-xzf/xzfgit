@@ -18,6 +18,8 @@
 	--数据库已分配空间大小与使用率
 	--日志文件日均增长量
 	--归档日志最大切换时间，最小切换时间和高峰期日志平均切换时间
+	--表空间使用率
+	--ASM磁盘组使用率
 	
 set markup html off
 prompt  <H3 class='zoecomm'> <center>数据库空间状态信息 </center> </H3>
@@ -73,7 +75,34 @@ FROM
     )
   ) a,
   (SELECT MAX(completion_time)-MIN(completion_time) days FROM gv$archived_log
-  ) b;
+  ) b
+union all
+select '表空间"'||tablespace_name||'"使用率:',pct_used||'%' from
+(select tablespace_name,
+       max_gb,
+       used_gb,
+       round(100 * used_gb / max_gb) pct_used
+  from (select a.tablespace_name tablespace_name,
+               round((a.bytes_alloc - nvl(b.bytes_free, 0)) / power(2, 30),
+                     2) used_gb,
+               round(a.maxbytes / power(2, 30), 2) max_gb
+          from (select f.tablespace_name,
+                       sum(f.bytes) bytes_alloc,
+                       sum(decode(f.autoextensible,
+                                  'YES',
+                                  f.maxbytes,
+                                  'NO',
+                                  f.bytes)) maxbytes
+                  from dba_data_files f
+                 group by tablespace_name) a,
+               (select f.tablespace_name, sum(f.bytes) bytes_free
+                  from dba_free_space f
+                 group by tablespace_name) b
+         where a.tablespace_name = b.tablespace_name(+)) )
+where pct_used>70 and  max_gb<used_gb+100
+union all
+select 'ASM磁盘组"'||name||'"使用率:',100-round(free_mb/total_mb * 100,2)||'%' pct_free from v$asm_diskgroup;
+
 
 prompt  </center>
 
