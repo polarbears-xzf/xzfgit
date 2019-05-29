@@ -34,7 +34,7 @@ set markup html on table "WIDTH=600 BORDER=1"
 select STAT_NAME as "column1",
        value  as "column2"
 from v$osstat
-where STAT_NAME IN ('NUM_CPUS','','PHYSICAL_MEMORY_BYTES','FREE_MEMORY_BYTES');
+where STAT_NAME IN ('NUM_CPUS','','PHYSICAL_MEMORY_BYTES','FREE_MEMORY_BYTES','VM_IN_BYTES','VM_OUT_BYTES');
 
 prompt  </center>
 
