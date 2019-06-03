@@ -58,9 +58,9 @@ select '当前数据文件数',to_char(count(*)) from v$datafile
 union all
 select '当前控制文件数',to_char(count(*)) from v$controlfile
 union all
-select '在线日志组数/成员数/大小',to_char(count(group#)/max(thread#)||'/'||max(members)||'/'||min(bytes)/1024/1024||'M') from v$log
+select '在线日志组数/成员数/大小',to_char(count(group#)/max(thread#)||'/'||max(members)||'/'||trunc(min(bytes)/1024/1024)||'M') from v$log
 union all
-select '历史归档日志数',records_total from v$controlfile_record_section where type='ARCHIVED LOG'
+select '历史归档日志数',to_char(records_total) from v$controlfile_record_section where type='ARCHIVED LOG'
 union all
 select '当前热备状态文件数',decode(count(status),0,'否',count(status)) from v$backup where status='ACTIVE';
 

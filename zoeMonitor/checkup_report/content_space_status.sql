@@ -51,30 +51,32 @@ union all
 select '最大日志切换时间' , trunc(max(next_time-first_time)*24*60,-2)||'分钟'
 from v$archived_log
 union all
-SELECT '上午9-12点日志平均切换时间', trunc(180/(a.total_count/b.days),-2)||'分钟'
+SELECT '上午9-12点日志平均切换时间', decode(a.total_count,0,null,trunc(180/(a.total_count/b.days),2)||'分钟')
 FROM
-  (SELECT COUNT(1) total_count
-  FROM
-    (SELECT DISTINCT SUBSTR(name,instr(name,'/',-1)+1)
+  (SELECT COUNT(name)/decode(count(distinct dest_id),0,1,count(distinct dest_id)) total_count
     FROM gv$archived_log
     WHERE to_number(TO_CHAR(completion_time,'hh24')) > 9
       AND to_number(TO_CHAR(completion_time,'hh24')) < 12
-    )
+      AND standby_dest='NO'
   ) a,
-  (SELECT MAX(completion_time)-MIN(completion_time) days FROM gv$archived_log
+  (SELECT MAX(completion_time) - MIN(completion_time) days
+  FROM gv$archived_log
+ where name is not null
+   and standby_dest = 'NO'
   ) b
 union all
-SELECT '凌晨0-3点日志平均切换时间', trunc(180/(a.total_count/b.days),-2)||'分钟'
+SELECT '凌晨0-3点日志平均切换时间', decode(a.total_count,0,null,trunc(180/(a.total_count/b.days),2)||'分钟')
 FROM
-  (SELECT COUNT(1) total_count
-  FROM
-    (SELECT DISTINCT SUBSTR(name,instr(name,'/',-1)+1)
+  (SELECT COUNT(name)/decode(count(distinct dest_id),0,1,count(distinct dest_id)) total_count
     FROM gv$archived_log
     WHERE to_number(TO_CHAR(completion_time,'hh24')) > 0
       AND to_number(TO_CHAR(completion_time,'hh24')) < 3
-    )
+      AND standby_dest='NO'
   ) a,
-  (SELECT MAX(completion_time)-MIN(completion_time) days FROM gv$archived_log
+  (SELECT MAX(completion_time) - MIN(completion_time) days
+  FROM gv$archived_log
+ where name is not null
+   and standby_dest = 'NO'
   ) b
 union all
 select '表空间"'||tablespace_name||'"使用率:',pct_used||'%' from
