@@ -30,7 +30,7 @@ prompt  <H3 class='zoecomm'>  <center> 项目基本信息 </center> </H3> <br>
 
 --定义巡检系统
 column systemname  NEW_VALUE systemname noprint
-select decode('&checkupSystem','his','HIS系统','其它系统') as "systemname" from dual;
+select decode('&checkupSystem','his','HIS系统','emr','EMR系统','hdc','HDC系统','hip','HIP系统','其它系统') as "systemname" from dual;
 --定义数据库版本
 column banner  NEW_VALUE db_version noprint
 select banner as "banner" from v$version where banner like 'Oracle Database%';
