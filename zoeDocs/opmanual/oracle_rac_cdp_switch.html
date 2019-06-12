@@ -1,0 +1,34 @@
+<!DOCTYPE html []>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="MarkdownViewer++" />
+    <title>oracle_rac_cdp_switch.txt</title>
+    <style type="text/css">
+            
+/* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
+td, h1, h2, h3, h4, h5, p, ul, ol, li {
+    page-break-inside: avoid; 
+}
+
+        </style>
+  </head>
+  <body>
+    <p>
+      <a href="../zoedocs_index.html">文档主页</a>
+    </p>
+    <h3 id="oracle-rac-cdp">Oracle RAC 存储CDP容灾切换</h3>
+    <blockquote>
+      <p>Linux平台</p>
+    </blockquote>
+    <ol>
+      <li>切换挂载容灾存储（如：EMC的RPA）</li>
+      <li>Linux操作系统重新扫描磁盘
+<ul><li>获取重新扫描磁盘的语句
+<blockquote><p>ls /sys/class/scsi_host/ | awk '{print "echo "- - -" &gt; /sys/class/scsi_host/" $1 "/scan"}'</p></blockquote></li><li>执行获取语句重新扫描磁盘</li></ul></li>
+    </ol>
+    <p>
+      <a href="../zoedocs_index.html">文档主页</a>
+    </p>
+  </body>
+</html>
