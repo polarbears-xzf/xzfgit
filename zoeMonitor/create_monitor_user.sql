@@ -43,7 +43,7 @@ BEGIN
     lv_sql              := 'CREATE TABLESPACE '||lv_tablespace_name||' ';
     lv_sql              := lv_sql||'LOGGING ' ;
     lv_sql              := lv_sql||'DATAFILE '''||lv_dir||lv_tablespace_name||'01.ora'' SIZE 10M REUSE ';
-    lv_sql              := lv_sql||'AUTOEXTEND ON NEXT 10M MAXSIZE 16000M ';
+    lv_sql              := lv_sql||'AUTOEXTEND ON NEXT 10M MAXSIZE 16G ';
     lv_sql              := lv_sql||'EXTENT MANAGEMENT LOCAL';
     EXECUTE immediate lv_sql;
     --dbms_output.put_line(lv_sql);
