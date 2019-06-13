@@ -52,7 +52,39 @@
 			-- If you use a title in your output, then SQL*Plus starts a new HTML table for output rows that appear after the title. 
 			--Your browser may format column widths of each table differently, depending on the width of data in each column.
 		-- SET COLSEP, RECSEP and UNDERLINE only produce output in HTML reports when PREFORMAT is ON
+
+
+
+
+
 		
+
+-- =======================================
+-- 定义报表变量
+-- =======================================
+
+define porjectName="厦门市卫计委"
+define porjectCode="xmswjw"
+define reportType="zoeOradb"
+--define checkupSystem="emr"
+define reportPath="c:\zoedir\zoerpt\"
+-- "
+--输入系统名称
+prompt
+prompt Specify the Report checkupSystem
+prompt ~~~~~~~~~~~~~~~~~~~~~~~
+prompt What systems need to be checked?
+prompt  Defaults to 'his'
+
+column checkupSystem new_value checkupSystem;
+set heading off;
+select 'checkupSystem Specified: ',lower(nvl('&&checkupSystem','his')) checkupSystem from dual;
+set heading on;
+
+
+column report_time NEW_VALUE reportTime noprint
+select to_char(sysdate,'yyyymmdd') as "report_time" from dual;
+
 -- =======================================
 -- 设置SQLPLUS环境
 -- =======================================
@@ -67,18 +99,6 @@ set linesize 999
 set long     9999
 set pagesize 9999
 alter session set nls_date_format='yyyy-mm-dd hh24:mi:ss';
--- =======================================
--- 定义报表变量
--- =======================================
-
-define porjectName="厦门市卫计委"
-define porjectCode="xmswjw"
-define reportType="zoeOradb"
-define checkupSystem="his"
-define reportPath="c:\zoedir\zoerpt\"
--- "
-column report_time NEW_VALUE reportTime noprint
-select to_char(sysdate,'yyyymmdd') as "report_time" from dual;
 
 -- =======================================
 -- 定义HTML格式
