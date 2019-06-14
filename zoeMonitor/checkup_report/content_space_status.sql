@@ -75,18 +75,9 @@ FROM
       AND to_number(TO_CHAR(completion_time,'hh24')) < 3
       AND standby_dest='NO'
   ) a,
-<<<<<<< HEAD
-  (SELECT MAX(completion_time)-MIN(completion_time) days FROM gv$archived_log
-=======
   (SELECT MAX(completion_time) - MIN(completion_time) days
   FROM gv$archived_log
-<<<<<<< HEAD
- where name is not null
-   and standby_dest = 'NO'
->>>>>>> e8533cff042f75beaad7bc63bb2ca3ec9ddefd9c
-=======
  where standby_dest = 'NO'
->>>>>>> c0cc1c901e74c97c4c08ccc36cd36ff79837d515
   ) b
 union all
 select '表空间"'||tablespace_name||'"使用率:',pct_used||'%' from
