@@ -39,7 +39,7 @@ set markup html on table "WIDTH=600 BORDER=1"
 
 select '是否集群数据库' as "column1",
        decode(value,'TRUE','是','FALSE','否',value)  as "column2"
-from gv$parameter
+from v$parameter
 where name = 'cluster_database'
 union all
 select '是否开启归档', decode(log_mode,'ARCHIVELOG','是','否') from v$database
