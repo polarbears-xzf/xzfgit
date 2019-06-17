@@ -12,7 +12,9 @@
 ###	使用手册
 1.	[sqloader使用手册](manual/manual_sqlloader.html)
 2.	[markdown使用手册](manual/manual_markdown.html)
+3.	[flashback使用手册](manual/manual_flashback.html)
 ###	操作手册
 1.	[Oracle RAC IP切换](opmanual/oracle_rac_switch_ip.html)
 2.	[Oracle RAC 存储CDP容灾切换测试](opmanual/oracle_rac_cdp_switch.html)
+
 
