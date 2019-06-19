@@ -1,0 +1,6 @@
+>	_Created in 2019.06.19 by polarbears_  
+>	_Copyright (c) 20xx, CHINA and/or affiliates._  
+>	_docname datanode_install_guide_  
+###	安装运维管理系统基础功能包数据节点 
+	
+1.	创建用户
