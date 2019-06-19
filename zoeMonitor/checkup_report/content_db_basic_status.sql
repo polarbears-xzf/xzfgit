@@ -37,10 +37,9 @@ prompt  <center>
 set markup html on entmap off
 set markup html on table "WIDTH=600 BORDER=1"
 
-select '是否集群数据库' as "column1",
-       decode(value,'TRUE','是','FALSE','否',value)  as "column2"
-from v$parameter
-where name = 'cluster_database'
+WITH cluster_or_not AS 
+(select value from v$parameter where name = 'cluster_database')
+select '是否集群数据库' as "column1", decode(value,'TRUE','是','FALSE','否',value)  as "column2" from cluster_or_not
 union all
 select '是否开启归档', decode(log_mode,'ARCHIVELOG','是','否') from v$database
 union all
@@ -48,9 +47,9 @@ select '是否开启强制日志', decode(force_logging,'YES','是','否') from 
 union all
 select '是否开启附加日志', decode(supplemental_log_data_min,'YES','是','否') from v$database
 union all
-select '当前进程数',to_char(count(*)) from v$process
+select '当前进程数',LISTAGG(decode(b.value,'TRUE','节点'||a.inst_id||' : ',null)||to_char(count(1)),'<br/>') within group(order by 2)  from gv$process a,cluster_or_not b group by decode(b.value,'TRUE','节点'||a.inst_id||' : ',null)
 union all
-select '当前会话数',to_char(count(*)) from v$session
+select '当前会话数',LISTAGG(decode(b.value,'TRUE','节点'||a.inst_id||' : ',null)||to_char(count(1)),'<br/>') within group(order by 2)  from gv$session a,cluster_or_not b group by decode(b.value,'TRUE','节点'||a.inst_id||' : ',null)
 union all
 select '当前表空间数',to_char(count(*)) from v$tablespace
 union all
