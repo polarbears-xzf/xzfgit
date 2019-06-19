@@ -11,33 +11,39 @@
 --		基本注意事项
 --	修改 - （年-月-日） - 描述
 --
-
---检查指标
-	--数据文件数：与控制文件和参数文件中对比，当差值小于10时临界严重警告，当差值小于50时警告
-	--控制文件数：小于2时进行提示处理
+---检查指标
+-	--数据文件数：与控制文件和参数文件中对比，当差值小于5时临界严重警告，当差值小于20时警告
+-	--控制文件数：小于2时进行提示处理
 	
 set markup html off
 prompt <br />
 
+--SET SERVEROUTPUT ON
 DECLARE
-	lv_is_rac  VARCHAR2(3);
-	lv_is_archive VARCHAR2(3);
+	lv_datafiles  VARCHAR2(16);
+	lv_datas	 VARCHAR2(16);
+	lv_ctlfiles  VARCHAR2(16);
 BEGIN
-	--是否RAC
-	select decode(value,'TRUE','是','FALSE','否',value)  INTO lv_is_rac
-	from gv$parameter where name = 'cluster_database';
-	IF lv_is_rac = '否' THEN 
-		DBMS_OUTPUT.PUT_LINE('Oracle RAC 未部署，系统存在高可用性缺陷');
-	END IF;
-	--是否开启归档
-	select decode(log_mode,'ARCHIVELOG','是','否')       INTO lv_is_archive
-	from v$database;
-	IF lv_is_archive = '否' THEN 
-		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE(' <td> 紧急：数据库未开启归档模式，存在严重安全隐患</td> ');
-		DBMS_OUTPUT.PUT_LINE('</table> ');
-	END IF;
+	--数据文件数：与控制文件和参数文件中对比，当差值小于5时临界严重警告，当差值小于20时警告
 	
-END;
+	select to_char(count(*)) into lv_datafiles from dba_data_files;
+	select value into lv_datas from V$parameter t where t.NAME='db_files';
+	if lv_datas-lv_datafiles<5 then 
+		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+		DBMS_OUTPUT.PUT_LINE('<td>严重警告！当前库最大数据文个数：'||lv_datas||'，当前数据文件个数：'||lv_datafiles||'，请调整最大数据文件个数</td>');
+		DBMS_OUTPUT.PUT_LINE('</table> ');
+	else if lv_datas-lv_datafiles<20 and lv_datas-lv_datafiles>=5 then
+		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+		DBMS_OUTPUT.PUT_LINE('<td>警告！当前库最大数据文个数：'||lv_datas||'，当前数据文件个数：'||lv_datafiles||'，请注意数据文件个数增长</td>');
+		DBMS_OUTPUT.PUT_LINE('</table> ');
+	end if;
+	end if;
+	--控制文件数：小于2时提醒
+	select count(1) into lv_ctlfiles from v$controlfile;
+	if lv_ctlfiles <2 then
+		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+		DBMS_OUTPUT.PUT_LINE('<td>严重警告！当前控制文件个数：'||lv_ctlfiles||'，请及时处理进行备份</td>');
+		DBMS_OUTPUT.PUT_LINE('</table> ');
+	end if;
+END; 
 /
-

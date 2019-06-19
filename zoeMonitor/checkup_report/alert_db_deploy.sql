@@ -42,7 +42,7 @@ BEGIN
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	END IF;
 	--实例及数据库状态
-	select LISTAGG('实例：'||instance_name||'；实例状态：'||status||',数据库状态：'||database_status||'','；') WITHIN GROUP(ORDER BY inst_id) into lv_dbstatus from gv$instance;
+	select LISTAGG('实例：'||instance_name||'；实例状态：'||status||',数据库状态：'||database_status||'','</td>') WITHIN GROUP(ORDER BY inst_id) into lv_dbstatus from gv$instance;
 	    DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>'); 
 		DBMS_OUTPUT.PUT_LINE('<td>'||lv_dbstatus||'</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
