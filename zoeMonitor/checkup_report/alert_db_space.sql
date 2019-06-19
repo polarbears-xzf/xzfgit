@@ -26,7 +26,7 @@ DECLARE
 --	lv_is_archive VARCHAR2(3);
 CURSOR tab_cursor IS
 -- 查询使用率大于70% 同时剩余表空间小于100Gb的表空间
-select tablespace_name,pct_used from
+select tablespace_name,pct_used,free_gb from
 (
 	select tablespace_name,
        (max_gb-used_gb) free_gb,
@@ -69,15 +69,16 @@ BEGIN
 	FOR t in tab_cursor loop
 		if t.pct_used > 80 and t.pct_used <90 then
 			DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-			DBMS_OUTPUT.PUT_LINE('<td>表空间'||t.tablespace_name||'余量较少,请在一周内扩展');
+			DBMS_OUTPUT.PUT_LINE('<td>表空间'||t.tablespace_name||'余量较少,请注意扩展');
+			DBMS_OUTPUT.PUT_LINE('<td>表空间'||t.tablespace_name||'使用率:'||t.pct_used||' 剩余空间:'||t.free_gb);
 			DBMS_OUTPUT.PUT_LINE('</table> ');
 		end if;
 		if t.pct_used > 90  then
 			DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
 			DBMS_OUTPUT.PUT_LINE('<td>表空间'||t.tablespace_name||'余量极少,请立即扩展');
+			DBMS_OUTPUT.PUT_LINE('<td>表空间'||t.tablespace_name||'使用率:'||t.pct_used||' 剩余空间:'||t.free_gb);
 			DBMS_OUTPUT.PUT_LINE('</table> ');
 		end if;
 	end loop;
-	
 END;
 /
