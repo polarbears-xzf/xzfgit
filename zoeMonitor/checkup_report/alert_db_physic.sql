@@ -16,7 +16,7 @@
 -	--控制文件数：小于2时进行提示处理
 	
 set markup html off
-prompt <br />
+--prompt <br />
 
 --SET SERVEROUTPUT ON
 DECLARE
@@ -47,3 +47,49 @@ BEGIN
 	end if;
 END; 
 /
+
+DECLARE
+    DB_FILE_DIFF number(5);
+    CON_FILES number(5);
+BEGIN
+
+-- 查询数据文件剩余可用量；
+select (max_db_files - db_files) difference into DB_FILE_DIFF
+   from (select value max_db_files from v$parameter where NAME = 'db_files'),
+        (select count(*) db_files from v$datafile);
+		 
+-- 查询控制文件数量
+select type into CON_FILES from v$parameter where NAME = 'control_files';
+
+--判断数据文件剩余可用量值范围   
+	if DB_FILE_DIFF >= 10 and  DB_FILE_DIFF < 30 then
+		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+		DBMS_OUTPUT.PUT_LINE('<td> 注意:最大数据文件剩余可用数量='|| DB_FILE_DIFF ||',少于30个,请注意添加');
+		DBMS_OUTPUT.PUT_LINE('</table> ');
+	else if  DB_FILE_DIFF < 10 and DB_FILE_DIFF >= 0 then
+		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+		DBMS_OUTPUT.PUT_LINE('<td> 告警:最大数据文件剩余可用数量='|| DB_FILE_DIFF ||',少于10个,请立即添加');
+		DBMS_OUTPUT.PUT_LINE('</table> ');
+	else 
+		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+		DBMS_OUTPUT.PUT_LINE('<td> 数据文件剩余可用数量:'|| DB_FILE_DIFF);
+		DBMS_OUTPUT.PUT_LINE('</table> ');
+		end if;
+	end if;
+
+--判断控制文件数量
+	if con_files < 2 and con_files >=0 then
+		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+        DBMS_OUTPUT.PUT_LINE('<td> 控制文件数量少于2个,请立即增加控制文件');
+		DBMS_OUTPUT.PUT_LINE('</table> ');
+    else
+		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+        DBMS_OUTPUT.PUT_LINE('<td> 控制文件数量:'|| CON_FILES );
+		DBMS_OUTPUT.PUT_LINE('</table> ');
+    end if;
+
+			   
+END;
+/
+
+
