@@ -27,6 +27,8 @@ DECLARE
 	MAX_PROCESSES number(10);
 	PGA_USED_PCT number(10);
 	MEMORY_TARGET number(10);
+	HIGH_OPEN_CURSORS number(10);
+	MAX_OPEN_CURSORS number(10);
 	lv_sessions  VARCHAR2(16);
 	lv_sga VARCHAR2(16);
 	lv_pga VARCHAR2(16);
@@ -75,6 +77,7 @@ BEGIN
 	SELECT round(value/1024/1024) into lv_pga FROM v$parameter WHERE name='pga_aggregate_target';
 	SELECT round(value/1024/1024) into lv_sga FROM v$parameter WHERE name='sga_target';
 	
+	--通过PGA_TAG+1排除等于0的情况 (问题1)
 	select USED/(PGA_TAG+1) into PGA_USED_PCT FROM 
 		(select value/1024/1024 USED from v$pgastat where name = 'total PGA allocated'),
 		(select value/1024/1024 PGA_TAG from v$parameter t where name = 'pga_aggregate_target');
@@ -94,12 +97,32 @@ BEGIN
 		DBMS_OUTPUT.PUT_LINE(' <td> 当前数据库使用自动内存管理,建议使用手动管理');
 		DBMS_OUTPUT.PUT_LINE('</table> ');	
 */		
-	--问题:自动内存管理的情况
+	--问题1:自动内存管理的情况 
 	IF MEMORY_TARGET = 0 AND PGA_USED_PCT > 2 THEN
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
 		DBMS_OUTPUT.PUT_LINE('<td> 紧急：当前PGA使用率超过200%,请关注内存使用情况');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	END IF;
 	
+	--检查最大打开游标及最大可用游标值
+	SELECT MAX(A.VALUE) HIGH_OPEN_CUR, P.VALUE MAX_OPEN_CUR
+		FROM GV$SESSTAT A, V$STATNAME B, V$PARAMETER P
+	WHERE A.STATISTIC# = B.STATISTIC#
+		AND B.NAME = 'opened cursors current'
+		AND P.NAME = 'open_cursors'
+	GROUP BY P.VALUE;
+	
+	-- 余量不足100或当游标使用超过70%告警
+	IF (MAX_OPEN_CUR - HIGH_OPEN_CUR) < 100 THEN
+		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+		DBMS_OUTPUT.PUT_LINE('<td> 可用游标不足100，请关注');
+		DBMS_OUTPUT.PUT_LINE('</table> ');
+	ELSE IF (MAX_OPEN_CUR - HIGH_OPEN_CUR) >= 100 AND HIGH_OPEN_CUR > (MAX_OPEN_CUR * 0.7) THEN
+		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+		DBMS_OUTPUT.PUT_LINE('<td> 最大游标使用量超过70%，请关注');
+		DBMS_OUTPUT.PUT_LINE('</table> ');
+	END IF;
+	END IF;
+
 END;
 /

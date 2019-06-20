@@ -47,7 +47,7 @@ BEGIN
 	end if;
 END; 
 /
-
+/* 
 DECLARE
     DB_FILE_DIFF number(5);
     CON_FILES number(5);
@@ -90,6 +90,7 @@ select type into CON_FILES from v$parameter where NAME = 'control_files';
 
 			   
 END;
-/
+/ 
+*/
 
 
