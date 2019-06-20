@@ -59,7 +59,7 @@ SELECT '上午9-12点日志平均切换时间', decode(a.total_count,0,null,trun
 FROM
   (SELECT COUNT(*)/decode(count(distinct dest_id),0,1,count(distinct dest_id)) total_count
     FROM gv$archived_log
-    WHERE to_number(TO_CHAR(completion_time,'hh24')) > 9
+    WHERE to_number(TO_CHAR(completion_time,'hh24')) >= 9
       AND to_number(TO_CHAR(completion_time,'hh24')) < 12
       AND standby_dest='NO'
   ) a,
@@ -72,7 +72,7 @@ SELECT '凌晨0-3点日志平均切换时间', decode(a.total_count,0,null,trunc
 FROM
   (SELECT COUNT(*)/decode(count(distinct dest_id),0,1,count(distinct dest_id)) total_count
     FROM gv$archived_log
-    WHERE to_number(TO_CHAR(completion_time,'hh24')) > 0
+    WHERE to_number(TO_CHAR(completion_time,'hh24')) >= 0
       AND to_number(TO_CHAR(completion_time,'hh24')) < 3
       AND standby_dest='NO'
   ) a,
