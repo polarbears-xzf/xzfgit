@@ -20,6 +20,7 @@
 	--归档日志最大切换时间，最小切换时间和高峰期日志平均切换时间
 	--表空间使用率
 	--ASM磁盘组使用率
+	--对象统计信息最近收集时间
 	
 set markup html off
 prompt  <H3 class='zoecomm'> <center>数据库空间状态信息 </center> </H3>
@@ -104,7 +105,9 @@ select '表空间"'||tablespace_name||'"使用率:',pct_used||'%' from
          where a.tablespace_name = b.tablespace_name(+)) )
 where pct_used>70 and  max_gb<used_gb+100
 union all
-select 'ASM磁盘组"'||name||'"使用率:',100-round(free_mb/total_mb * 100,2)||'%' pct_free from v$asm_diskgroup;
+select 'ASM磁盘组"'||name||'"使用率:',100-round(free_mb/total_mb * 100,2)||'%' pct_free from v$asm_diskgroup
+union all
+select '对象统计信息最近收集时间',to_char(max(last_analyzed)) from dba_tables;
 
 
 prompt  </center>

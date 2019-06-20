@@ -77,6 +77,7 @@ prompt What systems need to be checked?
 prompt  Defaults to 'his'
 
 column checkupSystem new_value checkupSystem;
+set verify  off;
 set heading off;
 select 'checkupSystem Specified: ',lower(nvl('&&checkupSystem','his')) checkupSystem from dual;
 set heading on;
