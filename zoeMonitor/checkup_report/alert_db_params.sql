@@ -27,8 +27,8 @@ DECLARE
 	MAX_PROCESSES number(10);
 	PGA_USED_PCT number(10);
 	MEMORY_TARGET number(10);
-	HIGH_OPEN_CURSORS number(10);
-	MAX_OPEN_CURSORS number(10);
+	HIGH_OPEN_CUR number(10);
+	MAX_OPEN_CUR number(10);
 	lv_sessions  VARCHAR2(16);
 	lv_sga VARCHAR2(16);
 	lv_pga VARCHAR2(16);
@@ -105,13 +105,13 @@ BEGIN
 	END IF;
 	
 	--检查最大打开游标及最大可用游标值
-	SELECT MAX(A.VALUE) HIGH_OPEN_CUR, P.VALUE MAX_OPEN_CUR
-		FROM GV$SESSTAT A, V$STATNAME B, V$PARAMETER P
-	WHERE A.STATISTIC# = B.STATISTIC#
-		AND B.NAME = 'opened cursors current'
-		AND P.NAME = 'open_cursors'
-	GROUP BY P.VALUE;
-	
+	SELECT P.VALUE into MAX_OPEN_CUR FROM V$PARAMETER P where P.NAME = 'open_cursors';
+
+	SELECT MAX(A.VALUE) into HIGH_OPEN_CUR
+	  FROM GV$SESSTAT A, V$STATNAME B
+	 WHERE A.STATISTIC# = B.STATISTIC# 
+	   AND B.NAME = 'opened cursors current';
+
 	-- 余量不足100或当游标使用超过70%告警
 	IF (MAX_OPEN_CUR - HIGH_OPEN_CUR) < 100 THEN
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
