@@ -1,22 +1,29 @@
---
-CREATE OR REPLACE PACKAGE BODY ZOEDEVOPS.ZOEPKG_COMM 
-AS
--- Created in 2017.10.10 by polarbears
+-- =====================================================
+
+CREATE OR REPLACE PACKAGE BODY ZOEDEVOPS.ZOEPKG_UTILITY
+
+-- Created in 2019.06.18 by polarbears
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
 --	Name:
--- 		zoepkg_comm.pkb
+-- 		zoepkg_utility.pkb
 --	Description:
--- 		运维管理基础包
+-- 		基础工具包
 --  Relation:
---      
+--      建在所有其它包之前
 --	Notes:
 --		基本注意事项
 --	修改 - （年-月-日） - 描述
 --
+--
 
-FUNCTION GET_ORACLE_USER RETURN zoetyp_db_object_list AS
-	lt_oracle_user zoetyp_db_object_list := zoetyp_db_object_list();
+AS
+
+-- ===================================================
+-- 枚举Oracle自身产品用户列表
+-- ===================================================
+FUNCTION GET_ORACLE_USER RETURN zoett_db_object_list AS
+	lt_oracle_user zoett_db_object_list := zoett_db_object_list();
 BEGIN
 	lt_oracle_user.extend;
 	lt_oracle_user(lt_oracle_user.count) := 'SYS';
@@ -114,5 +121,6 @@ BEGIN
 	RETURN lt_oracle_user;
 END GET_ORACLE_USER;
 
-END ZOEPKG_COMM;
+
+END ZOEPKG_UTILITY;
 /

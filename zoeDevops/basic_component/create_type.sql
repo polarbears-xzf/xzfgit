@@ -22,3 +22,7 @@ CREATE OR REPLACE TYPE ZOEDEVOPS.zoeto_db_basic_info AS OBJECT(
 /
 CREATE OR REPLACE TYPE ZOEDEVOPS.zoett_db_basic_info AS TABLE OF zoeto_db_basic_info;
 /
+
+--用于获取数据库对象信息
+CREATE OR REPLACE TYPE ZOEDEVOPS.zoett_db_object_list IS TABLE OF VARCHAR2(64);
+/

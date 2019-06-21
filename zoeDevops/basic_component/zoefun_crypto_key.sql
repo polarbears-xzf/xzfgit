@@ -1,7 +1,7 @@
 -- ======================================================
 
 COLUMN c_crypto_key1 new_value c_crypto_key1
-SELECT  DBMS_RANDOM.STRING('X',24) c_crypto_key1 FROM  DUAL;
+SELECT  DBMS_RANDOM.STRING('X',16) c_crypto_key1 FROM  DUAL;
 
 CREATE OR REPLACE FUNCTION ZOEDEVOPS.ZOEFUN_CRYPTO_KEY
 	RETURN VARCHAR2
@@ -27,4 +27,4 @@ BEGIN
 END;
 /
 
-SELECT DBMS_RANDOM.STRING('X',8) crypto_key2 FROM DUAL;
+

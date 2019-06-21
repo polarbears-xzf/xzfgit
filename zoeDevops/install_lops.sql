@@ -20,7 +20,7 @@ SET VERIFY OFF
 	
 -- 创建运维管理用户
 @@create_lops_user.sql
- --创建运维管理相关对象
+--创建运维管理相关对象
 	--表
 @@create_lops_table.sql
 		--加载表数据

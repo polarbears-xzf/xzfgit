@@ -6,9 +6,9 @@ CREATE OR REPLACE PACKAGE BODY ZOEDEVOPS.ZOEPKG_SECURITY
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
 --	Name:
--- 		create_ops_table.sql
+-- 		zoepkg_security.pkb
 --	Description:
--- 		创建运维相关表
+-- 		基础安全包
 --  Relation:
 --      zoeUtility
 --	Notes:

@@ -21,7 +21,7 @@ AS
     lv_text               VARCHAR2(128);
     lv_encrypted_text     VARCHAR2(128);
   BEGIN
-    lv_text    := iv_username||iv_password;
+    lv_text    := upper(iv_username)||iv_password;
     lv_encrypted_text := ZOEDEVOPS.ZOEPKG_SECURITY.ENCRYPT_DES(lv_text,iv_key);
     RETURN lv_encrypted_text;
   END ZOEFUN_ENCRYPT_USER;
