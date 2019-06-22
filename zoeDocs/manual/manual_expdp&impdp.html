@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="author" content="MarkdownViewer++" />
+        <title>manual_expdp&impdp.txt</title>
+        <style type="text/css">
+            
+/* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
+td, h1, h2, h3, h4, h5, p, ul, ol, li {
+    page-break-inside: avoid; 
+}
+
+        </style>
+      </head>
+    <body>
+        <p><a href="../zoedocs_index.html">文档主页</a></p>
+<h3 id="section">数据泵的导入导出</h3>
+<blockquote>
+<p>数据泵使用前的检查</p>
+</blockquote>
+<ol>
+<li>适用范围
+<ul>
+<li>Linux系统下RAC集群11g数据库版本的导出导入</li>
+</ul>
+</li>
+<li>导出导入前的检查
+<ul>
+<li>数据库版本的检查（目标库版本&gt;=源库版本）
+<ul>
+<li>select * from v$version;</li>
+</ul>
+</li>
+<li>字符集类型的检查
+<ul>
+<li>select userenv('language') from dual;</li>
+</ul>
+</li>
+<li>数据库使用情况
+<ul>
+<li>select 'DB Size/Used/Rate',
+trunc(sum(a.bytes)/1024/1024/1024,2)||'G/'||trunc((sum(a.bytes)-sum(b.bytes))/1024/1024/1024,2)||'G/'||trunc((1-sum(b.bytes)/sum(a.bytes))*100,2)||'%'
+from dba_data_files a, (select tablespace_name,file_id,sum(bytes) bytes from dba_free_space group by tablespace_name,file_id) b
+where a.tablespace_name=b.tablespace_name(+) and a.file_id=b.file_id(+);</li>
+</ul>
+</li>
+<li>查看目标端与源端系统磁盘空间是否充足</li>
+<li>源端数据库的表空间使用情况（根据表空间大小，修改获取的创建表空间语句，避免由于表空间不足导致卡住）</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>expdp导出</p>
+</blockquote>
+<ol>
+<li>在导出端建立存放的逻辑目录
+<ul>
+<li>select * from dba_directories;</li>
+<li>create or replace directory expdpdir as '/home/oracle/expdp';</li>
+<li>create  directory expdpdir as '/home/oracle/expdp';</li>
+<li>grant read,write on directory expdpdir to system;</li>
+</ul>
+</li>
+<li>全库导出
+<ul>
+<li>export ORACLE_SID=zyhis1</li>
+<li>expdp system/oracle directory=expdpdir dumpfile=hisdata_%U.dmp logfile=expdata.log FULL=Y filesize=16G</li>
+</ul>
+</li>
+<li>获取源库的表空间创建语句
+<ul>
+<li>通过语法get_create_tabespace.sql获取create_tabespace.sql，注意修改脚本生成路径
+根据源库表空间使用情况，修改create_tabespace.sql语法。</li>
+</ul>
+</li>
+<li>查看导出日志及拷贝</li>
+</ol>
+<blockquote>
+<p>impdp导入</p>
+</blockquote>
+<ol>
+<li>在导入端建立存放的逻辑目录
+<ul>
+<li>select * from dba_directories;</li>
+<li>create or replace directory impdpdir as '/home/oracle/impdp';</li>
+<li>create  directory impdpdir as '/home/oracle/impdp';</li>
+<li>grant read,write on directory impdpdir to system;
+2.查看impdp文件夹所属用户及权限</li>
+<li>ls -al /home/oracle/impdp</li>
+<li>chown -R oracle:oinstall /home/oracle/impdp</li>
+<li>chmod 777 /home/oracle/impdp
+3.创建表空间（执行前，注意修改数据文件的存储路径）</li>
+<li>select file_id,file_name,tablespace_name from dba_data_files;</li>
+<li>select name from v$tempfile;（通常情况下注释掉create_tabespace.sql中临时表空间的创建语法）</li>
+<li>执行create_tabespace.sql脚本</li>
+</ul>
+</li>
+<li>全库导入
+<ul>
+<li>export ORACLE_SID=zyhis1</li>
+<li>impdp system/oracle directory=impdpdir dumpfile=hisdata_%U.dmp logfile=impdata.log  cluster=N</li>
+</ul>
+</li>
+<li>检查日志，确认导入情况
+<ul>
+<li>通过语法get_create_tabespace.sql获取create_tabespace.sql，注意修改脚本生成路径
+根据源库表空间使用情况，修改create_tabespace.sql语法。</li>
+</ul>
+</li>
+<li>查看导出日志及拷贝并修改impdp文件权限
+<ul>
+<li>chmod 644 /home/oracle/impdp</li>
+</ul>
+</li>
+</ol>
+<p><a href="../zoedocs_index.html">文档主页</a></p>
+
+    </body>
+</html>
+            
