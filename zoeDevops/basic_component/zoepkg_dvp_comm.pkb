@@ -21,7 +21,7 @@ AS
 --  获取数据库版本
 -- ===================================================
   FUNCTION GET_DB_VERSION RETURN VARCHAR2 AS
-    lv_db_version  VARCHAR2(80);
+    lv_db_version VARCHAR2(80);
   BEGIN
     SELECT BANNER INTO lv_db_version FROM V$VERSION WHERE BANNER LIKE 'Oracle Database%';
     RETURN lv_db_version;
@@ -79,3 +79,5 @@ AS
     lt_db_basic_info(1).db_version      := lv_db_version;
     RETURN lt_db_basic_info;
   END;
+
+END ZOEPKG_DVP_COMM;
