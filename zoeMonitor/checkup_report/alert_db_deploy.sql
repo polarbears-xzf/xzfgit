@@ -18,7 +18,7 @@
 	--实例及数据库状态
 	--是否有offline状态的表空间： 为"否" 时进行提示处理
 set markup html off
-SET SERVEROUTPUT ON
+--SET SERVEROUTPUT ON
 DECLARE
 	lv_is_rac  VARCHAR2(32);
 	lv_is_archive VARCHAR2(32);
