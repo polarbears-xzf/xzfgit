@@ -23,9 +23,17 @@ td, h1, h2, h3, h4, h5, p, ul, ol, li {
         <em>docname datanode_install_guide</em>
       </p>
     </blockquote>
-    <h3 id="section">安装运维管理系统基础功能包数据节点</h3>
+    <h3 id="section">安装运维管理系统数据节点</h3>
     <ol>
-      <li>创建用户</li>
+      <li>创建标准目录
+<blockquote><p>create_standard_dir.sh</p></blockquote></li>
+      <li>数据节点-组件部署（以sysdba角色执行）
+<blockquote><p>@datanode_install.sql<br /><strong>内容说明</strong></p></blockquote><ol><li>创建运维管理数据存储表空间
+<ul><li>运维管理系统对象模式为zoedevops，对应表空间zoedevops_tab</li></ul></li><li>创建用户
+<ul><li>数据节点需要创建4个用户；
+<ul><li>zoedevops：运维管理系统对象模式用户</li><li>zoedba：用于管理员日常运维管理连接用户</li><li>zoeagent：用于运维管理控制节点数据库链路连接用户</li><li>zoeopsconn：用于运维管理系统连接用户</li></ul></li></ul></li><li>创建表对象
+<ul><li>数据节点创建：数据库基本信息表</li></ul></li><li>创建存储过程相关对象
+<ul><li>创建基础安全相关包</li><li>创建类型</li><li>创建初始化数据库信息功能包</li></ul></li></ol></li>
     </ol>
   </body>
 </html>

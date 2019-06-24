@@ -1,0 +1,21 @@
+>	_Created in 2019.06.19 by polarbears_  
+>	_Copyright (c) 20xx, CHINA and/or affiliates._  
+>	_docname datanode_install_guide_  
+###	安装运维管理系统控制节点 
+	
+1.  前提：已安装数据节点
+2.	创建运维管理数据存储表空间
+	*	运维管理系统对象模式为zoedevops，对应表空间zoedevops_tab
+3.	创建用户
+	*	数据节点需要创建4个用户；
+		*	zoedevops：运维管理系统对象模式用户
+		*	zoedba：用于管理员日常运维管理连接用户
+		*	zoeagent：用于运维管理控制节点数据库链路连接用户
+		*	zoeopsconn：用于运维管理系统连接用户
+4.	创建表对象		
+	*	数据节点创建：数据库基本信息表
+	
+5.	创建存储过程相关对象
+	*	创建基础安全相关包
+	*	创建类型
+	*	创建初始化数据库信息功能包

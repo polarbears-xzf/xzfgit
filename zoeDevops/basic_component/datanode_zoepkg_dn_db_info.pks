@@ -1,12 +1,12 @@
 -- =====================================================
 
-CREATE OR REPLACE PACKAGE ZOEDEVOPS.ZOEPKG_DVP_COMM
+CREATE OR REPLACE PACKAGE ZOEDEVOPS.ZOEPKG_DN_DB_INFO
 
 -- Created in 2019.06.18 by polarbears
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
 --	Name:
--- 		zoepkg_dvp_comm.pks
+-- 		ZOEPKG_DN_DB_INFO.pks
 --	Description:
 -- 		基础工具包
 --  Relation:
@@ -29,6 +29,13 @@ AS
 -- ===================================================
   FUNCTION GET_DB_ID RETURN VARCHAR2;
 
+-- ===================================================
+--  数据库基本信息设置
+-- ===================================================
+--  	初始化本地数据库信息
+  PROCEDURE INIT_PROJ_DB_BASIC_INFO(in_project_id IN VARCHAR2 DEFAULT NULL);
+--		保存数据库管理用户信息
 
 
-END ZOEPKG_DVP_COMM;
+
+END ZOEPKG_DN_DB_INFO;

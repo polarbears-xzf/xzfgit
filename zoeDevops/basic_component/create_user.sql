@@ -173,6 +173,7 @@ BEGIN
 SELECT  DBMS_RANDOM.STRING('X',12) INTO :sv_password FROM DUAL;
 lv_password := 'Zoe$'||:sv_password;
 lv_sql_ddl := 'CREATE USER &sv_zoeagent IDENTIFIED BY '||lv_password||' DEFAULT TABLESPACE &sv_tablespace_name';
+DBMS_OUTPUT.PUT_LINE('&sv_zoeagent : '||lv_password);
 EXECUTE IMMEDIATE lv_sql_ddl;
 END;
 /

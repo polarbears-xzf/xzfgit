@@ -3,6 +3,7 @@
 2.	[Oracle GoldenGata](installconfig/oracle_goldengate.html)
 ###	运维管理系统
 1.	[运维管理规范](devops/devops_norm.html)
+2.	[运维管理系统-数据节点安装](devops/datanode_install_guide.html)
 2.	[运维管理系统部署](devops/devops_deploy.html)
 3.	[运维管理系统功能说明](devops/devops_function_desc.html)
 ### 运维监控

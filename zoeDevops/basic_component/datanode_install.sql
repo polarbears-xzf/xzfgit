@@ -4,7 +4,8 @@
 -- Name:
 -- 		datanode_install.sql
 -- Description:
--- 		安装运维管理系统数据节点
+-- 	安装运维管理系统数据节点
+	--  
 --  Relation:
 --      
 -- Notes:
@@ -57,5 +58,11 @@ END;
 /
 	--相关类型
 @@create_type.sql
+	--初始化数据库信息功能包
+@@datanode_zoepkg_dn_db_info.pks
+@@datanode_zoepkg_dn_db_info.pkb
+
+
+
 
 	
