@@ -32,6 +32,7 @@ DECLARE
 	lv_sessions  VARCHAR2(16);
 	lv_sga VARCHAR2(16);
 	lv_pga VARCHAR2(16);
+	lv_session_status VARCHAR2(128);
 	
 BEGIN
 	--是否RAC
@@ -51,11 +52,12 @@ BEGIN
 */	
 
 	--判断当前连接数是否超过阈值
+	select (LISTAGG('节点'||a.inst_id||',进程数是'||count(a.INST_ID)||',会话数是'||(select count(b.INST_ID)from gv$session b where a.INST_ID = b.inst_id)||'','；') WITHIN GROUP(ORDER BY a.inst_id))into lv_session_status from gv$process a group by a.inst_id;
 	select count(*) into PROCESSES from gv$process;
 	select p.VALUE  into MAX_PROCESSES from v$parameter p where p.NAME = 'processes';
 	select to_char(count(*)) into lv_sessions from gv$session;
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE('<td>允许的最大连接数：'||MAX_PROCESSES||'，当前进程数：'||PROCESSES||'，当前会话数：'||lv_sessions||'</td>');
+		DBMS_OUTPUT.PUT_LINE('<td>节点最大连接数：'||MAX_PROCESSES||'，其'||lv_session_status||'。</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	IF (0 < MAX_PROCESSES AND MAX_PROCESSES <= 2500 and PROCESSES > 0.8* MAX_PROCESSES)  THEN
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
@@ -72,7 +74,7 @@ BEGIN
 	END IF;
 	END IF;
 	END IF;
-	
+
 	select round(value/1024/1024) into MEMORY_TARGET from v$parameter where name = 'memory_target';
 	SELECT round(value/1024/1024) into lv_pga FROM v$parameter WHERE name='pga_aggregate_target';
 	SELECT round(value/1024/1024) into lv_sga FROM v$parameter WHERE name='sga_target';
