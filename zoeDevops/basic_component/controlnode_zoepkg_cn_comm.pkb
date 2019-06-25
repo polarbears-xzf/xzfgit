@@ -49,9 +49,10 @@ PROCEDURE SET_DB_USER(iv_key VARCHAR2, iv_username IN VARCHAR2, iv_db_id IN VARC
         lv_db_id := ZOEDEVOPS.ZOEPKG_DN_DB_INFO.GET_DB_ID;
         EXECUTE IMMEDIATE lv_sql_ddl;
     ELSE 
+        lv_db_id := iv_db_id;
         SELECT A.DB_LINK_NAME INTO lv_db_link
             FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS A
-            WHERE A.DB_ID# = iv_db_id;
+            WHERE A.DB_ID# = lv_db_id;
         EXECUTE IMMEDIATE 'select count(1) from dba_users@'||lv_db_link||' where username='''||lv_username||'''' INTO ln_user_exist;
         IF ln_user_exist = 1 THEN
           lv_sql_ddl := 'ALTER USER '||lv_username||' IDENTIFIED BY '||lv_password;
@@ -64,13 +65,16 @@ PROCEDURE SET_DB_USER(iv_key VARCHAR2, iv_username IN VARCHAR2, iv_db_id IN VARC
     select count(1) INTO ln_user_exist from ZOEDEVOPS.DVP_PROJ_DB_USER_ADMIN_INFO where DB_ID# = lv_db_id and USERNAME = lv_username;
     lv_encryp_password := zoedevops.zoefun_encrypt_user(lv_username,lv_password,iv_key);
     IF ln_user_exist = 1 THEN
-      dbms_output.put_line('exist user');
+        UPDATE ZOEDEVOPS.DVP_PROJ_DB_USER_ADMIN_INFO SET
+            (user_password,modifier_code,modified_time) =
+            (select lv_encryp_password,'ZOEPKG_CN_COMM.SET_DB_USER',SYSDATE from dual) 
+        WHERE db_id# = lv_db_id and username = lv_username;
     ELSE
-      INSERT INTO ZOEDEVOPS.DVP_PROJ_DB_USER_ADMIN_INFO
-        (project_id#,db_id#,username,user_password,creator_code,created_time)
-        SELECT project_id#,db_id,'a','b','ZOEPKG_CN_COMM.SET_DB_USER',SYSDATE  
-            FROM ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO
-            WHERE DB_ID = lv_db_id;
+        INSERT INTO ZOEDEVOPS.DVP_PROJ_DB_USER_ADMIN_INFO 
+            (project_id#,db_id#,username,user_password,creator_code,created_time) 
+            SELECT project_id#,db_id,lv_username,lv_encryp_password,'ZOEPKG_CN_COMM.SET_DB_USER',SYSDATE 
+                FROM ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO 
+                WHERE DB_ID = lv_db_id;
       dbms_output.put_line('not exist user');
       COMMIT;
     END IF;
