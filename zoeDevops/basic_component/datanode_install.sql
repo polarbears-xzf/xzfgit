@@ -61,7 +61,8 @@ END;
 	--初始化数据库信息功能包
 @@datanode_zoepkg_dn_db_info.pks
 @@datanode_zoepkg_dn_db_info.pkb
-
+	--远程sql调用
+@@datanode_zoeprc_exec_sql.pls
 
 
 

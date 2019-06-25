@@ -23,9 +23,9 @@ SET SERVEROUTPUT ON
 DEFINE sv_tablespace_name = ZOEDEVOPS_TAB
 --运维管理模式用户
 DEFINE sv_zoedevops  = ZOEDEVOPS
-DEFINE sv_zoedba     = ZOEDEVOPS
-DEFINE sv_zoeagent   = ZOEDEVOPS
-DEFINE sv_zoeopsconn = ZOEDEVOPS
+DEFINE sv_zoedba     = ZOEDBA
+DEFINE sv_zoeagent   = ZOEAGENT
+DEFINE sv_zoeopsconn = ZOEOPSCONN
 
 
 -- ===================================================
@@ -90,6 +90,7 @@ BEGIN
 SELECT  DBMS_RANDOM.STRING('X',12) INTO :sv_password FROM DUAL;
 lv_password := 'Zoe$'||:sv_password;
 lv_sql_ddl := 'CREATE USER &sv_zoedevops IDENTIFIED BY '||lv_password||' DEFAULT TABLESPACE &sv_tablespace_name';
+DBMS_OUTPUT.PUT_LINE('&sv_zoedevops : '||lv_password);
 EXECUTE IMMEDIATE lv_sql_ddl;
 END;
 /
