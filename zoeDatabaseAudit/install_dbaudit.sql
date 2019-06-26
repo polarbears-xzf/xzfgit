@@ -26,7 +26,7 @@
 @@create_type.sql
 
 -- 连接数据库
-conn zoesecurity/zoe5VCDSXXLCU6V
+conn zoesecurity/password
 --创建上下文
 --上下文：审计相关           "ZOE_AUDIT_CONTEXT"
 @@create_context.sql

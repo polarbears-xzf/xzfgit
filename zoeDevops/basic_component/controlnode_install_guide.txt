@@ -17,6 +17,10 @@
 	2.	加载字典数据
 		*	@controlnode_dvp_db_deploy_type$.sql
 		*	@controlnode_dvp_db_role$.sql
+3.	控制节点-采集项目数据
+	>	@cellect_data\collect_project_data.sql
+4.	控制节点-加载项目数据（将数据导回公司运维管理控制节点）
+	>	cellect_data\collect_project_data.sh
+	
 		
 		
-		zoedevops.ZOEPKG_CN_COMM.SET_DB_USER(key,username,db_id,password)
