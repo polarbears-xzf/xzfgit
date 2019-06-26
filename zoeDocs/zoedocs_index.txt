@@ -1,9 +1,12 @@
 ###	标准与规范
 1.	[运维管理规范](norm/devops_norm.html)
 ###	运维管理系统
-2.	[运维管理部署-基础组件-数据节点安装](opssystem/datanode_install_guide.html)
-2.	[运维管理系统部署](opssystem/devops_deploy.html)
-3.	[运维管理系统功能说明](opssystem/devops_function_desc.html)
+1.	[运维管理部署-基础组件-数据节点安装](opssystem/basic_datanode_install_guide.html)
+2.	[运维管理部署-基础组件-控制节点安装](opssystem/basic_controlnode_install_guide.html)
+3.	[运维管理部署-审计组件-数据节点安装](opssystem/audit_datanode_install_guide.html)
+4.	[运维管理部署-审计组件-控制节点安装](opssystem/audit_controlnode_install_guide.html)
+5.	[运维管理部署-元数据管理组件-数据节点安装](opssystem/metadata_datanode_install_guide.html)
+6.	[运维管理部署-元数据管理组件-控制节点安装](opssystem/metadata_controlnode_install_guide.html)
 ### 运维项目管理
 1.	[项目巡检流程](opsproject/checkup_process.html)
 2.	[项目巡检报告输出内容](opsproject/checkup_db_ora.html)

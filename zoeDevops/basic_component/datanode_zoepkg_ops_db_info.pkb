@@ -1,13 +1,13 @@
 -- =====================================================
 
-CREATE OR REPLACE PACKAGE BODY ZOEDEVOPS.ZOEPKG_DN_DB_INFO
+CREATE OR REPLACE PACKAGE BODY ZOEDEVOPS.ZOEPKG_OPS_DB_INFO
 
 
 -- Created in 2019.06.18 by polarbears
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
 --	Name:
--- 		ZOEPKG_DN_DB_INFO.pkb
+-- 		ZOEPKG_OPS_DB_INFO.pkb
 --	Description:
 -- 		基础工具包
 --  Relation:
@@ -43,7 +43,7 @@ AS
      lv_db_id              VARCHAR2(128);        --数据库DB_ID
      lt_db_basic_info zoett_db_basic_info := zoett_db_basic_info();      --数据库基本信息对象
   BEGIN
-    lt_db_basic_info   := ZOEPKG_DN_DB_INFO.GET_DB_BASIC_INFO;
+    lt_db_basic_info   := ZOEPKG_OPS_DB_INFO.GET_DB_BASIC_INFO;
     lv_host_name       := lt_db_basic_info(1).host_name   ;
     lv_ip_address      := lt_db_basic_info(1).ip_address  ;
     lv_db_name         := lt_db_basic_info(1).db_name     ;
@@ -94,13 +94,13 @@ AS
      lv_porject_id         VARCHAR2(64);         --项目ID
      lt_db_basic_info zoett_db_basic_info := zoett_db_basic_info();      --数据库基本信息对象
   BEGIN
-    lt_db_basic_info   := ZOEPKG_DN_DB_INFO.GET_DB_BASIC_INFO;
+    lt_db_basic_info   := ZOEPKG_OPS_DB_INFO.GET_DB_BASIC_INFO;
     lv_host_name       := lt_db_basic_info(1).host_name   ;
     lv_ip_address      := lt_db_basic_info(1).ip_address  ;
     lv_db_name         := lt_db_basic_info(1).db_name     ;
     ld_db_created_time :=lt_db_basic_info(1).created_time;
     lv_db_version      :=lt_db_basic_info(1).db_version  ;
-    lv_db_id := ZOEPKG_DN_DB_INFO.GET_DB_ID;
+    lv_db_id := ZOEPKG_OPS_DB_INFO.GET_DB_ID;
     IF in_project_id IS NULL  THEN
         lv_porject_id := sys_guid();
     ELSE 
@@ -121,6 +121,6 @@ AS
   END INIT_PROJ_DB_BASIC_INFO;
 
  
-END ZOEPKG_DN_DB_INFO;
+END ZOEPKG_OPS_DB_INFO;
 
 /

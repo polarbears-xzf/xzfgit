@@ -1,12 +1,12 @@
 --  ===================================================
 
-CREATE OR REPLACE PACKAGE BODY ZOEDEVOPS.ZOEPKG_CN_COMM
+CREATE OR REPLACE PACKAGE BODY ZOEDEVOPS.ZOEPKG_OPS_COMM
 
 -- Created in 2017.10.10 by polarbears
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
 --	Name:
--- 		zoepkg_cn_comm.pkb
+-- 		zoepkg_ops_comm.pkb
 --	Description:
 -- 		运维管理控制节点公共功能包
 --  Relation:
@@ -46,7 +46,7 @@ PROCEDURE SET_DB_USER(iv_key VARCHAR2, iv_username IN VARCHAR2, iv_db_id IN VARC
         ELSE
           lv_sql_ddl := 'CREATE USER '||lv_username||' IDENTIFIED BY '||lv_password;
         END IF;
-        lv_db_id := ZOEDEVOPS.ZOEPKG_DN_DB_INFO.GET_DB_ID;
+        lv_db_id := ZOEDEVOPS.ZOEPKG_OPS_DB_INFO.GET_DB_ID;
         EXECUTE IMMEDIATE lv_sql_ddl;
     ELSE 
         lv_db_id := iv_db_id;
@@ -85,4 +85,4 @@ PROCEDURE SET_DB_USER(iv_key VARCHAR2, iv_username IN VARCHAR2, iv_db_id IN VARC
         RAISE;
   END SET_DB_USER;
   
-END ZOEPKG_CN_COMM;
+END ZOEPKG_OPS_COMM;

@@ -1,12 +1,12 @@
 --  ===================================================
 
-CREATE OR REPLACE PACKAGE ZOEDEVOPS.ZOEPKG_CN_COMM
+CREATE OR REPLACE PACKAGE ZOEDEVOPS.ZOEPKG_OPS_COMM
 
 -- Created in 2017.10.10 by polarbears
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
 --	Name:
--- 		zoepkg_cn_comm.pks
+-- 		zoepkg_ops_comm.pks
 --	Description:
 -- 		运维管理控制节点公共功能包
 --  Relation:
@@ -23,4 +23,4 @@ CREATE OR REPLACE PACKAGE ZOEDEVOPS.ZOEPKG_CN_COMM
 -- ===================================================
   PROCEDURE SET_DB_USER(iv_key VARCHAR2, iv_username IN VARCHAR2, iv_db_id IN VARCHAR2 DEFAULT NULL, iv_password IN VARCHAR2 DEFAULT NULL);
   
-END ZOEPKG_CN_COMM;
+END ZOEPKG_OPS_COMM;

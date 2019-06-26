@@ -1,12 +1,12 @@
 -- =====================================================
 
-CREATE OR REPLACE PACKAGE ZOEDEVOPS.ZOEPKG_DN_DB_INFO
+CREATE OR REPLACE PACKAGE ZOEDEVOPS.ZOEPKG_OPS_DB_INFO
 
 -- Created in 2019.06.18 by polarbears
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
 --	Name:
--- 		ZOEPKG_DN_DB_INFO.pks
+-- 		ZOEPKG_OPS_DB_INFO.pks
 --	Description:
 -- 		基础工具包
 --  Relation:
@@ -38,5 +38,5 @@ AS
 
 
 
-END ZOEPKG_DN_DB_INFO;
+END ZOEPKG_OPS_DB_INFO;
 /

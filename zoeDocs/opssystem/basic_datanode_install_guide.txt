@@ -1,8 +1,10 @@
+[文档主页](../zoedocs_index.html)
+
 >	_Created in 2019.06.19 by polarbears_  
 >	_Copyright (c) 20xx, CHINA and/or affiliates._  
->	_docname datanode_install_guide_  
+>	_docname basic_datanode_install_guide_  
 ###	安装运维管理系统数据节点 
-	
+>	__脚本目录：zoeDevops\basic_component__
 1.	创建标准目录  
 	>	create_standard_dir.sh  
 2.	数据节点-组件部署（以sysdba角色执行）
@@ -40,10 +42,12 @@
 		>	__注：部署控制节点时，此步骤在控制节点部署完毕后执行__
 	*	同步数据节点数据库信息
 		>	
-5 附
+5.	附
 	*	建立临时sys用户，安装后立刻删除
 		>	create user zoetmpsys identified by Zoe$tmp123; grant sysdba to zoetmpsys;
 	*	检查主机IP地址是否是IPv6，影响生成数据库唯一ID（db_id），获取过程不支持IPv6 
 		>	检查是否支持：select utl_inaddr.get_host_address from dual;  
 		>	
 
+
+[文档主页](../zoedocs_index.html)
