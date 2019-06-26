@@ -1,4 +1,45 @@
-运维管理页面设计
+﻿运维管理页面设计
 	页码：201；功能：会话与锁监控
 	
-	
+	1.查看锁的相关语法
+		SELECT * FROM V$SESSION;--查看会话和锁的信息
+		SELECT * FROM V$SESSION_WAIT;--查看等待的会话信息
+		SELECT * FROM V$LOCK;--系统中所有锁
+		SELECT * FROM V$LOCKED_OBJECT;--系统中DML锁
+	2.查询锁对象记录表
+		select a.session_id, 
+			   b.owner,
+			   b.object_name, 
+			   a.locked_mode, 
+			   a.inst_id
+		  from gv$locked_object a, 
+			   dba_objects b
+		 where a.object_id = b.object_id;
+	3.查询在线用户会话信息
+		SELECT A.SID                SID,
+			   A.SERIAL#            SERIAL,
+			   A.USERNAME           USERNAME,
+			   A.MACHINE            MACHINE,
+			   A.PROGRAM            PROGRAM,
+			   ''                   IP_ADDRESS,
+			   A.SQL_HASH_VALUE     SQL_HASH_VALUE,
+			   (SELECT COUNT(1)
+				  FROM V$LOCKED_OBJECT T
+				 WHERE T.SESSION_ID = A.SID
+				   AND ROWNUM = 1)  LOCK_FLAG,
+			   A.LOCKWAIT           LOCKWAIT,
+			   (SELECT L2.SID
+				  FROM V$LOCK L1,
+					   V$LOCK L2
+				 WHERE L2.BLOCK = 1
+				   AND L1.TYPE = L2.TYPE
+				   AND L1.ID1 = L2.ID1
+				   AND L1.ID2 = L2.ID2
+				   AND L1.SID = A.SID
+				   AND L2.SID <> A.SID)  LOCK_SOURCE
+		  FROM V$SESSION A
+		 WHERE A.SERIAL# <> '1'
+		   AND A.USERNAME IS NOT NULL
+		   AND A.PROGRAM <> 'OMS'
+	4.结束会话语法
+		ALTER SYSTEM KILL SESSION 'sid,serial#';
