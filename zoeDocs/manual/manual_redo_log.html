@@ -1,0 +1,47 @@
+<!DOCTYPE html []>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="MarkdownViewer++" />
+    <title>manual_redo_log.txt</title>
+    <style type="text/css">
+            
+/* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
+td, h1, h2, h3, h4, h5, p, ul, ol, li {
+    page-break-inside: avoid; 
+}
+
+        </style>
+  </head>
+  <body>
+    <p>
+      <a href="../zoedocs_index.html">文档主页</a>
+    </p>
+    <h3 id="section">修改重做日志的大小</h3>
+    <ol>
+      <li>查看日志组
+<ul><li>select * from v$logfile;</li></ul></li>
+      <li>创建3个新的日志组
+<ul><li>SQL&gt; ALTER DATABASE ADD LOGFILE GROUP 4 ('/u01/app/oracle/oradata/orcl/redo04.log') SIZE 500M;</li><li>SQL&gt; ALTER DATABASE ADD LOGFILE GROUP 5 ('/u01/app/oracle/oradata/orcl/redo05.log') SIZE 500M;</li><li>SQL&gt; ALTER DATABASE ADD LOGFILE GROUP 6 ('/u01/app/oracle/oradata/orcl/redo06.log') SIZE 500M;</li></ul></li>
+      <li>切换当前日志到新的日志组
+<ul><li>SQL&gt; alter system switch logfile;</li></ul></li>
+      <li>查看日志的状态
+<ul><li>SQL&gt; select group#,sequence#,bytes,members,status from v$log;</li></ul></li>
+      <li>将要删除的日志的状态切换为INACTIVE
+<ul><li>SQL&gt; alter system switch logfile;</li><li>SQL&gt; alter system archive log current;</li><li>SQL&gt; alter system checkpoint;</li></ul></li>
+      <li>查看日志的状态
+<ul><li>SQL&gt; select group#,sequence#,bytes,members,status from v$log;</li></ul></li>
+      <li>删除旧的日志组
+<ul><li>SQL&gt; alter database drop logfile group 1;</li><li>SQL&gt; alter database drop logfile group 2;</li><li>SQL&gt; alter database drop logfile group 3;</li></ul></li>
+      <li>查看是否删除了日志组
+<ul><li>SQL&gt; select group#,sequence#,bytes,members,status from v$log;</li></ul></li>
+      <li>操作系统删除原日志组1、2、3中的文件</li>
+      <li>重建日志组1、2、3
+<ul><li>SQL&gt; ALTER DATABASE ADD LOGFILE GROUP 4 ('/u01/app/oracle/oradata/orcl/redo01.log') SIZE 500M;</li><li>SQL&gt; ALTER DATABASE ADD LOGFILE GROUP 5 ('/u01/app/oracle/oradata/orcl/redo02.log') SIZE 500M;</li><li>SQL&gt; ALTER DATABASE ADD LOGFILE GROUP 6 ('/u01/app/oracle/oradata/orcl/redo03.log') SIZE 500M;</li></ul></li>
+      <li>重复步骤3-6，然后删除日志组4、5、6，并在操作系统删除对应的日志文件</li>
+    </ol>
+    <p>
+      <a href="../zoedocs_index.html">文档主页</a>
+    </p>
+  </body>
+</html>
