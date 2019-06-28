@@ -17,6 +17,8 @@
 	--是否开启归档： 为"否" 时进行提示处理
 	--实例及数据库状态
 	--是否有offline状态的表空间： 为"否" 时进行提示处理
+    --审计日志表是否存放于SYSTEM表空间： 为"是" 时进行提示处理
+	--密码属性检查： 为"否" 时进行提示处理
 set markup html off
 --SET SERVEROUTPUT ON
 DECLARE
@@ -25,6 +27,9 @@ DECLARE
 	lv_is_offlinetablespace VARCHAR2(3);
 	lv_tbsname VARCHAR2(64);
 	lv_dbstatus VARCHAR2(512);
+	lv_is_audit VARCHAR2(32);
+	lv_is_password1 VARCHAR2(32);
+	lv_is_password2 VARCHAR2(32);
 BEGIN
 	--是否RAC
 	select decode(value,'TRUE','是','FALSE','否',value)  INTO lv_is_rac
@@ -52,6 +57,26 @@ BEGIN
 	select (LISTAGG(tablespace_name,',') WITHIN GROUP(ORDER BY tablespace_name))into lv_tbsname  from dba_tablespaces where status!='ONLINE';
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
 		DBMS_OUTPUT.PUT_LINE('<td>存在offline状态的表空间，请检查'||lv_tbsname||'表空间</td>');
+		DBMS_OUTPUT.PUT_LINE('</table> ');
+	END IF;
+	--审计检查
+	select decode(tablespace_name,'SYSTEM','是','否')INTO lv_is_audit from dba_tables where table_name='AUD$';
+	IF lv_is_archive = '是' THEN 
+		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+		DBMS_OUTPUT.PUT_LINE(' <td> 审计日志表存放于SYSTEM表空间，尽快调整审计</td>');
+		DBMS_OUTPUT.PUT_LINE('</table> ');
+	END IF;
+	--密码属性检查
+	select decode(limit,'UNLIMITED','是','否')INTO lv_is_password1 from dba_profiles t where t.resource_name='PASSWORD_LIFE_TIME' and t.profile='DEFAULT';
+	IF lv_is_password1 = '否' THEN 
+		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+		DBMS_OUTPUT.PUT_LINE(' <td> 密码参数(PASSWORD_LIFE_TIME)不是无限制，存在密码无效隐患</td>');
+		DBMS_OUTPUT.PUT_LINE('</table> ');
+	END IF;
+	select decode(limit,'UNLIMITED','是','否')INTO lv_is_password2 from dba_profiles t where t.resource_name='FAILED_LOGIN_ATTEMPTS' and t.profile='DEFAULT';
+	IF lv_is_password1 = '否' THEN 
+		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+		DBMS_OUTPUT.PUT_LINE(' <td> 密码参数(FAILED_LOGIN_ATTEMPTS)不是无限制，存在用户被锁隐患</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	END IF;
 END; 
