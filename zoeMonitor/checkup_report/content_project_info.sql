@@ -38,6 +38,9 @@ select banner as "banner" from v$version where banner like 'Oracle Database%';
 column platform_name  NEW_VALUE platform noprint
 /*select platform_name as "platform_name" from dba_hist_database_instance WHERE ROWNUM <= 1; 10g版本没有platform_name字段*/
 select PLATFORM_NAME as "platform_name" from V$DATABASE;
+--定义数据库创建时间
+column dbcreate  NEW_VALUE db_create noprint
+select ''||name||'库创建于'||created||''as "dbcreate" from V$DATABASE;
 
 
 prompt  <center> <table WIDTH=600 BORDER=1> 
@@ -57,6 +60,10 @@ prompt  <center> <table WIDTH=600 BORDER=1>
 	prompt  <tr>
 		prompt  <td> 操作系统类型 </td>
 		prompt  <td> &platform  </td>
+	prompt  </tr>
+	prompt  <tr>
+		prompt  <td> 数据库创建时间</td>
+		prompt  <td> &db_create </td>
 	prompt  </tr>
 	prompt </table>  </center> <br> <br>
 
