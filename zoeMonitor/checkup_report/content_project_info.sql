@@ -36,7 +36,8 @@ column banner  NEW_VALUE db_version noprint
 select banner as "banner" from v$version where banner like 'Oracle Database%';
 --定义操作系统类型
 column platform_name  NEW_VALUE platform noprint
-select platform_name as "platform_name" from dba_hist_database_instance WHERE ROWNUM <= 1;
+/*select platform_name as "platform_name" from dba_hist_database_instance WHERE ROWNUM <= 1; 10g版本没有platform_name字段*/
+select PLATFORM_NAME as "platform_name" from V$DATABASE;
 
 
 prompt  <center> <table WIDTH=600 BORDER=1> 
