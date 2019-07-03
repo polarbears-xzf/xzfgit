@@ -1,21 +1,28 @@
-### 安装配置
-1.	[Oracle DataGuard](installconfig/oracle_data_guard.html)
-2.	[Oracle GoldenGata](installconfig/oracle_goldengate.html)
+###	标准与规范
+1.	[运维管理规范](norm/devops_norm.html)
 ###	运维管理系统
-1.	[运维管理规范](devops/devops_norm.html)
-2.	[运维管理系统部署](devops/devops_deploy.html)
-3.	[运维管理系统功能说明](devops/devops_function_desc.html)
-### 运维监控
-1.	[项目巡检流程](monitor/checkup_process.html)
-2.	[项目巡检报告输出内容](monitor/checkup_db_ora.html)
-3.	[项目巡检指标列表](monitor/mnt_checkup.html)
+1.	[运维管理部署-基础组件-数据节点安装](opssystem/basic_datanode_install_guide.html)
+2.	[运维管理部署-基础组件-控制节点安装](opssystem/basic_controlnode_install_guide.html)
+3.	[运维管理部署-审计组件-数据节点安装](opssystem/audit_datanode_install_guide.html)
+4.	[运维管理部署-审计组件-控制节点安装](opssystem/audit_controlnode_install_guide.html)
+5.	[运维管理部署-元数据管理组件-数据节点安装](opssystem/metadata_datanode_install_guide.html)
+6.	[运维管理部署-元数据管理组件-控制节点安装](opssystem/metadata_controlnode_install_guide.html)
+### 运维项目管理
+1.	[项目巡检流程](opsproject/checkup_process.html)
+2.	[项目巡检报告输出内容](opsproject/checkup_db_ora.html)
+3.	[项目巡检指标列表](opsproject/mnt_checkup.html)
 ###	使用手册
 1.	[sqloader使用手册](manual/manual_sqlloader.html)
 2.	[markdown使用手册](manual/manual_markdown.html)
 3.	[flashback使用手册](manual/manual_flashback.html)
 4.	[数据泵使用手册](manual/manual_expdp&impdp.html)
+5.	[logminer使用手册](manual/manual_logminer.html)
+6.	[重做日志修改手册](manual/manual_redo_log.html)
 ###	操作手册
 1.	[Oracle RAC IP切换](opmanual/oracle_rac_switch_ip.html)
 2.	[Oracle RAC 存储CDP容灾切换测试](opmanual/oracle_rac_cdp_switch.html)
+### 安装指导
+1.	[Oracle DataGuard](installguide/oracle_data_guard.html)
+2.	[Oracle GoldenGata](installguide/oracle_goldengate.html)
 
 

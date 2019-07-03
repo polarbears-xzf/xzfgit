@@ -34,6 +34,9 @@ select decode('&checkupSystem','his','HIS系统','emr','EMR系统','hdc','HDC系
 --定义数据库版本
 column banner  NEW_VALUE db_version noprint
 select banner as "banner" from v$version where banner like 'Oracle Database%';
+--定义操作系统类型
+column platform_name  NEW_VALUE platform noprint
+select platform_name as "platform_name" from dba_hist_database_instance WHERE ROWNUM <= 1;
 
 
 prompt  <center> <table WIDTH=600 BORDER=1> 
@@ -49,6 +52,10 @@ prompt  <center> <table WIDTH=600 BORDER=1>
 	prompt  <tr>
 		prompt  <td> 数据库版本 </td>
 		prompt  <td> &db_version  </td>
+	prompt  </tr>
+	prompt  <tr>
+		prompt  <td> 操作系统类型 </td>
+		prompt  <td> &platform  </td>
 	prompt  </tr>
 	prompt </table>  </center> <br> <br>
 

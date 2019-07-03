@@ -9,7 +9,7 @@ CREATE OR REPLACE FUNCTION ZOEDEVOPS.ZOEFUN_ENCRYPT_USER(iv_username VARCHAR2, i
 --	Name:
 -- 		zoefun_encrypt_user.sql
 --	Description:
--- 		创建运维相关表
+-- 		加密用户密码
 --  Relation:
 --      zoeUtility
 --	Notes:
