@@ -14,6 +14,7 @@
 ---检查指标
 	--数据文件数：与控制文件和参数文件中对比，当差值小于5时临界严重警告，当差值小于20时警告
 	--控制文件数：小于2时进行提示处理
+	--数据库失效对象：	存在告警
 	
 set markup html off
 --prompt <br />
@@ -23,6 +24,9 @@ DECLARE
 	lv_datafiles  VARCHAR2(16);
 	lv_datas	 VARCHAR2(16);
 	lv_ctlfiles  VARCHAR2(16);
+	INVAILD_OBJECT_COUNT number(10);
+	
+	
 BEGIN
 	--数据文件数：与控制文件和参数文件中对比，当差值小于5时临界严重警告，当差值小于20时警告
 	
@@ -45,6 +49,17 @@ BEGIN
 		DBMS_OUTPUT.PUT_LINE('<td>严重警告！当前控制文件个数：'||lv_ctlfiles||'，请及时处理进行备份</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	end if;
+	
+--判断失效对象数量，存在失效对象时告警
+select count(1) into INVAILD_OBJECT_COUNT from dba_objects where status <> 'VALID';
+
+	if INVAILD_OBJECT_COUNT > 0 then
+		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+		DBMS_OUTPUT.PUT_LINE('<td> 数据库存在 '||INVAILD_OBJECT_COUNT||' 个失效对象,请检查并处理。 </br>');
+		DBMS_OUTPUT.PUT_LINE('</table> ');
+	end if ;
+
+	
 END; 
 /
 /* 

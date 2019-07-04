@@ -61,6 +61,10 @@ select '在线日志组数/成员数/大小',to_char(count(group#)/max(thread#)|
 union all
 select '历史归档日志数',to_char(records_total) from v$controlfile_record_section where type='ARCHIVED LOG'
 union all
-select '当前热备状态文件数',decode(count(status),0,'否',count(status)) from v$backup where status='ACTIVE';
+select '当前热备状态文件数',decode(count(status),0,'否',count(status)) from v$backup where status='ACTIVE'
+union all
+select '用户失效对象数',LISTAGG(to_char(''||owner||'：'||count(1)),'<br/>') within group(order by count(1) desc) from dba_objects where status <> 'VALID' group by owner;
+
+
 
 prompt  </center>
