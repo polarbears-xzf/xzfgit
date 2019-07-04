@@ -1,0 +1,12 @@
+[文档主页](../zoedocs_index.html)
+
+###	运维管理系统
+1.	[运维管理部署-基础组件-数据节点安装](opssystem/basic_datanode_install_guide.html)
+2.	[运维管理部署-基础组件-控制节点安装](opssystem/basic_controlnode_install_guide.html)
+3.	[运维管理部署-审计组件-数据节点安装](opssystem/audit_datanode_install_guide.html)
+4.	[运维管理部署-审计组件-控制节点安装](opssystem/audit_controlnode_install_guide.html)
+5.	[运维管理部署-元数据管理组件-数据节点安装](opssystem/metadata_datanode_install_guide.html)
+6.	[运维管理部署-元数据管理组件-控制节点安装](opssystem/metadata_controlnode_install_guide.html)
+
+
+[文档主页](../zoedocs_index.html)

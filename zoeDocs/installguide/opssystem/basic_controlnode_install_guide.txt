@@ -1,4 +1,5 @@
-[文档主页](../zoedocs_index.html)
+[文档主页](../../zoedocs_index.html)
+[上一页](../installguide_index.html)
 
 
 >	_Created in 2019.06.19 by polarbears_  
@@ -26,4 +27,6 @@
 	>	cellect_data\collect_project_data.sh
 	
 		
-[文档主页](../zoedocs_index.html)		
+[文档主页](../../zoedocs_index.html)
+[上一页](../installguide_index.html)
+	

@@ -1,12 +1,5 @@
 ###	标准与规范
 1.	[运维管理规范](norm/devops_norm.html)
-###	运维管理系统
-1.	[运维管理部署-基础组件-数据节点安装](opssystem/basic_datanode_install_guide.html)
-2.	[运维管理部署-基础组件-控制节点安装](opssystem/basic_controlnode_install_guide.html)
-3.	[运维管理部署-审计组件-数据节点安装](opssystem/audit_datanode_install_guide.html)
-4.	[运维管理部署-审计组件-控制节点安装](opssystem/audit_controlnode_install_guide.html)
-5.	[运维管理部署-元数据管理组件-数据节点安装](opssystem/metadata_datanode_install_guide.html)
-6.	[运维管理部署-元数据管理组件-控制节点安装](opssystem/metadata_controlnode_install_guide.html)
 ### 运维项目管理
 1.	[项目巡检流程](opsproject/checkup_process.html)
 2.	[项目巡检报告输出内容](opsproject/checkup_db_ora.html)
@@ -19,10 +12,14 @@
 5.	[logminer使用手册](manual/manual_logminer.html)
 6.	[重做日志修改手册](manual/manual_redo_log.html)
 ###	操作手册
-1.	[Oracle RAC IP切换](opmanual/oracle_rac_switch_ip.html)
-2.	[Oracle RAC 存储CDP容灾切换测试](opmanual/oracle_rac_cdp_switch.html)
+1.	[运维管理系统](opmanual/opmanual_index.html)
+2.	[Oracle RAC IP切换](opmanual/oracle_rac_switch_ip.html)
+3.	[Oracle RAC 存储CDP容灾切换测试](opmanual/oracle_rac_cdp_switch.html)
 ### 安装指导
-1.	[Oracle DataGuard](installguide/oracle_data_guard.html)
-2.	[Oracle GoldenGata](installguide/oracle_goldengate.html)
+1.	[运维管理系统](installguide/installguide_index.html)
+2.	[Oracle DataGuard](installguide/oracle_data_guard.html)
+3.	[Oracle GoldenGata](installguide/oracle_goldengate.html)
+
+
 
 
