@@ -1,4 +1,5 @@
-[文档主页](../zoedocs_index.html)
+[文档主页](../../zoedocs_index.html)
+[上一页](../installguide_index.html)
 
 >	_Created in 2019.06.26 by polarbears_  
 >	_Copyright (c) 20xx, CHINA and/or affiliates._  
@@ -11,5 +12,6 @@
 
 
 
-[文档主页](../zoedocs_index.html)
+[文档主页](../../zoedocs_index.html)
+[上一页](../installguide_index.html)
 
