@@ -1,4 +1,4 @@
-[文档主页](../zoedocs_index.html)
+[文档主页](../index.html)
 
 ###	项目巡检流程
 1.	AWR报告采集：获取AWR报告以便在需要时对性能进行进一步分析。依据db_time大小决定是否生成报告
@@ -8,4 +8,4 @@
 	
 
 
-[文档主页](../zoedocs_index.html)
+[文档主页](../index.html)

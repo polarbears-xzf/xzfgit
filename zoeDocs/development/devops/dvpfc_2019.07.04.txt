@@ -1,4 +1,4 @@
-[文档主页](./functionchange_index.html)
+[上一页](../devops_index.html)
 
 ###	运维管理平台开发-2019.07.04
 *	数据结构变更
@@ -18,4 +18,4 @@
 	2.	SQL执行流程：执行独立记录对象版本，依据对象版本判断是否执行SQL
 	3.	锁监控增加会话阻塞情况树形视图，显示阻塞源头
 	
-[文档主页](./functionchange_index.html)
+[上一页](../devops_index.html)

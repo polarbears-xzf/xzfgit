@@ -1,4 +1,4 @@
-[文档主页](../zoedocs_index.html)
+[文档主页](../index.html)
 
 
 ###	Oracle RAC 存储CDP容灾切换测试
@@ -39,4 +39,4 @@
 
 
 
-[文档主页](../zoedocs_index.html)
+[文档主页](../index.html)

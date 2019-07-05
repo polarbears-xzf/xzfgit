@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="author" content="MarkdownViewer++" />
-    <title>opmanual_index.txt</title>
+    <title>checkup_process.txt</title>
     <style type="text/css">
             
 /* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
@@ -17,11 +17,11 @@ td, h1, h2, h3, h4, h5, p, ul, ol, li {
     <p>
       <a href="../index.html">文档主页</a>
     </p>
-    <h3 id="section">运维管理系统操作手册</h3>
+    <h3 id="section">项目巡检流程</h3>
     <ol>
-      <li>
-        <a href="opssystem/db_version_manage.html">数据库版本管理</a>
-      </li>
+      <li>AWR报告采集：获取AWR报告以便在需要时对性能进行进一步分析。依据db_time大小决定是否生成报告
+<ol><li>执行autoawr_db_time_11g.sql 或执行 autoawr_db_time_12c.sql生成获取报告脚本</li><li>执行autoawr生成的autoawr_db_time_exec脚本后去报告</li></ol></li>
+      <li>生成巡检报告</li>
     </ol>
     <p>
       <a href="../index.html">文档主页</a>

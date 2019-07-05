@@ -15,9 +15,9 @@ td, h1, h2, h3, h4, h5, p, ul, ol, li {
   </head>
   <body>
     <p>
-      <a href="../zoedocs_index.html">文档主页</a>
+      <a href="../index.html">文档主页</a>
     </p>
-    <h3 id="oracle-rac-cdp">Oracle RAC 存储CDP容灾切换</h3>
+    <h3 id="oracle-rac-cdp">Oracle RAC 存储CDP容灾切换测试</h3>
     <blockquote>
       <p>Linux平台</p>
     </blockquote>
@@ -25,10 +25,30 @@ td, h1, h2, h3, h4, h5, p, ul, ol, li {
       <li>切换挂载容灾存储（如：EMC的RPA）</li>
       <li>Linux操作系统重新扫描磁盘
 <ul><li>获取重新扫描磁盘的语句
-<blockquote><p>ls /sys/class/scsi_host/ | awk '{print "echo "- - -" &gt; /sys/class/scsi_host/" $1 "/scan"}'</p></blockquote></li><li>执行获取语句重新扫描磁盘</li></ul></li>
+<blockquote><p>#  ls /sys/class/scsi_host/ | awk '{print "echo "- - -" &gt; /sys/class/scsi_host/" $1 "/scan"}'</p></blockquote></li><li>执行获取语句重新扫描磁盘</li></ul></li>
+      <li>使用oracleasm命令重新扫描asm磁盘
+<ul><li>扫描asm磁盘
+<blockquote><p>#  /usr/sbin/oracleasm scandisks</p></blockquote></li><li>查看asm磁盘
+<blockquote><p>#  /usr/sbin/oracleasm listdisks</p></blockquote></li></ul></li>
+      <li>使用asmcmd挂载asm磁盘组
+<ul><li>登录grid用户
+<blockquote><p>#  su - grid</p></blockquote></li><li>运行asmcmd
+<blockquote><p>grid$	asmcmd</p></blockquote></li><li>查看asmcmd磁盘组
+<blockquote><p>asmcmd&gt;	lsdg --disrecovery</p></blockquote></li><li>挂载磁盘组
+<blockquote><p>asmcmd&gt;	mount data
+asmcmd&gt;	mount fra</p></blockquote></li><li>检查磁盘组状态
+<blockquote><p>asmcmd&gt;	lsdg</p></blockquote></li></ul></li>
+      <li>启动数据库
+<ul><li>检查集群与数据库启动状态
+<blockquote><p>crsctl stat res -t</p></blockquote></li><li>启动数据库
+<blockquote><p>srvctl start database -d <em>db_uniq_name</em></p></blockquote></li><li>检查数据库启动状态
+<blockquote><p>srvctl status database -d dyyy</p></blockquote></li></ul></li>
+      <li>切换IP地址
+<ul><li>执行switch_vip_to_ _ipaddress_脚本切换vip
+<blockquote><p>#   ./switch_vip_to_xxx.sh</p></blockquote></li></ul></li>
     </ol>
     <p>
-      <a href="../zoedocs_index.html">文档主页</a>
+      <a href="../index.html">文档主页</a>
     </p>
   </body>
 </html>

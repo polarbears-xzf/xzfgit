@@ -1,4 +1,4 @@
-[文档主页](../../zoedocs_index.html)
+[文档主页](../../index.html)
 [上一页](../opmanual_index.html)
 
 >	_Created in 2019.06.19 by polarbears_  
@@ -32,5 +32,5 @@
 					*	“操作对象”为<数据字典>：<主键列数据><修改列数据>
 				
 					
-[文档主页](../../zoedocs_index.html)
+[文档主页](../../index.html)
 [上一页](../opmanual_index.html)

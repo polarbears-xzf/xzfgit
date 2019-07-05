@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="author" content="MarkdownViewer++" />
-    <title>mnt_checkup_db_ora.txt</title>
+    <title>checkup_db_ora.txt</title>
     <style type="text/css">
             
 /* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
@@ -15,49 +15,21 @@ td, h1, h2, h3, h4, h5, p, ul, ol, li {
   </head>
   <body>
     <p>
-      <a href="../zoedocs_index.html">文档主页</a>
+      <a href="../index.html">文档主页</a>
     </p>
     <h3 id="section">项目巡检报告</h3>
     <ol>
-      <li>
-        <p>报告脚本名称</p>
-        <blockquote>
-          <p>checkup_db_ora.sql</p>
-        </blockquote>
-      </li>
-      <li>
-        <p>报告内容</p>
-        <ol>
-          <li>运行时间</li>
-          <li>基本状态</li>
-        </ol>
-        <blockquote>
-          <ul>
-            <li>是否集群数据库</li>
-            <li>是否开启归档</li>
-            <li>当前表空间数</li>
-            <li>当前数据文件数</li>
-            <li>当前控制文件数</li>
-            <li>当前热备状态文件数</li>
-          </ul>
-        </blockquote>
-        <ol start="3">
-          <li>空间状态信息</li>
-        </ol>
-        <blockquote>
-          <ul>
-            <li>当前数据库大小/已使用空间/使用率</li>
-            <li>日志平均增长量/日</li>
-            <li>日志平均增长量/小时/日</li>
-          </ul>
-        </blockquote>
-        <ol start="4">
-          <li>非默认初始化参数</li>
-        </ol>
-      </li>
+      <li>报告脚本名称：checkup_db_ora.sql</li>
+      <li>报告主体内容
+<ol><li>运行时间</li><li>系统综合评价
+<ul><li>是否RAC集群</li><li>是否开启归档</li><li>数据库实例及状态</li><li>是否存在OFFLINE的表空间</li><li>审计检查</li><li>密码属性检查</li><li>连接数超限告警</li><li>内存管理模式及PGA使用率异常告警</li><li>游标余量不足告警</li><li>数据文件数量告警</li><li>控制文件数量小于2告警</li><li>失效对象告警</li><li>表空间使用率及剩余大小告警</li><li>ASM盘使用率及剩余大小告警</li><li>回滚段OFFLINE告警</li><li>9-12时归档切换时间过短时告警</li><li>统计信息过旧告警</li></ul></li><li>项目基本信息
+<ul><li>系统名称</li><li>数据库名称</li><li>数据库版本</li><li>数据库创建时间</li><li>操作系统类型</li><li>服务IP信息</li></ul></li><li>操作系统基本状态
+<ul><li>CPU数</li><li>物理内存大小</li><li>由于虚拟内存交换而调入的字节数</li><li>由于虚拟内存交换而调出的字节数</li></ul></li><li>数据库基本状态
+<ul><li>是否集群数据库</li><li>是否开启归档</li><li>是否开启强制日志</li><li>是否开启附加日志</li><li>当前进程数</li><li>当前会话数</li><li>当前表空间数</li><li>当前数据文件数</li><li>当前控制文件数</li><li>在线日志组数/成员数/大小</li><li>历史归档日志数</li><li>当前热备状态文件数</li><li>用户失效对象数</li></ul></li><li>数据库空间状态信息
+<ul><li>当前数据库大小/已使用空间/使用率</li><li>日志日均增长量</li><li>最小日志切换时间</li><li>最大日志切换时间</li><li>上午9-12时日志平均切换时间</li><li>凌晨0-3时日志平均切换时间</li><li>ASM磁盘组使用率</li><li>最近统计信息收集时间</li><li>表空间回滚段状态</li></ul></li><li>非默认初始化参数</li></ol></li>
     </ol>
     <p>
-      <a href="../zoedocs_index.html">文档主页</a>
+      <a href="../index.html">文档主页</a>
     </p>
   </body>
 </html>

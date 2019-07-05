@@ -1,4 +1,4 @@
-[文档主页](../zoedocs_index.html)
+[文档主页](../index.html)
 
 
 ###	闪回技术应用
@@ -41,4 +41,4 @@
 			*	alter database open resetlogs;
 			*	drop restore point test20190603;
 			
-[文档主页](../zoedocs_index.html)
+[文档主页](../index.html)

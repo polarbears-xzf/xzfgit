@@ -1,0 +1,9 @@
+[文档主页](../index.html)
+
+###	运维管理系统功能变更记录
+1.	[运维管理系统功能说明](devops/devops_function_desc.html)
+2.	[功能变更-2019.07.03](devops/dvpfc_2019.07.03.html)
+3.	[功能变更-2019.07.04](devops/dvpfc_2019.07.04.html)
+3.	[功能变更-2019.07.05](devops/dvpfc_2019.07.05.html)
+
+[文档主页](../index.html)
