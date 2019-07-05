@@ -18,15 +18,15 @@
 	--日志日增量：      大于日志日均增量3倍，提醒是否存在异常业务
 	--日志最小切换时间：  小于3分钟，增加日志大小
 	--统计信息最近收集时间：	大于三天提醒
+	--OFFLINE的回滚段：	存在提醒
 	
 set markup html off
 prompt <br />
 
 DECLARE
---	lv_is_rac  VARCHAR2(3);
---	lv_is_archive VARCHAR2(3);
 LOG_AVG_SWITCH_TIME NUMBER(10);
 ANALYZED_DAY NUMBER(10);
+
 
 CURSOR ASM_CURSOR IS
 --查询ASM磁盘空闲率及空闲空间(GB)
@@ -65,21 +65,14 @@ select tablespace_name,pct_used,free_gb,max_gb from
          where a.tablespace_name = b.tablespace_name(+)))
 where pct_used>70 and  free_gb <100;
 
+CURSOR seg_cursor IS
+--查询回滚段STATUS
+select d.tablespace_name, s.STATUS, n.name
+  from dba_rollback_segs d, v$rollstat s, v$rollname n
+ where n.usn = s.USN
+   and d.segment_name = n.name;
+
 BEGIN
-/* 	--是否RAC
-	select decode(value,'TRUE','是','FALSE','否',value)  INTO lv_is_rac
-	from gv$parameter where name = 'cluster_database';
-	IF lv_is_rac = '否' THEN 
-		DBMS_OUTPUT.PUT_LINE('Oracle RAC 未部署，系统存在高可用性缺陷');
-	END IF;
-	--是否开启归档
-	select decode(log_mode,'ARCHIVELOG','是','否')       INTO lv_is_archive
-	from v$database;
-	IF lv_is_archive = '否' THEN 
-		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE(' <td> 紧急：数据库未开启归档模式，存在严重安全隐患</td> ');
-		DBMS_OUTPUT.PUT_LINE('</table> ');
-	END IF; */
 --检查表空间使用率及剩余大小并告警
 	FOR t in tab_cursor loop
 		if t.pct_used > 80 and t.pct_used <90 then
@@ -114,6 +107,15 @@ BEGIN
 			DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
 			DBMS_OUTPUT.PUT_LINE('<td> ASM磁盘组 '||A.NAME||' 余量极少,请立即扩展</br>');
 			DBMS_OUTPUT.PUT_LINE('使用率:'||A.pct_used||'% 剩余空间:'||A.free_gb||'GB 总大小:'||A.total_gb||'GB');
+			DBMS_OUTPUT.PUT_LINE('</table> ');
+		end if;
+	end loop;
+	
+--判断是否存在OFFLINE回滚段
+	FOR S in seg_cursor loop
+		if s.status = 'OFFLINE' then
+			DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+			DBMS_OUTPUT.PUT_LINE('<td> 表空间 '||s.tablespace_name||'中回滚段 '||s.name||' 处于OFFLINE状态，请检查</br>');
 			DBMS_OUTPUT.PUT_LINE('</table> ');
 		end if;
 	end loop;
@@ -171,9 +173,6 @@ BEGIN
 	END IF;
 	END IF;
 
-
-
-	
 		
 END;
 /
