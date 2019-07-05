@@ -1,4 +1,4 @@
-[文档主页](../functionchange_index.html)
+[文档主页](./functionchange_index.html)
 
 ###	运维管理平台开发-2019.07.03
 *	数据结构变更
@@ -17,4 +17,4 @@
 	4.	数据库SQL语法发布登记，功能：修改数据库表，增加修改字段名称，增加字段名称弹出选择现有对象。来源V_ZOESOFT_TAB_COLUMN
 	5.	
 	
-[文档主页](../functionchange_index.html)
+[文档主页](./functionchange_index.html)
