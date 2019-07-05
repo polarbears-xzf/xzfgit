@@ -18,7 +18,7 @@
 -- =======================================
 	--	巡检系统名称
 	--	操作系统版本
-	--  数据库name
+	--  数据库名称
 	--	数据库版本
 	--  数据库创建时间	
     --  服务器ip信息
@@ -32,7 +32,7 @@ prompt  <H3 class='zoecomm'>  <center> 项目基本信息 </center> </H3> <br>
 --定义巡检系统
 column systemname  NEW_VALUE systemname noprint
 select decode('&checkupSystem','his','HIS系统','emr','EMR系统','hdc','HDC系统','hip','HIP系统','其它系统') as "systemname" from dual;
---定义db_name
+--定义数据库名称
 column db_name  NEW_VALUE db_name noprint
 select value as "db_name" from V$parameter  where name='db_name';
 --定义数据库版本
@@ -47,7 +47,7 @@ column dbcreate  NEW_VALUE db_create noprint
 select created as "dbcreate" from V$DATABASE;
 --定义服务器ip信息
 column ips  NEW_VALUE ips noprint
-select (LISTAGG('节点'||inst_id||',机器名:'||host_name||',ip:'||utl_inaddr.get_host_address(host_name)||'','</td>')WITHIN GROUP(ORDER BY inst_id))as "ips" from gv$instance order by inst_id;
+select (LISTAGG('节点'||inst_id||'  机器名: '||host_name||'  ip: '||utl_inaddr.get_host_address(host_name)||'','</td>')WITHIN GROUP(ORDER BY inst_id))as "ips" from gv$instance order by inst_id;
 
 prompt  <center> <table WIDTH=600 BORDER=1> 
 

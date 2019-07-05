@@ -47,10 +47,12 @@ select '日志日均增长量', trunc(a.total_size / b.days / 1024 / 1024) || 'M
   from (select Sum(Block_size * blocks) /
                decode(count(distinct dest_id), 0, 1, count(distinct dest_id)) total_size
           From v$archived_log
-         where standby_dest = 'NO') a,
+         where standby_dest = 'NO'
+		   and completion_time>sysdate-30) a,
        (select max(completion_time) - min(completion_time) days
           from v$archived_log
-         where standby_dest = 'NO') b
+         where standby_dest = 'NO'
+		   and completion_time>sysdate-30) b
 union all
 select '最小日志切换时间' , trunc(min(next_time-first_time)*24*60,-2)||'分钟'
 from v$archived_log
@@ -72,10 +74,12 @@ SELECT '上午9-12点日志平均切换时间',
          WHERE to_number(TO_CHAR(completion_time, 'hh24')) >= 9
            AND to_number(TO_CHAR(completion_time, 'hh24')) < 12
            AND standby_dest = 'NO'
+		   AND completion_time>sysdate-30
          GROUP BY thread#) a,
        (SELECT MAX(completion_time) - MIN(completion_time) days
 		from v$archived_log
-         WHERE standby_dest = 'NO') b,
+         WHERE standby_dest = 'NO'
+		   AND completion_time>sysdate-30) b,
        cluster_or_not c
 union all
 SELECT '凌晨0-3点日志平均切换时间',
@@ -92,10 +96,12 @@ SELECT '凌晨0-3点日志平均切换时间',
          WHERE to_number(TO_CHAR(completion_time, 'hh24')) >= 0
            AND to_number(TO_CHAR(completion_time, 'hh24')) <  3
            AND standby_dest = 'NO'
+		   AND completion_time>sysdate-30
          GROUP BY thread#) a,
        (SELECT MAX(completion_time) - MIN(completion_time) days
           From v$archived_log
-         WHERE standby_dest = 'NO') b,
+         WHERE standby_dest = 'NO'
+		   AND completion_time>sysdate-30) b,
        cluster_or_not c
 union all
 select '表空间"'||tablespace_name||'"使用率:',pct_used||'%' from
