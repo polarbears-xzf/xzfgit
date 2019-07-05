@@ -22,8 +22,8 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
 
 --  初始化META_USER$，从DBA_USERS。设置用于所属系统，如：ORACLE，ZOESOFT
     lv_sql := 'INSERT INTO ZOESTD.META_USER$';
-    lv_sql := lv_sql || ' (USER_ID,USERNAME,USER_SOURCE,CREATOR,CREATED_TIME,DB_USER#)';
-    lv_sql := lv_sql || ' SELECT SYS_GUID(),USERNAME,';
+    lv_sql := lv_sql || ' (DB_ID#,USER_ID,USERNAME,USER_SOURCE,CREATOR,CREATED_TIME,DB_USER#)';
+    lv_sql := lv_sql || ' SELECT '''||in_db_id||''', SYS_GUID(),USERNAME,';
     lv_sql := lv_sql || ' CASE WHEN USERNAME LIKE ''ZOE%'' THEN ''ZOESOFT''';
     lv_sql := lv_sql || ' WHEN USERNAME = (SELECT COLUMN_VALUE FROM TABLE(ZOEDEVOPS.ZOEPKG_UTILITY.GET_ORACLE_USER) B'; 
     lv_sql := lv_sql || ' WHERE B.COLUMN_VALUE=A.USERNAME) THEN ''ORACLE''';
@@ -37,9 +37,9 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
     COMMIT;
 --  初始化META_OBJ$，从DBA_TABLES。排除Oracle用户，依据ZOEDEVOPS.ZOEPKG_UTILITY.GET_ORACLE_USER
     lv_sql := 'INSERT INTO ZOESTD.META_OBJ$';
-    lv_sql := lv_sql || ' (DB_OBJ_ID#,USER_ID#,OBJ_NAME,OBJ_TYPE_ID#,';
+    lv_sql := lv_sql || ' (DB_ID#,OBJ_ID,DB_OBJ_ID#,USER_ID#,OBJ_NAME,OBJ_TYPE_ID#,';
     lv_sql := lv_sql || ' CREATOR,CREATED_TIME,MODIFIER,MODIFIED_TIME)';
-    lv_sql := lv_sql || ' SELECT OBJECT_ID,';
+    lv_sql := lv_sql || ' SELECT '''||in_db_id||''', SYS_GUID(), OBJECT_ID,';
     lv_sql := lv_sql || ' (SELECT USER_ID FROM ZOESTD.META_USER$ u WHERE u.USERNAME=o.OWNER) AS USER#,OBJECT_NAME,';
     lv_sql := lv_sql || ' DECODE(OBJECT_TYPE,''TABLE'',''1'',''VIEW'',''2'',''SEQUENCE'',3,NULL) AS OBJECT_TYPE#,'; 
     lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER'') AS CREATOR,';
@@ -53,8 +53,8 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
     COMMIT;
 --  初始化META_TAB$，从META_OBJ$视图
     lv_sql := 'INSERT INTO ZOESTD.META_TAB$';
-    lv_sql := lv_sql || ' (obj_ID#,user_ID#,tab_name,tab_chn_name,tab_checksum,memo)';
-    lv_sql := lv_sql || ' SELECT o.OBJ_ID,o.USER_ID#,o.OBJ_NAME, SUBSTR(tm.COMMENTS,1,DECODE(INSTR(tm.COMMENTS,''#|''),';
+    lv_sql := lv_sql || ' (DB_ID#,obj_ID#,user_ID#,tab_name,tab_chn_name,tab_checksum,memo)';
+    lv_sql := lv_sql || ' SELECT '''||in_db_id||''', o.OBJ_ID,o.USER_ID#,o.OBJ_NAME, SUBSTR(tm.COMMENTS,1,DECODE(INSTR(tm.COMMENTS,''#|''),';
     lv_sql := lv_sql || ' 0,LENGTH(tm.COMMENTS),INSTR(tm.COMMENTS,''#|'')-1)) AS COLUMN_CHN_NAME,';
     lv_sql := lv_sql || ' (SELECT ZOEDEVOPS.ZOEPKG_SECURITY.VERIFY_SH1(TABLE_INFO||TABLE_PK_INFO)';
     lv_sql := lv_sql || ' FROM (SELECT ';
@@ -77,13 +77,13 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
     COMMIT;
 --  初始化META_COL$，从META_TAB$，DBA_TAB_COLS视图
     lv_sql := 'INSERT INTO ZOESTD.META_COL$(';
-    lv_sql := lv_sql || ' OBJ_ID#,COL_ID,COL_NAME,COL_CHN_NAME,';
+    lv_sql := lv_sql || ' DB_ID#,OBJ_ID#,COL_ID,COL_NAME,COL_CHN_NAME,';
     lv_sql := lv_sql || ' DATA_TYPE,DATA_LENGTH,DATA_PRECISION,DATA_SCALE,';
-    lv_sql := lv_sql || ' DATA_DEFAULT,MEMO)';
-    lv_sql := lv_sql || ' SELECT t.OBJ_ID#,cl.COLUMN_ID,cl.COLUMN_NAME, ';
+    lv_sql := lv_sql || ' MEMO)';
+    lv_sql := lv_sql || ' SELECT '''||in_db_id||''', t.OBJ_ID#,cl.COLUMN_ID,cl.COLUMN_NAME, ';
     lv_sql := lv_sql || ' SUBSTR(cm.COMMENTS,1,DECODE(INSTR(cm.COMMENTS,''#|''),';
     lv_sql := lv_sql || ' 0,LENGTH(cm.COMMENTS),INSTR(cm.COMMENTS,''#|'')-1)) AS COLUMN_CHN_NAME,';
-    lv_sql := lv_sql || ' cl.DATA_TYPE,cl.DATA_LENGTH,cl.DATA_PRECISION,cl.DATA_SCALE,to_lob(cl.DATA_DEFAULT), ';
+    lv_sql := lv_sql || ' cl.DATA_TYPE,cl.DATA_LENGTH,cl.DATA_PRECISION,cl.DATA_SCALE, ';
     lv_sql := lv_sql || ' SUBSTR(cm.COMMENTS,DECODE(INSTR(cm.COMMENTS,''#|''),';
     lv_sql := lv_sql || ' 0,LENGTH(cm.COMMENTS)+1,INSTR(cm.COMMENTS,''#|'')+2),LENGTH(cm.COMMENTS)) AS MEMO';
     lv_sql := lv_sql || ' FROM DBA_TAB_COLUMNS@'||lv_db_link||' cl ,DBA_COL_COMMENTS@'||lv_db_link||' cm ,ZOESTD.META_TAB$ t ,ZOESTD.META_USER$ u';
