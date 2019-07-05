@@ -1,4 +1,3 @@
-[文档主页](./functionchange_index.html)
 [上一页](./devops_function_desc.html)
 
 1.	用户密码加解密
@@ -25,5 +24,4 @@
     	>	例：ZOEDEVOPS.ZOEPKG_DEVOPS.MODIFY_DB_USER_INFO(ZOEDEVOPS.ZOEPKG_DEVOPS.GET_DB_ID,'username','password');
 
 
-[文档主页](./functionchange_index.html)
 [文档主页](./devops_function_desc.html)

@@ -1,4 +1,4 @@
-[文档主页](../zoedocs_index.html)
+[文档主页](../index.html)
 
 ###	项目巡检报告
 1.	报告脚本名称：checkup_db_ora.sql
@@ -18,4 +18,4 @@
 	4.	非默认初始化参数
 	
 
-[文档主页](../zoedocs_index.html)
+[文档主页](../index.html)

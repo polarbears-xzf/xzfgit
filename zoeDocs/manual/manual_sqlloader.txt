@@ -1,4 +1,4 @@
-[文档主页](../zoedocs_index.html)
+[文档主页](../index.html)
 
 ###	sqlloader使用说明
 >	sqlloader用于将文本文件数据加载到Oracle表中
@@ -54,4 +54,4 @@
 	
 	
 	
-[文档主页](../zoedocs_index.html)
+[文档主页](../index.html)

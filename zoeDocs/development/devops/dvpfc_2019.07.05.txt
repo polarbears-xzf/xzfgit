@@ -1,4 +1,4 @@
-[文档主页](./functionchange_index.html)
+[上一页](../devops_index.html)
 
 ###	运维管理平台开发-2019.07.05
 *	数据结构变更
@@ -14,4 +14,4 @@
 			*	从“项目数据库基本信息”时无需输入数据库连接信息
 			*	输入内容：数据库驱动（默认Oracle），数据库连接符，连接密码
 		
-[文档主页](./functionchange_index.html)
+[上一页](../devops_index.html)

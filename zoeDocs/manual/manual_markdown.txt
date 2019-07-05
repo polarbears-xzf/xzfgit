@@ -1,3 +1,6 @@
+[文档主页](../index.html)
+
+
 ##	markdown使用手册
 ###	基础语法
 *	标题：
@@ -74,4 +77,5 @@ cond(yes)->e
 cond(no)->sub->io
 ```
 
+[文档主页](../index.html)
 

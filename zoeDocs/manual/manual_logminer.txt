@@ -1,4 +1,4 @@
-[文档主页](../zoedocs_index.html)
+[文档主页](../index.html)
 
 
 ###	logminer使用手册
@@ -30,4 +30,4 @@
 *	归档日志挖掘结束后，将创建的表logmnr_contents删除，节省空间
 
 	
-[文档主页](../zoedocs_index.html)
+[文档主页](../index.html)
