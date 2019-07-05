@@ -1,4 +1,4 @@
-[文档主页](../zoedocs_index.html)
+[文档主页](../functionchange_index.html)
 
 1.	用户密码加解密
 	*	ZOEDEVOPS.ENCRYPT_USER('username' , 'password')
@@ -24,4 +24,4 @@
     	>	例：ZOEDEVOPS.ZOEPKG_DEVOPS.MODIFY_DB_USER_INFO(ZOEDEVOPS.ZOEPKG_DEVOPS.GET_DB_ID,'username','password');
 
 
-[文档主页](../zoedocs_index.html)
+[文档主页](../functionchange_index.html)
