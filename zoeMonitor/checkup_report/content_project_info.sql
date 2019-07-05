@@ -35,15 +35,6 @@ select decode('&checkupSystem','his','HIS系统','emr','EMR系统','hdc','HDC系
 --定义db_name
 column db_name  NEW_VALUE db_name noprint
 select value as "db_name" from V$parameter  where name='db_name';
---定义service_names
-column service_names  NEW_VALUE service_names noprint
-select value as "service_names" from V$parameter  where name='service_names';
---定义db_unique_name
-column db_unique_name  NEW_VALUE db_unique_name noprint
-select value as "db_unique_name" from V$parameter  where name='db_unique_name';
---定义instance_name
-column instance_name  NEW_VALUE instance_name noprint
-select (LISTAGG(instance_name,',')WITHIN GROUP(ORDER BY inst_id)) as "instance_name" from gV$instance;
 --定义数据库版本
 column banner  NEW_VALUE db_version noprint
 select banner as "banner" from v$version where banner like 'Oracle Database%';
@@ -69,20 +60,8 @@ prompt  <center> <table WIDTH=600 BORDER=1>
 		prompt  <td> &systemname  </td>
 	prompt  </tr>
 	prompt  <tr>
-		prompt  <td> DB_NAME </td>
+		prompt  <td> 数据库名称 </td>
 		prompt  <td> &db_name  </td>
-	prompt  </tr>
-	prompt  <tr>
-		prompt  <td> SERVICE_NAMES </td>
-		prompt  <td> &service_names  </td>
-	prompt  </tr>
-		prompt  <tr>
-		prompt  <td> DB_UNIQUE_NAME </td>
-		prompt  <td> &db_unique_name  </td>
-	prompt  </tr>
-		prompt  <tr>
-		prompt  <td> INSTANCE_NAME </td>
-		prompt  <td> &instance_name </td>
 	prompt  </tr>
 	prompt  <tr>
 		prompt  <td> 数据库版本 </td>

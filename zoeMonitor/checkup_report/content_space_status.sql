@@ -35,6 +35,9 @@ set markup html on entmap off
 
 set markup html on table "WIDTH=600 BORDER=1"
 
+
+WITH cluster_or_not AS 
+	(SELECT value FROM v$parameter WHERE name = 'cluster_database')
 select '当前数据库大小/已使用空间/使用率'  as "column1", 
        trunc(sum(a.bytes)/1024/1024/1024,2)||'G/'||trunc((sum(a.bytes)-sum(b.bytes))/1024/1024/1024,2)||'G/'||trunc((1-sum(b.bytes)/sum(a.bytes))*100,2)||'%'    as "column2"
 from dba_data_files a, (select tablespace_name,file_id,sum(bytes) bytes from dba_free_space group by tablespace_name,file_id) b
@@ -43,10 +46,10 @@ union all
 select '日志日均增长量', trunc(a.total_size / b.days / 1024 / 1024) || 'MB'
   from (select Sum(Block_size * blocks) /
                decode(count(distinct dest_id), 0, 1, count(distinct dest_id)) total_size
-          From gv$archived_log
+          From v$archived_log
          where standby_dest = 'NO') a,
        (select max(completion_time) - min(completion_time) days
-          from gv$archived_log
+          from v$archived_log
          where standby_dest = 'NO') b
 union all
 select '最小日志切换时间' , trunc(min(next_time-first_time)*24*60,-2)||'分钟'
@@ -55,31 +58,45 @@ union all
 select '最大日志切换时间' , trunc(max(next_time-first_time)*24*60,-2)||'分钟'
 from v$archived_log
 union all
-SELECT '上午9-12点日志平均切换时间', decode(a.total_count,0,null,trunc(180/(a.total_count/b.days),2)||'分钟')
-FROM
-  (SELECT COUNT(*)/decode(count(distinct dest_id),0,1,count(distinct dest_id)) total_count
-    FROM gv$archived_log
-    WHERE to_number(TO_CHAR(completion_time,'hh24')) >= 9
-      AND to_number(TO_CHAR(completion_time,'hh24')) < 12
-      AND standby_dest='NO'
-  ) a,
-  (SELECT MAX(completion_time) - MIN(completion_time) days
-  FROM gv$archived_log
- where standby_dest = 'NO'
-  ) b
+SELECT '上午9-12点日志平均切换时间',
+       LISTAGG(DECODE(c.value, 'TRUE', '节点' || a.thread# || ' : ', NULL) ||
+               DECODE(a.total_count,
+                      0,
+                      NULL,
+                      trunc(180 / (a.total_count / b.days), 2) || '分钟'),
+               '<br/>') WITHIN GROUP(ORDER BY 2)
+  FROM (SELECT thread#,
+               COUNT(*) /
+               DECODE(COUNT(DISTINCT dest_id), 0, 1, COUNT(DISTINCT dest_id)) total_count
+          FRom v$archived_log
+         WHERE to_number(TO_CHAR(completion_time, 'hh24')) >= 9
+           AND to_number(TO_CHAR(completion_time, 'hh24')) < 12
+           AND standby_dest = 'NO'
+         GROUP BY thread#) a,
+       (SELECT MAX(completion_time) - MIN(completion_time) days
+		from v$archived_log
+         WHERE standby_dest = 'NO') b,
+       cluster_or_not c
 union all
-SELECT '凌晨0-3点日志平均切换时间', decode(a.total_count,0,null,trunc(180/(a.total_count/b.days),2)||'分钟')
-FROM
-  (SELECT COUNT(*)/decode(count(distinct dest_id),0,1,count(distinct dest_id)) total_count
-    FROM gv$archived_log
-    WHERE to_number(TO_CHAR(completion_time,'hh24')) >= 0
-      AND to_number(TO_CHAR(completion_time,'hh24')) < 3
-      AND standby_dest='NO'
-  ) a,
-  (SELECT MAX(completion_time) - MIN(completion_time) days
-  FROM gv$archived_log
- where standby_dest = 'NO'
-  ) b
+SELECT '凌晨0-3点日志平均切换时间',
+       LISTAGG(DECODE(c.value, 'TRUE', '节点' || a.thread# || ' : ', NULL) ||
+               DECODE(a.total_count,
+                      0,
+                      NULL,
+                      trunc(180 / (a.total_count / b.days), 2) || '分钟'),
+               '<br/>') WITHIN GROUP(ORDER BY 2)
+  FROM (SELECT thread#,
+               COUNT(*) /
+               DECODE(COUNT(DISTINCT dest_id), 0, 1, COUNT(DISTINCT dest_id)) total_count
+          From v$archived_log
+         WHERE to_number(TO_CHAR(completion_time, 'hh24')) >= 0
+           AND to_number(TO_CHAR(completion_time, 'hh24')) <  3
+           AND standby_dest = 'NO'
+         GROUP BY thread#) a,
+       (SELECT MAX(completion_time) - MIN(completion_time) days
+          From v$archived_log
+         WHERE standby_dest = 'NO') b,
+       cluster_or_not c
 union all
 select '表空间"'||tablespace_name||'"使用率:',pct_used||'%' from
 (select tablespace_name,
