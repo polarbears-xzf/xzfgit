@@ -107,7 +107,10 @@ where pct_used>70 and  max_gb<used_gb+100
 union all
 select 'ASM磁盘组"'||name||'"使用率:',100-round(free_mb/total_mb * 100,2)||'%' pct_free from v$asm_diskgroup
 union all
-select '对象统计信息最近收集时间',to_char(max(last_analyzed)) from dba_tables;
+select '对象统计信息最近收集时间',to_char(max(last_analyzed)) from dba_tables
+union all
+select '表空间'||d.tablespace_name||'回滚段状态',s.STATUS from dba_rollback_segs d, v$rollstat s, v$rollname n where n.usn = s.USN and d.segment_name = n.name group by d.tablespace_name,s.status
+;
 
 
 prompt  </center>
