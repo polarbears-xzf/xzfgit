@@ -58,9 +58,12 @@ END;
 /
 	--相关类型
 @@create_type.sql
+	--基本工具包
+@@zoepkg_utility.pks
+@@zoepkg_utility.pkb
 	--初始化数据库信息功能包
-@@datanode_zoepkg_dn_db_info.pks
-@@datanode_zoepkg_dn_db_info.pkb
+@@datanode_zoepkg_ops_db_info.pks
+@@datanode_zoepkg_ops_db_info.pkb
 	--远程sql调用
 @@datanode_zoeprc_exec_sql.pls
 
