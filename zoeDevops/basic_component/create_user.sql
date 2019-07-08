@@ -97,6 +97,7 @@ END;
 
 	-- 授权系统权限
 ALTER USER &sv_zoedevops QUOTA UNLIMITED ON &sv_tablespace_name;
+
 GRANT CONNECT                                     TO &sv_zoedevops;
 GRANT ALTER USER, CREATE USER                     TO &sv_zoedevops;
 GRANT CREATE DATABASE LINK                        TO &sv_zoedevops;
@@ -110,10 +111,11 @@ GRANT EXECUTE ON  SYS.DBMS_OBFUSCATION_TOOLKIT    TO &sv_zoedevops;
 GRANT SELECT  ON  DBA_CONSTRAINTS                 TO &sv_zoedevops;
 GRANT SELECT  ON  DBA_CONS_COLUMNS                TO &sv_zoedevops;
 GRANT SELECT  ON  DBA_DB_LINKS                    TO &sv_zoedevops;
-GRANT SELECT  ON  DBA_TAB_COLUMNS                 TO &sv_zoedevops;
 GRANT SELECT  ON  V_$DATABASE                     TO &sv_zoedevops;
 GRANT SELECT  ON  V_$PDBS                         TO &sv_zoedevops;
 GRANT SELECT  ON  DBA_USERS                       TO &sv_zoedevops;
+GRANT SELECT  ON  DBA_TABLES                      TO &sv_zoedevops;
+GRANT SELECT  ON  DBA_TAB_COLUMNS                 TO &sv_zoedevops;
 
 	-- 授权网络访问权限权限
 begin
