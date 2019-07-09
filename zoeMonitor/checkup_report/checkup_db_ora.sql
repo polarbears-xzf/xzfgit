@@ -210,6 +210,12 @@ set markup html on entmap off
 @@content_init_parameter.sql
 set markup html on entmap off
 
+-- =======================================
+-- Oracle表空间使用情况
+-- =======================================
+@@tablespace_status.sql
+set markup html on entmap off
+
 
 
 
