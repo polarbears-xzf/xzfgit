@@ -33,10 +33,7 @@ DECLARE
 	lv_sga VARCHAR2(16);
 	lv_pga VARCHAR2(16);
 	lv_session_status VARCHAR2(128);
-	log_archive_dest VARCHAR2(32);
-	db_recovery_file_dest VARCHAR2(128);
-	log_archive_dest_n VARCHAR2(128);
-	
+
 BEGIN
 	--是否RAC
 /*	select decode(value,'TRUE','是','FALSE','否',value)  INTO lv_is_rac
@@ -45,8 +42,7 @@ BEGIN
 		DBMS_OUTPUT.PUT_LINE('Oracle RAC 未部署，系统存在高可用性缺陷');
 	END IF;
 	--是否开启归档
-	select decode(log_mode,'ARCHIVELOG','是','否')       INTO lv_is_archive
-	from v$database;
+	select decode(log_mode,'ARCHIVELOG','是','否')       INTO lv_is_archive from v$database;
 	IF lv_is_archive = '否' THEN 
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
 		DBMS_OUTPUT.PUT_LINE(' <td> 紧急：数据库未开启归档模式，存在严重安全隐患</td> ');
@@ -127,32 +123,6 @@ BEGIN
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	END IF;
 	END IF;	
-	
-	--判断归档路径
-	select value into log_archive_dest from v$parameter where name = 'log_archive_dest';
-	select value into db_recovery_file_dest from v$parameter where name = 'db_recovery_file_dest';
-	select (LISTAGG(substr(value,10), ' ; ') WITHIN GROUP(ORDER BY value)) into log_archive_dest_n from v$parameter where name not like 'log_archive_dest_s%'   and name like 'log_archive_dest_%' and value like 'location%' or value like 'LOCATION%';
-	
-	IF log_archive_dest is not null  THEN 
-		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE('<td>当前归档路径参数使用log_archive_dest，路径为'||log_archive_dest||'</td>');
-		DBMS_OUTPUT.PUT_LINE('</table> ');
-	else if db_recovery_file_dest is not null then
-	    if log_archive_dest_n is null then
-		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE('<td>当前归档路径在指定闪回恢复区：'||db_recovery_file_dest||'</td>');
-		DBMS_OUTPUT.PUT_LINE('</table> ');
-		else 
-		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE('<td>当前归档路径参数使用log_archive_dest_n，路径为'||log_archive_dest_n||'</td>');
-		DBMS_OUTPUT.PUT_LINE('</table> ');
-		END IF;	
-	END IF;	
-	END IF;	
-	IF log_archive_dest_n is not null and db_recovery_file_dest is null  THEN 
-		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE('<td>当前归档路径参数使用log_archive_dest_n，路径为'||log_archive_dest_n||'</td>');
-		DBMS_OUTPUT.PUT_LINE('</table> ');
-	END IF;	
+		
 END;
 /
