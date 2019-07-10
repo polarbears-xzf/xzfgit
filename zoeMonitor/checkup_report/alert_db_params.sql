@@ -26,14 +26,14 @@ DECLARE
 	PROCESSES number(10);
 	MAX_PROCESSES number(10);
 	PGA_USED_PCT number(10);
-	MEMORY_TARGET number(10);
+	MEMORY_TARGET VARCHAR2(16);
 	HIGH_OPEN_CUR number(10);
 	MAX_OPEN_CUR number(10);
 	lv_sessions  VARCHAR2(16);
 	lv_sga VARCHAR2(16);
 	lv_pga VARCHAR2(16);
 	lv_session_status VARCHAR2(128);
-	
+
 BEGIN
 	--是否RAC
 /*	select decode(value,'TRUE','是','FALSE','否',value)  INTO lv_is_rac
@@ -42,8 +42,7 @@ BEGIN
 		DBMS_OUTPUT.PUT_LINE('Oracle RAC 未部署，系统存在高可用性缺陷');
 	END IF;
 	--是否开启归档
-	select decode(log_mode,'ARCHIVELOG','是','否')       INTO lv_is_archive
-	from v$database;
+	select decode(log_mode,'ARCHIVELOG','是','否')       INTO lv_is_archive from v$database;
 	IF lv_is_archive = '否' THEN 
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
 		DBMS_OUTPUT.PUT_LINE(' <td> 紧急：数据库未开启归档模式，存在严重安全隐患</td> ');
@@ -75,22 +74,21 @@ BEGIN
 	END IF;
 	END IF;
 
-	select round(value/1024/1024) into MEMORY_TARGET from v$parameter where name = 'memory_target';
-	SELECT round(value/1024/1024) into lv_pga FROM v$parameter WHERE name='pga_aggregate_target';
-	SELECT round(value/1024/1024) into lv_sga FROM v$parameter WHERE name='sga_target';
+	select round(value/1024/1024/1024,2) into MEMORY_TARGET from v$parameter where name = 'memory_target';
+	SELECT round(value/1024/1024/1024,2) into lv_pga FROM v$parameter WHERE name='pga_aggregate_target';
+	SELECT round(value/1024/1024/1024,2) into lv_sga FROM v$parameter WHERE name='sga_target';
 	
 	--通过PGA_TAG+1排除等于0的情况 (问题1)
 	select USED/(PGA_TAG+1) into PGA_USED_PCT FROM 
 		(select value/1024/1024 USED from v$pgastat where name = 'total PGA allocated'),
 		(select value/1024/1024 PGA_TAG from v$parameter t where name = 'pga_aggregate_target');
-		
-	IF MEMORY_TARGET<>0 THEN 
+	IF MEMORY_TARGET=0 THEN 
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE('<td>当前为自动内存管理模式，可分配内存memory_target值为'||MEMORY_TARGET||'M，建议更改为自动共享内存管理模式</td>');
+		DBMS_OUTPUT.PUT_LINE('<td>当前为自动共享内存管理模式，其中SGA为'||lv_sga||'G,PGA为'||lv_pga||'G</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	ELSE 
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE('<td>当前为自动共享内存管理模式，其中SGA为'||lv_sga||'M,PGA为'||lv_pga||'M</td>');
+		DBMS_OUTPUT.PUT_LINE('<td>当前为自动内存管理模式，可分配内存memory_target值为'||MEMORY_TARGET||'G，建议更改为自动共享内存管理模式</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	END IF;	
 	
@@ -124,7 +122,7 @@ BEGIN
 		DBMS_OUTPUT.PUT_LINE('<td> 最大游标使用量超过70%，请关注');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	END IF;
-	END IF;
-
+	END IF;	
+		
 END;
 /

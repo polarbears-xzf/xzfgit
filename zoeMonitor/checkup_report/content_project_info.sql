@@ -38,16 +38,13 @@ select value as "db_name" from V$parameter  where name='db_name';
 --定义数据库版本
 column banner  NEW_VALUE db_version noprint
 select banner as "banner" from v$version where banner like 'Oracle Database%';
---定义操作系统类型
-column platform_name  NEW_VALUE platform noprint
-/*select platform_name as "platform_name" from dba_hist_database_instance WHERE ROWNUM <= 1; 10g版本没有platform_name字段*/
-select PLATFORM_NAME as "platform_name" from V$DATABASE;
 --定义数据库创建时间
 column dbcreate  NEW_VALUE db_create noprint
 select created as "dbcreate" from V$DATABASE;
---定义服务器ip信息
-column ips  NEW_VALUE ips noprint
-select (LISTAGG('节点'||inst_id||'  机器名: '||host_name||'  ip: '||utl_inaddr.get_host_address(host_name)||'','</td>')WITHIN GROUP(ORDER BY inst_id))as "ips" from gv$instance order by inst_id;
+--定义数据库大小
+column db_size  NEW_VALUE db_size noprint
+select ''||round(sum(bytes)/1024/1024/1024,2)||'G' as "db_size" from dba_data_files;
+
 
 prompt  <center> <table WIDTH=600 BORDER=1> 
 
@@ -67,17 +64,13 @@ prompt  <center> <table WIDTH=600 BORDER=1>
 		prompt  <td> 数据库版本 </td>
 		prompt  <td> &db_version  </td>
 	prompt  </tr>
-		prompt  <tr>
+	prompt  <tr>
 		prompt  <td> 数据库创建时间</td>
 		prompt  <td> &db_create </td>
+	prompt  </tr>
 	prompt  <tr>
-		prompt  <td> 操作系统类型 </td>
-		prompt  <td> &platform  </td>
-	prompt  </tr>
-	prompt  </tr>
-		prompt  <tr>
-		prompt  <td> 服务器ip信息</td>
-		prompt  <td> &ips </td>
+		prompt  <td> 数据库大小</td>
+		prompt  <td> &db_size </td>
 	prompt  </tr>
 	prompt </table>  </center> <br> <br>
 

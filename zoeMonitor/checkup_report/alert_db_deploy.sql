@@ -30,6 +30,11 @@ DECLARE
 	lv_is_audit VARCHAR2(32);
 	lv_is_password1 VARCHAR2(32);
 	lv_is_password2 VARCHAR2(32);
+	log_archive_dest VARCHAR2(32);
+	db_recovery_file_dest VARCHAR2(64);
+	log_archive_dest_n VARCHAR2(64);
+	slimit VARCHAR2(16);
+	sused VARCHAR2(16);
 BEGIN
 	--是否RAC
 	select decode(value,'TRUE','是','FALSE','否',value)  INTO lv_is_rac
@@ -39,15 +44,45 @@ BEGIN
 		DBMS_OUTPUT.PUT_LINE('<td>Oracle RAC 未部署，系统存在高可用性缺陷</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	END IF;
-	--是否开启归档
+	--是否开启归档以及判断归档路径
 	select decode(log_mode,'ARCHIVELOG','是','否')INTO lv_is_archive from v$database;
+	select value into log_archive_dest from v$parameter where name = 'log_archive_dest';
+	select value into db_recovery_file_dest from v$parameter where name = 'db_recovery_file_dest';
+	select (LISTAGG(substr(value,10), ' ; ') WITHIN GROUP(ORDER BY value)) into log_archive_dest_n from v$parameter where name not like 'log_archive_dest_s%'   and name like 'log_archive_dest_%' and value like 'location%' or value like 'LOCATION%';
+	select round(space_limit/1024/1024,2) into slimit from v$recovery_file_dest;
+	select round(space_used/1024/1024,2) into sused from v$recovery_file_dest;
 	IF lv_is_archive = '否' THEN 
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
 		DBMS_OUTPUT.PUT_LINE(' <td> 紧急：数据库未开启归档模式，存在严重安全隐患</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
+			ELSE IF log_archive_dest is not null  THEN 
+				DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+				DBMS_OUTPUT.PUT_LINE('<td>当前归档路径参数使用log_archive_dest，路径为'||log_archive_dest||'</td>');
+				DBMS_OUTPUT.PUT_LINE('</table> ');
+			else if db_recovery_file_dest is not null and log_archive_dest_n is null then
+					DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+					DBMS_OUTPUT.PUT_LINE('<td>当前归档路径在指定闪回恢复区：'||db_recovery_file_dest||',其大小为'||slimit||'M,已使用'||sused||'M</td>');
+					DBMS_OUTPUT.PUT_LINE('</table> ');
+				else if db_recovery_file_dest is not null and log_archive_dest_n is not null then
+						DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+						DBMS_OUTPUT.PUT_LINE('<td>当前归档路径参数使用log_archive_dest_n，路径为'||log_archive_dest_n||'</td>');
+						DBMS_OUTPUT.PUT_LINE('</table> ');
+					else if db_recovery_file_dest is null and log_archive_dest_n is not null then
+							DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+							DBMS_OUTPUT.PUT_LINE('<td>当前归档路径参数使用log_archive_dest_n，路径为'||log_archive_dest_n||'</td>');
+							DBMS_OUTPUT.PUT_LINE('</table> ');
+						else if db_recovery_file_dest is null and log_archive_dest_n is null then
+								DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+								DBMS_OUTPUT.PUT_LINE('<td>当前归档路径在%ORACLE_HOME%\RDBMS</td>');
+								DBMS_OUTPUT.PUT_LINE('</table> ');
+						END IF;
+					END IF;	
+				END IF;	
+			END IF;
+		END IF;
 	END IF;
 	--实例及数据库状态
-	select LISTAGG('实例：'||instance_name||'；实例状态：'||status||',数据库状态：'||database_status||'','</td>') WITHIN GROUP(ORDER BY inst_id) into lv_dbstatus from gv$instance;
+	select LISTAGG('实例：'||instance_name||'；实例状态：'||status||',数据库状态：'||database_status||'','<br />') WITHIN GROUP(ORDER BY inst_id) into lv_dbstatus from gv$instance;
 	    DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>'); 
 		DBMS_OUTPUT.PUT_LINE('<td>'||lv_dbstatus||'</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
