@@ -13,5 +13,5 @@
 
 
 set markup html off
+prompt  <center> <a  href="#top">Back to Top </a></center>
 prompt <br />
-prompt 这里是我自己写的

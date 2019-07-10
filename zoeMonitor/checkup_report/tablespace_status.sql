@@ -16,7 +16,7 @@
 -- Oracle表空间使用情况
 -- =======================================
 set markup html off
-prompt  <H3 class='zoecomm'>  <center>表空间使用情况</center>  </H3>
+prompt  <H3 class='zoecomm'>  <center><a name="#00007"></a>表空间使用情况</center>  </H3>
 set markup html on entmap off
 
 column column1  format A80  heading '表空间名'
@@ -31,11 +31,17 @@ set markup html on entmap off
 
 set markup html on table "WIDTH=600 BORDER=1"
 
-select  to_char(rownum) as "column5",
-		to_char(tablespace_name) as "column1",
-       ''||rtrim(to_char(max_gb,'fm9990.99'), '.')||'G' as "column2",
-       ''||rtrim(to_char(used_gb,'fm9990.99'), '.')||'G' as "column3",
-       ''||to_char(round(100 * used_gb / max_gb))||'%' as "column4"
+select to_char(rownum) as "column5",
+       to_char(tablespace_name) as "column1",
+       rtrim(to_char(max_gb,'fm9990.99'), '.')||'G' as "column2",
+       rtrim(to_char(used_gb,'fm9990.99'), '.')||'G' as "column3",
+       to_char(round(100 * used_gb / max_gb))||'%' as "column4"
+     from
+(select 
+   tablespace_name,
+       max_gb,
+       used_gb,
+       (round(100 * used_gb / max_gb))
   from (select a.tablespace_name tablespace_name,
                round((a.bytes_alloc - nvl(b.bytes_free, 0)) / power(2, 30),
                      2) used_gb,
@@ -68,6 +74,6 @@ select  to_char(rownum) as "column5",
            and f.file_id = h.file_id
            and f.tablespace_name = h.tablespace_name
          group by h.tablespace_name)
-order by rownum;
+order by 4);
 
-prompt  </center>
+prompt   <a  href="#top">Back to Top </a></center>

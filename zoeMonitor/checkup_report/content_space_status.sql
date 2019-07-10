@@ -23,7 +23,7 @@
 	--对象统计信息最近收集时间
 	
 set markup html off
-prompt  <H3 class='zoecomm'> <center>数据库空间状态信息 </center> </H3>
+prompt  <H3 class='zoecomm'> <center><a name="#00005"></a>数据库空间状态信息 </center> </H3>
 set markup html on entmap off
 
 column column1  format A80  heading '状态'
@@ -135,6 +135,5 @@ union all
 select '表空间'||d.tablespace_name||'回滚段状态',s.STATUS from dba_rollback_segs d, v$rollstat s, v$rollname n where n.usn = s.USN and d.segment_name = n.name group by d.tablespace_name,s.status
 ;
 
-
-prompt  </center>
+prompt  <a  href="#top">Back to Top </a></center>
 
