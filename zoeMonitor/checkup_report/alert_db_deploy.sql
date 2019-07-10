@@ -21,6 +21,7 @@
 	--密码属性检查： 为"否" 时进行提示处理
 set markup html off
 --SET SERVEROUTPUT ON
+prompt  <center>
 DECLARE
 	lv_is_rac  VARCHAR2(32);
 	lv_is_archive VARCHAR2(32);
@@ -49,8 +50,6 @@ BEGIN
 	select value into log_archive_dest from v$parameter where name = 'log_archive_dest';
 	select value into db_recovery_file_dest from v$parameter where name = 'db_recovery_file_dest';
 	select (LISTAGG(substr(value,10), ' ; ') WITHIN GROUP(ORDER BY value)) into log_archive_dest_n from v$parameter where name not like 'log_archive_dest_s%'   and name like 'log_archive_dest_%' and value like 'location%' or value like 'LOCATION%';
-	select round(space_limit/1024/1024,2) into slimit from v$recovery_file_dest;
-	select round(space_used/1024/1024,2) into sused from v$recovery_file_dest;
 	IF lv_is_archive = '否' THEN 
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
 		DBMS_OUTPUT.PUT_LINE(' <td> 紧急：数据库未开启归档模式，存在严重安全隐患</td>');
@@ -60,6 +59,8 @@ BEGIN
 				DBMS_OUTPUT.PUT_LINE('<td>当前归档路径参数使用log_archive_dest，路径为'||log_archive_dest||'</td>');
 				DBMS_OUTPUT.PUT_LINE('</table> ');
 			else if db_recovery_file_dest is not null and log_archive_dest_n is null then
+					select round(space_limit/1024/1024,2) into slimit from v$recovery_file_dest;
+					select round(space_used/1024/1024,2) into sused from v$recovery_file_dest;
 					DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
 					DBMS_OUTPUT.PUT_LINE('<td>当前归档路径在指定闪回恢复区：'||db_recovery_file_dest||',其大小为'||slimit||'M,已使用'||sused||'M</td>');
 					DBMS_OUTPUT.PUT_LINE('</table> ');

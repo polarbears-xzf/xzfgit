@@ -16,7 +16,7 @@
 -- Oracle非默认初始化参数设置
 -- =======================================
 set markup html off
-prompt  <H3 class='zoecomm'>  <center>非默认初始化参数</center>  </H3>
+prompt  <H3 class='zoecomm'>  <center><a name="#00006"></a>非默认初始化参数</center>  </H3>
 set markup html on entmap off
 
 column column1  format A80  heading '参数名'
@@ -39,4 +39,5 @@ select to_number(''),'合计',to_char(count(*))
 from gv$system_parameter
 where ISDEFAULT = 'FALSE';
 
-prompt  </center>
+
+prompt  <a  href="#top">Back to Top </a></center>

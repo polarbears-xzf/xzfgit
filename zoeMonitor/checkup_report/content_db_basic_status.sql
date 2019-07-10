@@ -26,7 +26,7 @@
 	--当前热备状态文件数
 	
 set markup html off
-prompt  <H3 class='zoecomm'> <center> 数据库基本状态信息 </center>  </H3>
+prompt  <H3 class='zoecomm'> <center> <a name="#00004"></a>数据库基本状态信息 </center>  </H3>
 set markup html on entmap off
 
 column column1  format A80  heading '状态'
@@ -63,8 +63,10 @@ select '历史归档日志数',to_char(records_total) from v$controlfile_record_
 union all
 select '当前热备状态文件数',decode(count(status),0,'否',count(status)) from v$backup where status='ACTIVE'
 union all
-select '用户失效对象数',LISTAGG(to_char(''||owner||'：'||count(1)),'<br/>') within group(order by count(1) desc) from dba_objects where status <> 'VALID' group by owner;
+select '用户失效对象数',LISTAGG(to_char(''||owner||'：'||count(1)),'<br/>') within group(order by count(1) desc) from dba_objects where status <> 'VALID' group by owner
+union all
+select '数据文件路径',LISTAGG(name,'<br/>')within group(order by name desc) from (select distinct SUBSTR(name,1,decode(instr(name,'/',-1),0,instr(name,'\',-1),instr(name,'/',-1)))as name from v$datafile)
+union all
+select 'TEMP文件路径',LISTAGG(name,'<br/>')within group(order by name desc) from (select distinct SUBSTR(name,1,decode(instr(name,'/',-1),0,instr(name,'\',-1),instr(name,'/',-1)))as name from v$tempfile);
 
-
-
-prompt  </center>
+prompt  <a  href="#top">Back to Top </a></center>

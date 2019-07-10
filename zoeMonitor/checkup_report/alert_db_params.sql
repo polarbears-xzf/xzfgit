@@ -18,7 +18,7 @@
 	--open_cursors：
 	
 set markup html off
-prompt <br />
+prompt  <center>
 --SET SERVEROUTPUT ON
 DECLARE
 --	lv_is_rac  VARCHAR2(3);

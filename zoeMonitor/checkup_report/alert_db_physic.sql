@@ -18,7 +18,7 @@
 	
 set markup html off
 --prompt <br />
-
+prompt  <center>
 --SET SERVEROUTPUT ON
 DECLARE
 	lv_datafiles  VARCHAR2(16);
@@ -107,5 +107,6 @@ select type into CON_FILES from v$parameter where NAME = 'control_files';
 END;
 / 
 */
+
 
 

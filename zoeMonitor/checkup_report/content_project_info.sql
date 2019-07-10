@@ -27,7 +27,7 @@
 set markup html off
 
 
-prompt  <H3 class='zoecomm'>  <center> 项目基本信息 </center> </H3> <br>
+prompt  <H3 class='zoecomm'>  <center><a name="#00002"></a> 项目基本信息 </center> </H3> <br>
 
 --定义巡检系统
 column systemname  NEW_VALUE systemname noprint
@@ -43,7 +43,7 @@ column dbcreate  NEW_VALUE db_create noprint
 select created as "dbcreate" from V$DATABASE;
 --定义数据库大小
 column db_size  NEW_VALUE db_size noprint
-select ''||round(sum(bytes)/1024/1024/1024,2)||'G' as "db_size" from dba_data_files;
+select trunc(sum(bytes)/1024/1024/1024,2)||'G' as "db_size" from dba_data_files;
 
 
 prompt  <center> <table WIDTH=600 BORDER=1> 
@@ -72,5 +72,6 @@ prompt  <center> <table WIDTH=600 BORDER=1>
 		prompt  <td> 数据库大小</td>
 		prompt  <td> &db_size </td>
 	prompt  </tr>
-	prompt </table>  </center> <br> <br>
+	prompt </table>  </center> <br>
+	prompt  <center> <a  href="#top">Back to Top </a></center><br>
 

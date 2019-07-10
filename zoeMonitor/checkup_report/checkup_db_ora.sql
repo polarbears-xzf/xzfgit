@@ -1,4 +1,4 @@
--- Created in 2018.06.03 by polarbears
+﻿-- Created in 2018.06.03 by polarbears
 -- Copyright (c) 20xx, CHINA and/or affiliates.
 -- All rights reserved.
 --	Name:
@@ -140,6 +140,16 @@ prompt  <H1 class='zoecomm'>
 prompt  <center>&porjectName 健康检查报告</center> 
 prompt  </H1>
 prompt  <center><hr>Copyright (c) 2018-2020 <a target=""_blank"" href=""http://www.zoesoft.com.cn/"">智业软件股份有限公司</a>. All rights reserved.</center>
+prompt <ul>
+prompt <h4><a  name="#top"></a>目录</h4>
+prompt <li><a  href="#00001">系统综合评价</a></li>
+prompt <li><a  href="#00002">项目基本信息</a></li>
+prompt <li><a  href="#00003">操作系统基本状态信息</a></li>
+prompt <li><a  href="#00004">数据库基本状态信息</a></li>
+prompt <li><a  href="#00005">数据库空间状态信息</a></li>
+prompt <li><a  href="#00006">非默认初始化参数设置</a></li>
+prompt <li><a  href="#00007">表空间使用情况</a></li>
+prompt </ul>
 
 -- =======================================
 -- 获取数据库运行时间
@@ -154,7 +164,7 @@ prompt  </center>
 -- =======================================
 -- 系统综合评价
 -- =======================================
-prompt  <H2 class='zoecomm'> 系统综合评价 </H2>
+prompt  <H2 class='zoecomm'><center><a name="#00001"></a>系统综合评价 </H2>
 -- -- =======================================
 -- 数据库部署违规告警
 -- -- =======================================
@@ -215,6 +225,8 @@ set markup html on entmap off
 -- =======================================
 @@tablespace_status.sql
 set markup html on entmap off
+
+
 
 
 
