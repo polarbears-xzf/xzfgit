@@ -1,5 +1,6 @@
 ###	标准与规范
-1.	[运维管理规范](norm/devops_norm.html)
+1.	[运维管理基本规范](norm/devops_norm.html)
+2.	[OA需求登记规范](norm/oa_demand_register.html)
 ### 运维项目管理
 1.	[项目巡检流程](opsproject/checkup_process.html)
 2.	[项目巡检报告输出内容](opsproject/checkup_db_ora.html)

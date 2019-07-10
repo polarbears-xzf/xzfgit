@@ -1,5 +1,6 @@
 [文档主页](../index.html)
 
+###	运维管理基本规范
 1. 操作系统目录命名规则
 	*	Windows平台根目录：c:\zoedir
 	*	Linux平台根目录：/home/oracle/zoedir
