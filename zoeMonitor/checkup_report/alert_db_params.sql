@@ -75,8 +75,8 @@ BEGIN
 	END IF;
 
 	select round(value/1024/1024/1024,2) into MEMORY_TARGET from v$parameter where name = 'memory_target';
-	SELECT round(value/1024/1024/1024,2) into lv_pga FROM v$parameter WHERE name='pga_aggregate_target';
-	SELECT round(value/1024/1024/1024,2) into lv_sga FROM v$parameter WHERE name='sga_target';
+	SELECT rtrim(to_char(round(value/1024/1024/1024,2), 'fm9990.99'),'.') into lv_pga FROM v$parameter WHERE name='pga_aggregate_target';
+	SELECT rtrim(to_char(round(value/1024/1024/1024,2), 'fm9990.99'),'.') into lv_sga FROM v$parameter WHERE name='sga_target';
 	
 	--通过PGA_TAG+1排除等于0的情况 (问题1)
 	select USED/(PGA_TAG+1) into PGA_USED_PCT FROM 
