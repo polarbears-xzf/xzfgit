@@ -33,8 +33,8 @@ CURSOR ASM_CURSOR IS
 select name, pct_used, free_gb, total_gb
   from (select name,
                100 - round(free_mb / total_mb * 100, 2) pct_used,
-               ((total_mb - free_mb) / 1024) free_gb,
-               (total_mb / 1024) total_gb
+               round((total_mb - free_mb) / 1024,2) free_gb,
+               round(total_mb / 1024,2) total_gb
           from v$asm_diskgroup);
 
 
