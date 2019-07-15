@@ -31,9 +31,9 @@ DECLARE
 	lv_is_audit VARCHAR2(32);
 	lv_is_password1 VARCHAR2(32);
 	lv_is_password2 VARCHAR2(32);
-	log_archive_dest VARCHAR2(32);
+	log_archive_dest VARCHAR2(64);
 	db_recovery_file_dest VARCHAR2(64);
-	log_archive_dest_n VARCHAR2(64);
+	log_archive_dest_n VARCHAR2(128);
 	slimit VARCHAR2(16);
 	sused VARCHAR2(16);
 BEGIN
