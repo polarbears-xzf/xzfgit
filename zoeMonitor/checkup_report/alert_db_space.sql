@@ -24,7 +24,7 @@ set markup html off
 prompt <br />
 
 DECLARE
-LOG_AVG_SWITCH_TIME NUMBER(10);
+RAC_CK varchar(10);
 ANALYZED_DAY NUMBER(10);
 
 
@@ -64,6 +64,25 @@ select tablespace_name,pct_used,free_gb,max_gb from
                  group by tablespace_name) b
          where a.tablespace_name = b.tablespace_name(+)))
 where pct_used>70 and  free_gb <100;
+
+cursor log_switch is
+--查询上午9-12时归档平均切换时间
+select a.thread# thread#,
+       decode(a.total_count, 0, 0, trunc(180 / (a.total_count / b.days), 2)) log_avg_switch_time
+  from (select thread#,
+               count(*) /
+               decode(count(distinct dest_id), 0, 1, count(distinct dest_id)) total_count
+          from v$archived_log
+         where to_number(to_char(completion_time, 'hh24')) >= 9
+           and to_number(to_char(completion_time, 'hh24')) < 12
+           and standby_dest = 'no'
+           and completion_time > sysdate - 30
+         group by thread#) a,
+       (select max(completion_time) - min(completion_time) days
+          from v$archived_log
+         where standby_dest = 'no'
+           and completion_time > sysdate - 30) b;
+
 
 CURSOR seg_cursor IS
 --查询回滚段STATUS
@@ -120,39 +139,38 @@ BEGIN
 		end if;
 	end loop;
 
---查询上午9-12时归档平均切换时间
-	SELECT decode(a.total_count,
-				  0,
-				  0,
-				  trunc(180 / (a.total_count / b.days), 2)) into LOG_AVG_SWITCH_TIME
-	  FROM (SELECT COUNT(*) /
-				   decode(count(distinct dest_id), 0, 1, count(distinct dest_id)) total_count
-			  FROM gv$archived_log
-			 WHERE to_number(TO_CHAR(completion_time, 'hh24')) >= 9
-			   AND to_number(TO_CHAR(completion_time, 'hh24')) < 12
-			   AND standby_dest = 'NO') a,
-		   (SELECT MAX(completion_time) - MIN(completion_time) days
-			  FROM gv$archived_log
-			 where standby_dest = 'NO') b;
-			 
 --判断9-12时归档平均切换时间并给出告警
-	IF LOG_AVG_SWITCH_TIME = 0 THEN
-		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE('<td> 9-12时归档生成数量为零,请确认是否存在异常');
-		DBMS_OUTPUT.PUT_LINE('</table> ');
-	ELSE
-		IF LOG_AVG_SWITCH_TIME > 0 AND LOG_AVG_SWITCH_TIME <= 5 THEN
-			DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-			DBMS_OUTPUT.PUT_LINE('<td> 9-12时归档平均切换时间小于5分钟,数据库性能将受影响,请立即扩大REDO日志');
-			DBMS_OUTPUT.PUT_LINE('</table> ');
+	select value into RAC_CK
+	from v$parameter where name = 'cluster_database';
+	FOR r in LOG_SWITCH loop
+	IF r.LOG_AVG_SWITCH_TIME <=15 THEN
+		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1> <td> ');
+		IF RAC_CK = 'FALSE' THEN
+			IF r.LOG_AVG_SWITCH_TIME > 5 THEN
+				DBMS_OUTPUT.PUT_LINE('9-12时归档平均切换时间小于15分钟,数据库性能可能受影响,请尽快扩大REDO日志');	
+			ELSE
+				IF r.LOG_AVG_SWITCH_TIME > 0 THEN
+					DBMS_OUTPUT.PUT_LINE('9-12时归档平均切换时间小于5分钟,数据库性能将受影响,请立即扩大REDO日志');
+				ELSE 
+					DBMS_OUTPUT.PUT_LINE('9-12时归档生成数量为零,请确认是否存在异常');
+				END IF;
+			END IF;
 		ELSE 
-			IF LOG_AVG_SWITCH_TIME > 5 AND LOG_AVG_SWITCH_TIME <= 15 THEN
-				DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-				DBMS_OUTPUT.PUT_LINE('<td> 9-12时归档平均切换时间小于15分钟,数据库性能可能受影响,请尽快扩大REDO日志');
-				DBMS_OUTPUT.PUT_LINE('</table> ');
+			IF r.LOG_AVG_SWITCH_TIME >5 THEN
+				DBMS_OUTPUT.PUT_LINE('9-12时 '||r.thread#||' 归档平均切换时间小于15分钟,数据库性能可能受影响,请尽快扩大REDO日志<br />');
+			ELSE
+				IF r.LOG_AVG_SWITCH_TIME > 0 THEN
+					DBMS_OUTPUT.PUT_LINE('9-12时节点 '||r.thread#||' 归档平均切换时间小于5分钟,数据库性能将受影响,请立即扩大REDO日志<br />');
+				ELSE
+					DBMS_OUTPUT.PUT_LINE('9-12时 '||r.thread#||' 归档生成数量为零,请确认是否存在异常<br />');
+				END IF;
 			END IF;
 		END IF;
+		DBMS_OUTPUT.PUT_LINE('</table> ');
 	END IF;
+	end loop;
+
+
 
 --查询统计信息最近收集时间
 	select trunc(sysdate-max(last_analyzed)) into ANALYZED_DAY from dba_tables;

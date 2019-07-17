@@ -62,6 +62,8 @@ union all
 select '历史归档日志数',to_char(records_total) from v$controlfile_record_section where type='ARCHIVED LOG'
 union all
 select '当前热备状态文件数',decode(count(status),0,'否',count(status)) from v$backup where status='ACTIVE'
+union all 
+SELECT '是否进行rman备份',decode(count(1),0,'否','<a  href="#rman_status">是(点击查看详细备份信息)</a>') FROM V$RMAN_STATUS WHERE OPERATION ='BACKUP'  AND STATUS NOT LIKE 'RUNNING%'
 union all
 select '用户失效对象数',LISTAGG(to_char(''||owner||'：'||count(1)),'<br/>') within group(order by count(1) desc) from dba_objects where status <> 'VALID' group by owner
 union all
