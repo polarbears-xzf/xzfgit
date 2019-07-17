@@ -1,4 +1,6 @@
-[上一页](./devops_function_desc.html)
+<body bgcolor="#ddf" >
+
+[上一页](./devops_index.html)
 
 1.	用户密码加解密
 	*	ZOEDEVOPS.ENCRYPT_USER('username' , 'password')
@@ -24,4 +26,6 @@
     	>	例：ZOEDEVOPS.ZOEPKG_DEVOPS.MODIFY_DB_USER_INFO(ZOEDEVOPS.ZOEPKG_DEVOPS.GET_DB_ID,'username','password');
 
 
-[文档主页](./devops_function_desc.html)
+[上一页](./devops_index.html)
+
+</body>

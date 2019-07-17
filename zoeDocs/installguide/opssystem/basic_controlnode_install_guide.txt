@@ -1,3 +1,5 @@
+<body bgcolor="#ddf" >
+
 [文档主页](../../index.html)
 [上一页](../installguide_index.html)
 
@@ -30,3 +32,4 @@
 [文档主页](../../index.html)
 [上一页](../installguide_index.html)
 	
+</body>

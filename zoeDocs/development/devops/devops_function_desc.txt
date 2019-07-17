@@ -1,8 +1,0 @@
-[上一页](../devops_index.html)
-
-1.	[Oracle后台包功能说明](oraclepackge_function.html)
-	*	基础功能包
-	*	安全工具包
-
-
-[上一页](../devops_index.html)
