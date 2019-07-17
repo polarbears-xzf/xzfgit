@@ -34,7 +34,7 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
     lv_sql := lv_sql || ' ORDER BY CREATED';
 --    DBMS_OUTPUT.PUT_LINE(lv_sql);
     EXECUTE IMMEDIATE lv_sql;
-    COMMIT;
+--    COMMIT;
 --  初始化META_OBJ$，从DBA_TABLES。排除Oracle用户，依据ZOEDEVOPS.ZOEPKG_UTILITY.GET_ORACLE_USER
     lv_sql := 'INSERT INTO ZOESTD.META_OBJ$';
     lv_sql := lv_sql || ' (DB_ID#,OBJ_ID,DB_OBJ_ID#,USER_ID#,OBJ_NAME,OBJ_TYPE_ID#,';
@@ -50,7 +50,7 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
     lv_sql := lv_sql || ' AND OBJECT_TYPE IN (''TABLE'',''VIEW'',''SEQUENCE'')';
 --    DBMS_OUTPUT.PUT_LINE(lv_sql);
     EXECUTE IMMEDIATE lv_sql;
-    COMMIT;
+--    COMMIT;
 --  初始化META_TAB$，从META_OBJ$视图
     lv_sql := 'INSERT INTO ZOESTD.META_TAB$';
     lv_sql := lv_sql || ' (DB_ID#,obj_ID#,user_ID#,tab_name,tab_chn_name,tab_checksum,memo)';
@@ -74,28 +74,30 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
     lv_sql := lv_sql || ' AND tm.TABLE_NAME=o.OBJ_NAME';
 --    DBMS_OUTPUT.PUT_LINE(lv_sql);
     EXECUTE IMMEDIATE lv_sql;
-    COMMIT;
+--    COMMIT;
 --  初始化META_COL$，从META_TAB$，DBA_TAB_COLS视图
-    lv_sql := 'INSERT INTO ZOESTD.META_COL$(';
-    lv_sql := lv_sql || ' DB_ID#,OBJ_ID#,COL_ID,COL_NAME,COL_CHN_NAME,';
-    lv_sql := lv_sql || ' DATA_TYPE,DATA_LENGTH,DATA_PRECISION,DATA_SCALE,';
-    lv_sql := lv_sql || ' MEMO)';
-    lv_sql := lv_sql || ' SELECT '''||in_db_id||''', t.OBJ_ID#,cl.COLUMN_ID,cl.COLUMN_NAME, ';
-    lv_sql := lv_sql || ' SUBSTR(cm.COMMENTS,1,DECODE(INSTR(cm.COMMENTS,''#|''),';
-    lv_sql := lv_sql || ' 0,LENGTH(cm.COMMENTS),INSTR(cm.COMMENTS,''#|'')-1)) AS COLUMN_CHN_NAME,';
-    lv_sql := lv_sql || ' cl.DATA_TYPE,cl.DATA_LENGTH,cl.DATA_PRECISION,cl.DATA_SCALE, ';
-    lv_sql := lv_sql || ' SUBSTR(cm.COMMENTS,DECODE(INSTR(cm.COMMENTS,''#|''),';
-    lv_sql := lv_sql || ' 0,LENGTH(cm.COMMENTS)+1,INSTR(cm.COMMENTS,''#|'')+2),LENGTH(cm.COMMENTS)) AS MEMO';
-    lv_sql := lv_sql || ' FROM DBA_TAB_COLUMNS@'||lv_db_link||' cl ,DBA_COL_COMMENTS@'||lv_db_link||' cm ,ZOESTD.META_TAB$ t ,ZOESTD.META_USER$ u';
-    lv_sql := lv_sql || ' WHERE cl.OWNER      =cm.OWNER';
-    lv_sql := lv_sql || ' AND cl.TABLE_NAME =cm.TABLE_NAME';
-    lv_sql := lv_sql || ' AND cl.COLUMN_NAME=cm.COLUMN_NAME';
-    lv_sql := lv_sql || ' AND t.USER_ID#       =u.USER_ID';
-    lv_sql := lv_sql || ' AND u.USERNAME    =cl.OWNER';
-    lv_sql := lv_sql || ' AND t.TAB_NAME  =cl.TABLE_NAME';
---    DBMS_OUTPUT.PUT_LINE(lv_sql);
-    EXECUTE IMMEDIATE lv_sql;
-    COMMIT;
+    FOR c1 IN (SELECT u.USERNAME, t.TAB_NAME, t.OBJ_ID# FROM ZOESTD.META_TAB$ t, ZOESTD.META_USER$ u WHERE t.USER_ID# = u.USER_ID)
+    LOOP
+        lv_sql := 'INSERT INTO ZOESTD.META_COL$(';
+        lv_sql := lv_sql || ' DB_ID#,OBJ_ID#,COL_ID,COL_NAME,COL_CHN_NAME,';
+        lv_sql := lv_sql || ' DATA_TYPE,DATA_LENGTH,DATA_PRECISION,DATA_SCALE,';
+        lv_sql := lv_sql || ' MEMO)';
+        lv_sql := lv_sql || ' SELECT '''||in_db_id||''', '''||c1.OBJ_ID#||''',cl.COLUMN_ID,cl.COLUMN_NAME, ';
+        lv_sql := lv_sql || ' SUBSTR(cm.COMMENTS,1,DECODE(INSTR(cm.COMMENTS,''#|''),';
+        lv_sql := lv_sql || ' 0,LENGTH(cm.COMMENTS),INSTR(cm.COMMENTS,''#|'')-1)) AS COLUMN_CHN_NAME,';
+        lv_sql := lv_sql || ' cl.DATA_TYPE,cl.DATA_LENGTH,cl.DATA_PRECISION,cl.DATA_SCALE, ';
+        lv_sql := lv_sql || ' SUBSTR(cm.COMMENTS,DECODE(INSTR(cm.COMMENTS,''#|''),';
+        lv_sql := lv_sql || ' 0,LENGTH(cm.COMMENTS)+1,INSTR(cm.COMMENTS,''#|'')+2),LENGTH(cm.COMMENTS)) AS MEMO';
+        lv_sql := lv_sql || ' FROM DBA_TAB_COLUMNS@'||lv_db_link||' cl ,DBA_COL_COMMENTS@'||lv_db_link||' cm ';
+        lv_sql := lv_sql || ' WHERE cl.OWNER = cm.OWNER';
+        lv_sql := lv_sql || ' AND cl.TABLE_NAME = cm.TABLE_NAME';
+        lv_sql := lv_sql || ' AND cl.COLUMN_NAME = cm.COLUMN_NAME';
+        lv_sql := lv_sql || ' AND cl.OWNER = '''||c1.USERNAME||'''';
+        lv_sql := lv_sql || ' AND cl.TABLE_NAME = '''||c1.TAB_NAME||'''';
+--        DBMS_OUTPUT.PUT_LINE(lv_sql);
+        EXECUTE IMMEDIATE lv_sql;
+        COMMIT;
+    END LOOP;
   EXCEPTION
     WHEN OTHERS THEN
         ROLLBACK;

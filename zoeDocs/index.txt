@@ -1,3 +1,5 @@
+<body bgcolor="#ddf" >
+
 ###	标准与规范
 1.	[运维管理基本规范](norm/devops_norm.html)
 2.	[OA需求登记规范](norm/oa_demand_register.html)
@@ -24,4 +26,5 @@
 1.	[运维管理系统](development/devops_index.html)
 
 
+</body>
 
