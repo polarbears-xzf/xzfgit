@@ -3,8 +3,12 @@
 [上一页](./devops_index.html)
 
 1.	用户密码加解密
-	*	ZOEDEVOPS.ENCRYPT_USER('username' , 'password')
-	*	ZOEDEVOPS.DECRYPT_USER('username' , 'password')
+	*	实现功能：对用户密码进行加解密处理
+	*	实现方法：Oracle函数
+	*	传入参数：用户名/字符串，用户密码/字符串，密钥（16位）
+	*	使用示例：
+		*	加密用户密码：ZOEDEVOPS.ENCRYPT_USER('username' , 'password', 'crypt_key')
+		*	解密用户密码：ZOEDEVOPS.DECRYPT_USER('username' , 'password', 'crypt_key')
 2.	安全工具包：ZOEPKG_SECURITY
 3.	公用工具包：ZOEPKG_UTILITY
 	*	枚举Orale用户，返回嵌套表zoetyp_db_object_list

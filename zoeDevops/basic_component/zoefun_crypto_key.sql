@@ -1,7 +1,7 @@
 -- ======================================================
 
-COLUMN c_crypto_key1 new_value c_crypto_key1
-SELECT  DBMS_RANDOM.STRING('X',16) c_crypto_key1 FROM  DUAL;
+COLUMN c_secret_key new_value c_secret_key
+SELECT  DBMS_RANDOM.STRING('X',16) c_secret_key FROM  DUAL;
 
 CREATE OR REPLACE FUNCTION ZOEDEVOPS.ZOEFUN_CRYPTO_KEY
 	RETURN VARCHAR2
@@ -21,9 +21,23 @@ CREATE OR REPLACE FUNCTION ZOEDEVOPS.ZOEFUN_CRYPTO_KEY
 --
 
 AS
-	lv_crypto_key CONSTANT VARCHAR2(24) := '&c_crypto_key1';
+	lv_secret_key VARCHAR2(24) := '&c_secret_key';
+    lv_key_id VARCHAR2(64);
+    lv_sql VARCHAR2(2000);
 BEGIN
-	RETURN lv_crypto_key;
+    SELECT ZOEDEVOPS.ZOEPKG_OPS_DB_INFO.GET_DB_ID INTO lv_key_id FROM DUAL;
+    IF lv_key_id <> 'B82C969F0D4114F40EB3452C5CEC92C2B78A19EB' THEN
+    	RETURN lv_secret_key;
+    ELSE
+        lv_key_id := SYS_CONTEXT('ZOE_DEVOPS_CONTEXT', 'DB_KEY');
+        IF lv_key_id IS NULL OR lv_key_id = 'B82C969F0D4114F40EB3452C5CEC92C2B78A19EB' THEN
+            RETURN lv_secret_key;
+        ELSE 
+            lv_sql := 'SELECT KEY_VALUE FROM ZOEDEVOPS.DVP_PROJECT_SECRET_KEY WHERE KEY_ID#='''||lv_key_id||'''';
+            EXECUTE IMMEDIATE lv_sql INTO lv_secret_key;
+            RETURN SUBSTR(lv_secret_key,1,16);
+        END IF;
+    END IF;
 END;
 /
 

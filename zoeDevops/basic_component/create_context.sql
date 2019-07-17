@@ -1,0 +1,6 @@
+alter session set current_schema=zoedevops;
+
+CREATE OR REPLACE CONTEXT ZOE_DEVOPS_CONTEXT USING ZOEPRC_SET_DEVOPS_CONTEXT;
+
+-- CONTEXT NAME 
+-- KEY_ID 用于获取SECRET_KEY

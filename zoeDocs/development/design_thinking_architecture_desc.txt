@@ -1,0 +1,12 @@
+<body bgcolor="#ddf" >
+
+[上一页](./devops_index.html)
+
+1.	设计思路
+2.	架构
+>	![图片](../images/运维管理系统架构.png "运维平台架构")
+
+
+[上一页](./devops_index.html)
+
+</body>
