@@ -14,6 +14,7 @@ td, h1, h2, h3, h4, h5, p, ul, ol, li {
         </style>
   </head>
   <body>
+    <link href="../../zoe_docs.css" rel="stylesheet" type="text/css" />
     <p>
       <a href="../../index.html">文档主页</a>
       <a href="../installguide_index.html">上一页</a>
@@ -34,33 +35,81 @@ td, h1, h2, h3, h4, h5, p, ul, ol, li {
       </p>
     </blockquote>
     <ol>
-      <li>创建标准目录
-<blockquote><p>create_standard_dir.sh</p></blockquote></li>
-      <li>数据节点-组件部署（以sysdba角色执行）
-<blockquote><p>@datanode_install.sql<br />
-记录zoeagent密码，记录zoedevops密码（部署控制节点时）<br /><strong>内容说明</strong></p></blockquote><ol><li>创建运维管理数据存储表空间
-<ul><li>运维管理系统对象模式为zoedevops，对应表空间zoedevops_tab</li></ul></li><li>创建用户
+      <li>
+        <p>创建标准目录</p>
+        <blockquote>
+          <p>create_standard_dir.sh</p>
+        </blockquote>
+      </li>
+      <li>
+        <p>数据节点-组件部署（以sysdba角色执行）</p>
+        <blockquote>
+          <p>@datanode_install.sql<br />
+记录zoeagent密码，记录zoedevops密码（部署控制节点时）<br /><strong>内容说明</strong></p>
+        </blockquote>
+        <ol>
+          <li>创建运维管理数据存储表空间
+<ul><li>运维管理系统对象模式为zoedevops，对应表空间zoedevops_tab</li></ul></li>
+          <li>创建用户
 <ul><li>数据节点需要创建4个用户；
-<ul><li>zoedevops：运维管理系统对象模式用户</li><li>zoedba：用于管理员日常运维管理连接用户</li><li>zoeagent：用于运维管理控制节点数据库链路连接用户</li><li>zoeopsconn：用于运维管理系统连接用户</li></ul></li></ul></li><li>创建表对象
-<ul><li>数据节点创建：数据库基本信息表</li></ul></li><li>创建存储过程相关对象
-<ul><li>创建基础安全相关包</li><li>创建类型</li><li>创建初始化数据库信息功能包</li></ul></li></ol></li>
-      <li>生成数据库基本信息
-<blockquote><p>准备项目ID(控制节点的DVP_PROJ_BASIC_INFO，如部署数据库为控制节点，则自动生成)
-exec EXEC ZOEDEVOPS.ZOEPKG_DN_DB_INFO.init_proj_db_basic_info(project_id);</p></blockquote></li>
-      <li>控制节点-创建数据库链路
-<ul><li>使用zoedevops连接到控制节点数据库
-<blockquote><p>conn zoedevops/password@ip_address/service_name</p></blockquote></li><li>创建到数据节点数据库的数据库链路
-<blockquote><p>create database link linkname connect to zoeagent identified by zoeagentpassword using 'ip_address/service_name';<br /><strong>注：linkname格式为：数据库名+IP后2位+用户名</strong></p></blockquote></li><li>配置项目节点连接信息（ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS）
-<blockquote><p>INSERT INTO ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS<br />
+<ul><li>zoedevops：运维管理系统对象模式用户</li><li>zoedba：用于管理员日常运维管理连接用户</li><li>zoeagent：用于运维管理控制节点数据库链路连接用户</li><li>zoeopsconn：用于运维管理系统连接用户</li></ul></li></ul></li>
+          <li>创建表对象
+<ul><li>数据节点创建：数据库基本信息表</li></ul></li>
+          <li>创建存储过程相关对象
+<ul><li>创建基础安全相关包</li><li>创建类型</li><li>创建初始化数据库信息功能包</li></ul></li>
+        </ol>
+      </li>
+      <li>
+        <p>生成数据库基本信息</p>
+        <ul>
+          <li>准备项目ID(控制节点的DVP_PROJ_BASIC_INFO，如部署数据库为控制节点，则自动生成)
+<blockquote><p>EXEC ZOEDEVOPS.ZOEPKG_OPS_DB_INFO.INIT_PROJ_DB_BASIC_INFO(project_id);</p></blockquote></li>
+        </ul>
+      </li>
+      <li>
+        <p>控制节点-创建数据库链路</p>
+        <ul>
+          <li>
+            <p>使用zoedevops连接到控制节点数据库</p>
+            <blockquote>
+              <p>conn zoedevops/password@ip_address/service_name</p>
+            </blockquote>
+          </li>
+          <li>
+            <p>创建到数据节点数据库的数据库链路</p>
+            <blockquote>
+              <p>create database link linkname connect to zoeagent identified by zoeagentpassword using 'ip_address/service_name';<br /><strong>注：linkname格式为：数据库名+IP后2位+用户名</strong></p>
+            </blockquote>
+          </li>
+          <li>
+            <p>配置项目节点连接信息（ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS）</p>
+            <blockquote>
+              <p>INSERT INTO ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS<br />
 (project_id#,db_id#,db_link_name,connect_to_user,CREATOR_CODE,CREATED_TIME)<br />
-select project_id#,db_id,'linkname','ZOEAGENT','xzf',SYSDATE from ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO@ZOEMOPS141ZOEAGENT
-where db_name=dbname and server_ip_address#=ip_address;
-<strong>注：部署控制节点时，此步骤在控制节点部署完毕后执行</strong></p></blockquote></li><li>同步数据节点数据库信息
-<blockquote></blockquote></li></ul></li>
-      <li>附
-<ul><li>建立临时sys用户，安装后立刻删除
-<blockquote><p>create user zoetmpsys identified by Zoe$tmp123; grant sysdba to zoetmpsys;</p></blockquote></li><li>检查主机IP地址是否是IPv6，影响生成数据库唯一ID（db_id），获取过程不支持IPv6
-<blockquote><p>检查是否支持：select utl_inaddr.get_host_address from dual;</p></blockquote></li></ul></li>
+select project_id#,db_id,'linkname','ZOEAGENT','xzf',SYSDATE<br />
+from ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO@linkname;<br /><strong>注1：linkname 为上一步创建的数据库链路</strong><br /><strong>注2：部署控制节点时，此步骤在控制节点部署完毕后执行</strong></p>
+            </blockquote>
+          </li>
+          <li>
+            <p>同步数据节点数据库信息</p>
+            <blockquote>
+              <p>INSERT INTO ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO<br />
+(PROJECT_ID#,DB_ID,DB_NAME,SERVER_NAME,SERVER_IP_ADDRESS#,DB_CREATED_TIME,DB_VERSION,CREATOR_CODE,CREATED_TIME)<br />
+SELECT PROJECT_ID#,DB_ID,DB_NAME,SERVER_NAME,SERVER_IP_ADDRESS#,DB_CREATED_TIME,DB_VERSION,CREATOR_CODE,CREATED_TIME<br />
+FROM ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO@linkname;<br /><strong>注：linkname 为上一步创建的数据库链路</strong></p>
+            </blockquote>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p>附</p>
+        <ul>
+          <li>建立临时sys用户，安装后立刻删除
+<blockquote><p>create user zoetmpsys identified by Zoe$tmp123; grant sysdba to zoetmpsys;</p></blockquote></li>
+          <li>检查主机IP地址是否是IPv6，影响生成数据库唯一ID（db_id），获取过程不支持IPv6
+<blockquote><p>检查是否支持：select utl_inaddr.get_host_address from dual;</p></blockquote></li>
+        </ul>
+      </li>
     </ol>
     <p>
       <a href="../../index.html">文档主页</a>

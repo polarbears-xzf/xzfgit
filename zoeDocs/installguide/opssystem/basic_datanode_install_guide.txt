@@ -1,3 +1,5 @@
+<link href="../../zoe_docs.css" rel="stylesheet" type="text/css" />
+
 [文档主页](../../index.html)
 [上一页](../installguide_index.html)
 
@@ -26,9 +28,9 @@
 		*	创建基础安全相关包
 		*	创建类型
 		*	创建初始化数据库信息功能包
-3.	生成数据库基本信息
-	>	准备项目ID(控制节点的DVP_PROJ_BASIC_INFO，如部署数据库为控制节点，则自动生成) 
-	>	exec EXEC ZOEDEVOPS.ZOEPKG_DN_DB_INFO.init_proj_db_basic_info(project_id);
+3.	数据节点-生成数据库基本信息
+	*	准备项目ID(控制节点的DVP_PROJ_BASIC_INFO，如部署数据库为控制节点，则自动生成,project_id为空)
+		>	EXEC ZOEDEVOPS.ZOEPKG_OPS_DB_INFO.INIT_PROJ_DB_BASIC_INFO(project_id);
 4.	控制节点-创建数据库链路
 	*	使用zoedevops连接到控制节点数据库
 		>	conn zoedevops/password@ip_address/service_name
@@ -38,11 +40,19 @@
 	*	配置项目节点连接信息（ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS）
 		>	INSERT INTO ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS   
 		>	(project_id#,db_id#,db_link_name,connect_to_user,CREATOR_CODE,CREATED_TIME)  
-		>	select project_id#,db_id,'linkname','ZOEAGENT','xzf',SYSDATE from ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO@ZOEMOPS141ZOEAGENT
-		>	where db_name=dbname and server_ip_address#=ip_address;
-		>	__注：部署控制节点时，此步骤在控制节点部署完毕后执行__
+		>	select project_id#,db_id,'linkname','ZOEAGENT','xzf',SYSDATE  
+		>	from ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO@linkname;  
+		>	__注1：linkname 为上一步创建的数据库链路__  
+		>	__注2：部署控制节点时，此步骤在控制节点部署完毕后执行__  
+		
 	*	同步数据节点数据库信息
-		>	
+		>	INSERT INTO ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO  
+		>	(PROJECT_ID#,DB_ID,DB_NAME,SERVER_NAME,SERVER_IP_ADDRESS#,DB_CREATED_TIME,DB_VERSION,CREATOR_CODE,CREATED_TIME)  
+		>	SELECT PROJECT_ID#,DB_ID,DB_NAME,SERVER_NAME,SERVER_IP_ADDRESS#,DB_CREATED_TIME,DB_VERSION,CREATOR_CODE,CREATED_TIME  
+		>	FROM ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO@linkname;  
+		>	__注1：linkname 为上一步创建的数据库链路__  
+		>	__注2：部署控制节点时，此步骤无需执行__  
+		
 5.	附
 	*	建立临时sys用户，安装后立刻删除
 		>	create user zoetmpsys identified by Zoe$tmp123; grant sysdba to zoetmpsys;

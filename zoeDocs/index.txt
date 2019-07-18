@@ -1,4 +1,4 @@
-<link href="zoe_devops.css" rel="stylesheet" type="text/css" />
+<link href="zoe_docs.css" rel="stylesheet" type="text/css" />
 
 ###	标准与规范
 1.	[运维管理基本规范](norm/devops_norm.html)
