@@ -1,4 +1,4 @@
-<body bgcolor="#ddf" >
+<link href="zoe_devops.css" rel="stylesheet" type="text/css" />
 
 
 [文档主页](../index.html)
@@ -11,4 +11,3 @@
 
 [文档主页](./devops_function_desc.html)
 
-</body>
