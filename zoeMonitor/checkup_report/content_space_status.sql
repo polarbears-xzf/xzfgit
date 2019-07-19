@@ -21,6 +21,8 @@
 	--表空间使用率
 	--ASM磁盘组使用率
 	--对象统计信息最近收集时间
+	--AWR快照保留天数
+	--表空间回滚段状态
 	
 set markup html off
 prompt  <H3 class='zoecomm'> <center><a name="#00005"></a>数据库空间状态信息 </center> </H3>
@@ -56,9 +58,13 @@ select '日志日均增长量', trunc(a.total_size / b.days / 1024 / 1024) || 'M
 union all
 select '最小日志切换时间' , trunc(min(next_time-first_time)*24*60,-2)||'分钟'
 from v$archived_log
+where standby_dest = 'NO'
+  and completion_time>sysdate-30
 union all
 select '最大日志切换时间' , trunc(max(next_time-first_time)*24*60,-2)||'分钟'
 from v$archived_log
+where standby_dest = 'NO'
+  and completion_time>sysdate-30
 union all
 SELECT '上午9-12点日志平均切换时间',
        LISTAGG(DECODE(c.value, 'TRUE', '节点' || a.thread# || ' : ', NULL) ||
@@ -131,6 +137,8 @@ union all
 select 'ASM磁盘组"'||name||'"使用率:',100-round(free_mb/total_mb * 100,2)||'%' pct_free from v$asm_diskgroup
 union all
 select '对象统计信息最近收集时间',to_char(max(last_analyzed)) from dba_tables
+union all
+select 'AWR快照保留天数',to_char(EXTRACT(day from retention)) from dba_hist_wr_control
 union all
 select '表空间'||d.tablespace_name||'回滚段状态',s.STATUS from dba_rollback_segs d, v$rollstat s, v$rollname n where n.usn = s.USN and d.segment_name = n.name group by d.tablespace_name,s.status
 ;
