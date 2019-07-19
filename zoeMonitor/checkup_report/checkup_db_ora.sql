@@ -150,6 +150,7 @@ prompt <li><a  href="#00005">数据库空间状态信息</a></li>
 prompt <li><a  href="#00006">非默认初始化参数设置</a></li>
 prompt <li><a  href="#00007">表空间使用情况</a></li>
 prompt <li><a  href="#rman_status">RMAN备份情况</a></li>
+prompt <li><a  href="#awr_status">性能报告指标</a></li>
 prompt </ul>
 
 -- =======================================
@@ -233,7 +234,11 @@ set markup html on entmap off
 @@rman_backup_status.sql
 set markup html on entmap off
 
-
+-- =======================================
+-- Oracle-性能报告
+-- =======================================
+@@awr_status.sql
+set markup html on entmap off
 
 
 
