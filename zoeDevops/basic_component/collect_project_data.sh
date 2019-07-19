@@ -16,14 +16,14 @@
 #	进入脚本目录
 cd c:\zoedir\scripts
 #	连接数据库，删除旧数据
-sqlplus zoedba/zoe669N8LXWYKQ5@192.168.1.41/zoemops
+sqlplus zoedba/password@ip_address/service_name
 delete from zoedevops.DVP_PROJ_DB_BASIC_INFO        where project_id#=4;
 delete from zoedevops.DVP_PROJ_DB_USER_ADMIN_INFO   where project_id#=4;
 delete from zoedevops.DVP_PROJ_SERVER_BASIC_INFO    where project_id#=4;
 delete from zoedevops.DVP_PROJ_SERVER_ADMIN_INFO    where project_id#=4;
 commit;
 #	加载数据
-sqlldr zoedba/zoe669N8LXWYKQ5@192.168.1.41/zoemops loadDVP_PROJ_DB_BASIC_INFO.ctl
-sqlldr zoedba/zoe669N8LXWYKQ5@192.168.1.41/zoemops loadDVP_PROJ_DB_USER_ADMIN_INFO.ctl
-sqlldr zoedba/zoe669N8LXWYKQ5@192.168.1.41/zoemops loadDVP_PROJ_SERVER_BASIC_INFO.ctl
-sqlldr zoedba/zoe669N8LXWYKQ5@192.168.1.41/zoemops loadDVP_PROJ_SERVER_ADMIN_INFO.ctl
+sqlldr zoedba/password@ip_address/service_name loadDVP_PROJ_DB_BASIC_INFO.ctl
+sqlldr zoedba/password@ip_address/service_name loadDVP_PROJ_DB_USER_ADMIN_INFO.ctl
+sqlldr zoedba/password@ip_address/service_name loadDVP_PROJ_SERVER_BASIC_INFO.ctl
+sqlldr zoedba/password@ip_address/service_name loadDVP_PROJ_SERVER_ADMIN_INFO.ctl

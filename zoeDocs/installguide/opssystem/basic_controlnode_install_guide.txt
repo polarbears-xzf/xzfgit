@@ -14,17 +14,19 @@
 	>	@controlnode_install.sql  
 	>	__内容说明__  
 	1.	创建表对象
-		*	@controlnode_create_table.sql
-		*	省份字典、数据库角色字典、数据库部署类型字典
+		*	省份字典、数据库部署类型字典
 		*	项目基本信息、用户基本信息、项目服务器基本信息、项目合同基本信息
 		*	项目远程管理信息、项目服务器管理信息、项目数据库用户管理信息
 		*	项目数据节点数据库链路信息
 		*	项目合同回款信息
 	2.	加载字典数据
-		*	@controlnode_dvp_db_deploy_type$.sql
-		*	@controlnode_dvp_db_role$.sql
 3.	控制节点-采集项目数据
-	>	@cellect_data\collect_project_data.sql
+	>	@cellect_data\collect_project_data.sql  
+	>	__包含表数据__
+	*	DVP_PROJ_DB_BASIC_INFO
+	*	DVP_PROJ_DB_USER_ADMIN_INFO
+	*	DVP_PROJ_SERVER_BASIC_INFO
+	*	DVP_PROJ_SERVER_ADMIN_INFO
 4.	控制节点-加载项目数据（将数据导回公司运维管理控制节点）
 	>	cellect_data\collect_project_data.sh
 	
