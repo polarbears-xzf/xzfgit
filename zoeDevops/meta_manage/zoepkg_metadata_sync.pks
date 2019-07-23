@@ -11,7 +11,9 @@
 --		标准管理中数据库元数据相关表
 --			数据库用户字典，数据库对象字典，数据库表，数据库列  
 --    修改 - （年-月-日） - 描述
---
+--    2019.07.23：
+--      1. 重构完全同步，增加DB_ID以支持多数据库
+--      2. 重构增量同步，考虑到依赖关系，不再支持同步单个类型对象
 
 
 CREATE OR REPLACE PACKAGE zoedevops.zoepkg_metadata_sync AS
@@ -32,23 +34,8 @@ CREATE OR REPLACE PACKAGE zoedevops.zoepkg_metadata_sync AS
 --  完全同步所有数据库对象（包含：meta_user$,meta_obj$,meta_tab$,meta_col$）
     PROCEDURE init_sync_all(in_db_id IN VARCHAR2, in_force_flag IN VARCHAR2 DEFAULT NULL);
 
---========================================
--- 增量对象同步
---  =======================================
---  增量同步当前数据库用户名到数据库用户字典
-    PROCEDURE increment_sync_user;
---  =======================================
---  增量同步当前数据库表名到数据库对象字典
-    PROCEDURE increment_sync_object;
---  =======================================
---  增量同步当前数据库表名到数据库对象字典
-    PROCEDURE increment_sync_table;
---  =======================================
---  增量同步当前数据库列到数据库列字典
-    PROCEDURE increment_sync_column;
---  =======================================
---  增量同步所有对象
-    PROCEDURE increment_sync_all;
+--  增量同步所有对象（包含：meta_user$,meta_obj$,meta_tab$,meta_col$）
+    PROCEDURE increment_sync_all(in_db_id IN VARCHAR2);
     
     
 
