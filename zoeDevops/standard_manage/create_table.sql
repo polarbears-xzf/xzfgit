@@ -71,6 +71,78 @@ comment on column ZOESTD.META_USER$.MODIFIER is
 '修改用户';
 
 /*==============================================================*/
+/* Table: META_USER_TYPE$                                       */
+/*==============================================================*/
+create table META_USER_TYPE$ 
+(
+   TYPE_ID              NUMBER               not null,
+   TYPE_NAME            VARCHAR2(64),
+   CREATED_TIME         DATE,
+   CREATOR              VARCHAR2(64),
+   MODIFIED_TIME        DATE,
+   MODIFIER             VARCHAR2(64),
+   constraint PK_META_USER_TYPE$ primary key (TYPE_ID)
+         using index
+);
+
+comment on table META_USER_TYPE$ is
+'数据库用户类型';
+
+comment on column META_USER_TYPE$.TYPE_ID is
+'用户类型ID';
+
+comment on column META_USER_TYPE$.TYPE_NAME is
+'用户类型名称';
+
+comment on column META_USER_TYPE$.CREATED_TIME is
+'创建时间';
+
+comment on column META_USER_TYPE$.CREATOR is
+'创建用户';
+
+comment on column META_USER_TYPE$.MODIFIED_TIME is
+'获取时间';
+
+comment on column META_USER_TYPE$.MODIFIER is
+'修改用户';
+
+/*==============================================================*/
+/* Table: META_OBJ_TYPE$                                        */
+/*==============================================================*/
+create table META_OBJ_TYPE$ 
+(
+   TYPE_ID              NUMBER               not null,
+   TYPE_NAME            VARCHAR2(64),
+   CREATED_TIME         DATE,
+   CREATOR              VARCHAR2(64),
+   MODIFIED_TIME        DATE,
+   MODIFIER             VARCHAR2(64),
+   constraint PK_META_OBJ_TYPE$ primary key (TYPE_ID)
+         using index
+);
+
+comment on table META_OBJ_TYPE$ is
+'数据库对象类型';
+
+comment on column META_OBJ_TYPE$.TYPE_ID is
+'对象类型ID';
+
+comment on column META_OBJ_TYPE$.TYPE_NAME is
+'对象类型名称';
+
+comment on column META_OBJ_TYPE$.CREATED_TIME is
+'创建时间';
+
+comment on column META_OBJ_TYPE$.CREATOR is
+'创建用户';
+
+comment on column META_OBJ_TYPE$.MODIFIED_TIME is
+'获取时间';
+
+comment on column META_OBJ_TYPE$.MODIFIER is
+'修改用户';
+
+/*==============================================================*/
 /* Table: META_OBJ$                                             */
 /*==============================================================*/
 create table ZOESTD.META_OBJ$ 
@@ -133,7 +205,7 @@ comment on column ZOESTD.META_OBJ$.MODIFIER is
 /*==============================================================*/
 /* Table: META_TAB$                                             */
 /*==============================================================*/
-create table META_TAB$ 
+create table ZOESTD.META_TAB$ 
 (
    DB_ID#               VARCHAR2(64)         not null,
    OBJ_ID#              VARCHAR2(64)         not null,
@@ -143,44 +215,55 @@ create table META_TAB$
    TAB_CHECKSUM         VARCHAR2(128),
    MEMO                 VARCHAR2(2000),
    SPELL_CODE           VARCHAR2(255),
+   CREATED_TIME         DATE,
+   CREATOR              VARCHAR2(64),
    MODIFIED_TIME        DATE,
    MODIFIER             VARCHAR2(64),
    constraint PK_META_TAB$ primary key (DB_ID#, OBJ_ID#)
          using index
 );
 
-comment on table META_TAB$ is
+comment on table ZOESTD.META_TAB$ is
 '数据库表';
 
-comment on column META_TAB$.DB_ID# is
+comment on column ZOESTD.META_TAB$.DB_ID# is
 '数据库ID';
 
-comment on column META_TAB$.OBJ_ID# is
+comment on column ZOESTD.META_TAB$.OBJ_ID# is
 '表对象ID';
 
-comment on column META_TAB$.USER_ID# is
+comment on column ZOESTD.META_TAB$.USER_ID# is
 '所有者ID';
 
-comment on column META_TAB$.TAB_NAME is
+comment on column ZOESTD.META_TAB$.TAB_NAME is
 '表名';
 
-comment on column META_TAB$.TAB_CHN_NAME is
+comment on column ZOESTD.META_TAB$.TAB_CHN_NAME is
 '表中文名';
 
-comment on column META_TAB$.TAB_CHECKSUM is
+comment on column ZOESTD.META_TAB$.TAB_CHECKSUM is
 '表校验和';
 
-comment on column META_TAB$.MEMO is
+comment on column ZOESTD.META_TAB$.MEMO is
 '备注';
 
-comment on column META_TAB$.SPELL_CODE is
+comment on column ZOESTD.META_TAB$.SPELL_CODE is
 '拼音码';
 
-comment on column META_TAB$.MODIFIED_TIME is
+comment on column ZOESTD.META_TAB$.CREATED_TIME is
+'创建时间';
+
+comment on column ZOESTD.META_TAB$.CREATOR is
+'创建用户';
+
+comment on column ZOESTD.META_TAB$.MODIFIED_TIME is
 '获取时间';
 
-comment on column META_TAB$.MODIFIER is
+comment on column ZOESTD.META_TAB$.MODIFIER is
 '修改用户';
+
+
+drop index ZOESTD.TIME_META_COL$_MODIFIED;
 
 /*==============================================================*/
 /* Table: META_COL$                                             */
@@ -265,4 +348,12 @@ comment on column ZOESTD.META_COL$.MODIFIED_TIME is
 
 comment on column ZOESTD.META_COL$.MODIFIER is
 '修改用户';
+
+/*==============================================================*/
+/* Index: TIME_META_COL$_MODIFIED                               */
+/*==============================================================*/
+create index ZOESTD.TIME_META_COL$_MODIFIED on ZOESTD.META_COL$ (
+   MODIFIED_TIME ASC
+);
+
 

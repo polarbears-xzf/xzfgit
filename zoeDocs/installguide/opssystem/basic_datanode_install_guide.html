@@ -60,9 +60,9 @@ td, h1, h2, h3, h4, h5, p, ul, ol, li {
         </ol>
       </li>
       <li>
-        <p>生成数据库基本信息</p>
+        <p>数据节点-生成数据库基本信息</p>
         <ul>
-          <li>准备项目ID(控制节点的DVP_PROJ_BASIC_INFO，如部署数据库为控制节点，则自动生成)
+          <li>准备项目ID(控制节点的DVP_PROJ_BASIC_INFO，如部署数据库为控制节点，则自动生成,project_id为空)
 <blockquote><p>EXEC ZOEDEVOPS.ZOEPKG_OPS_DB_INFO.INIT_PROJ_DB_BASIC_INFO(project_id);</p></blockquote></li>
         </ul>
       </li>
@@ -96,7 +96,7 @@ from ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO@linkname;<br /><strong>注1：linkname 为
               <p>INSERT INTO ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO<br />
 (PROJECT_ID#,DB_ID,DB_NAME,SERVER_NAME,SERVER_IP_ADDRESS#,DB_CREATED_TIME,DB_VERSION,CREATOR_CODE,CREATED_TIME)<br />
 SELECT PROJECT_ID#,DB_ID,DB_NAME,SERVER_NAME,SERVER_IP_ADDRESS#,DB_CREATED_TIME,DB_VERSION,CREATOR_CODE,CREATED_TIME<br />
-FROM ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO@linkname;<br /><strong>注：linkname 为上一步创建的数据库链路</strong></p>
+FROM ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO@linkname;<br /><strong>注1：linkname 为上一步创建的数据库链路</strong><br /><strong>注2：部署控制节点时，此步骤无需执行</strong></p>
             </blockquote>
           </li>
         </ul>

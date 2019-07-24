@@ -1,4 +1,4 @@
-<link href="zoe_docs.css" rel="stylesheet" type="text/css" />
+<link href="../../zoe_docs.css" rel="stylesheet" type="text/css" />
 
 [文档主页](../../index.html)
 [上一页](../installguide_index.html)
@@ -9,7 +9,7 @@
 >	_docname datanode_install_guide_  
 ###	安装运维管理系统控制节点 
 >	__脚本目录：zoeDevops\basic_component__	
-1.  前提：已安装数据节点
+1.  前置条件：已安装数据节点
 2.	控制节点-组件部署
 	>	@controlnode_install.sql  
 	>	__内容说明__  

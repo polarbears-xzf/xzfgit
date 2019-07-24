@@ -14,33 +14,59 @@ AS
     --同步已删除用户
     lv_sql := 'SELECT USER_ID,USERNAME FROM ZOESTD.meta_user$';
     lv_sql := lv_sql || ' WHERE USERNAME NOT IN(SELECT USERNAME FROM DBA_USERS@'||in_db_link||')';
-    lv_sql := lv_sql || '  AND db_id#='''||in_db_id||''')';
+    lv_sql := lv_sql || '  AND db_id#='''||in_db_id||'''';
+--    DBMS_OUTPUT.PUT_LINE(lv_sql);
     OPEN lc_ref_cursor FOR lv_sql;
     LOOP 
         FETCH lc_ref_cursor INTO lv_user_id,lv_username;
         EXIT WHEN lc_ref_cursor%NOTFOUND;
-        lv_sql := 'DELETE FROM ZOESTD.meta_user$@'||in_db_link;
-        lv_sql := lv_sql || ' WHERE USERNAME='''||lv_username||'''';
-        lv_sql := lv_sql || '  AND db_id#='''||in_db_id||''')';
-        DBMS_OUTPUT.PUT_LINE(lv_sql);
---        EXECUTE IMMEDIATE lv_sql;
+        --同步已删除列元数据
+        lv_sql := 'DELETE from ZOESTD.meta_col$ where (db_id#,obj_id#) in';
+        lv_sql := lv_sql || ' (select a.db_id#,a.obj_id from zoestd.meta_obj$ a, ZOESTD.meta_user$ b';
+        lv_sql := lv_sql || ' where a.user_id#=b.user_id ';
+        lv_sql := lv_sql || ' and b.db_id#='''||in_db_id||'''';
+        lv_sql := lv_sql || ' and b.user_id='''||lv_user_id||''')';
+--        DBMS_OUTPUT.PUT_LINE(lv_sql);
+        EXECUTE IMMEDIATE lv_sql;
+        COMMIT;
+        --同步已删除表元数据
+        lv_sql := 'DELETE from ZOESTD.meta_tab$ ';
+        lv_sql := lv_sql || ' where db_id#='''||in_db_id||'''';
+        lv_sql := lv_sql || ' and user_id#='''||lv_user_id||''')';
+--        DBMS_OUTPUT.PUT_LINE(lv_sql);
+        EXECUTE IMMEDIATE lv_sql;
+        COMMIT;
+      --同步已删除对象元数据
+        lv_sql := 'DELETE from ZOESTD.meta_obj$ ';
+        lv_sql := lv_sql || ' where db_id#='''||in_db_id||'''';
+        lv_sql := lv_sql || ' and user_id#='''||lv_user_id||''')';
+--        DBMS_OUTPUT.PUT_LINE(lv_sql);
+        EXECUTE IMMEDIATE lv_sql;
+        COMMIT;
+        --删除用户元数据
+        lv_sql := 'DELETE FROM ZOESTD.meta_user$';
+        lv_sql := lv_sql || ' WHERE db_id#='''||in_db_id||'''';
+        lv_sql := lv_sql || '  AND user_id='''||lv_user_id||''')';
+--        DBMS_OUTPUT.PUT_LINE(lv_sql);
+        EXECUTE IMMEDIATE lv_sql;
+        COMMIT;
     END LOOP;
     --同步新增用户
     lv_sql := '    INSERT INTO ZOESTD.META_USER$';
-    lv_sql := lv_sql || ' (USER_ID,USERNAME,USER_SOURCE,CREATOR,CREATED_TIME,DB_USER#)';
-    lv_sql := lv_sql || ' SELECT SYS_GUID(),USERNAME,';
+    lv_sql := lv_sql || ' (DB_ID#,USER_ID,USERNAME,USER_SOURCE,CREATOR,CREATED_TIME,MODIFIER,MODIFIED_TIME,DB_USER#)';
+    lv_sql := lv_sql || ' SELECT '''||in_db_id||''',SYS_GUID(),USERNAME,';
     lv_sql := lv_sql || ' CASE WHEN USERNAME LIKE ''ZOE%'' THEN ''ZOESOFT''';
     lv_sql := lv_sql || ' WHEN USERNAME = (SELECT COLUMN_VALUE FROM TABLE(ZOEDEVOPS.ZOEPKG_UTILITY.GET_ORACLE_USER) B'; 
     lv_sql := lv_sql || ' WHERE B.COLUMN_VALUE=A.USERNAME) THEN ''ORACLE''';
     lv_sql := lv_sql || ' ELSE '''' END,';
-    lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER''),';
-    lv_sql := lv_sql || ' SYSDATE,USER_ID';
+    lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER''),SYSDATE,';
+    lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER''),SYSDATE,USER_ID';
     lv_sql := lv_sql || ' FROM DBA_USERS@'||in_db_link||' A ';
     lv_sql := lv_sql || ' WHERE NOT EXISTS (SELECT 1 FROM ZOESTD.META_USER$ C WHERE A.USERNAME=C.USERNAME)';
     lv_sql := lv_sql || ' ORDER BY CREATED';
-    DBMS_OUTPUT.PUT_LINE(lv_sql);
---  EXECUTE IMMEDIATE lv_sql;
---  COMMIT;
+--    DBMS_OUTPUT.PUT_LINE(lv_sql);
+    EXECUTE IMMEDIATE lv_sql;
+    COMMIT;
    EXCEPTION
     WHEN OTHERS THEN
         ROLLBACK;
@@ -48,24 +74,39 @@ AS
  END increment_sync_user;
   
   
-  PROCEDURE increment_sync_object
+  PROCEDURE increment_sync_object(in_db_id IN VARCHAR2, in_db_link IN VARCHAR2)
   AS
-  BEGIN
-    INSERT INTO ZOESTD.META_OBJ$
-      (OBJ_ID,USER_ID#,OBJ_NAME,OBJ_TYPE_ID#,CREATOR,CREATED_TIME,DB_OBJ_ID#
-      )
-    SELECT SYS_GUID(),USER_ID,A.OBJECT_NAME,
-        DECODE(OBJECT_TYPE,'TABLE','1','VIEW','2','SEQUENCE',3,NULL) AS OBJECT_TYPE#,
-        SYS_CONTEXT('USERENV','SESSION_USER'),
-        SYSDATE,OBJECT_ID
-    FROM DBA_OBJECTS@ZOEMDB141ZOEAGENT A , ZOESTD.META_USER$ B
-    WHERE A.OWNER=B.USERNAME AND A.OWNER LIKE 'ZOE%' 
-        AND OBJECT_TYPE IN ('TABLE','VIEW','SEQUENCE')
-        AND B.USERNAME NOT IN ('ZOETMP')
-        AND NOT EXISTS (SELECT 1 FROM ZOESTD.META_OBJ$ Z ,ZOESTD.META_USER$ Y 
-                        WHERE A.OBJECT_NAME=Z.OBJ_NAME AND Y.USERNAME=A.OWNER AND Z.USER_ID#=Y.USER_ID)
-        ORDER BY TIMESTAMP;
-        COMMIT;
+    -- =======================================
+    -- 局部变量声明
+    -- =======================================
+    lv_sql      VARCHAR2(4000);
+ BEGIN
+    --同步删除对象
+    lv_sql := 'DELETE from ZOESTD.meta_obj$ a';
+    lv_sql := lv_sql || ' where not exists (select 1 from zoestd.meta_user$ b ,dba_objects@'||in_db_link||' c ';
+    lv_sql := lv_sql || ' where a.user_id#=b.user_id and b.username=c.owner and a.obj_name=c.object_name';
+    lv_sql := lv_sql || ' and b.db_id#='''||in_db_id||''')';
+    lv_sql := lv_sql || ' and a.db_id#='''||in_db_id||'''';
+--    DBMS_OUTPUT.PUT_LINE(lv_sql);
+    EXECUTE IMMEDIATE lv_sql;
+    COMMIT;
+    --同步新增对象
+    lv_sql := 'INSERT INTO ZOESTD.META_OBJ$';
+    lv_sql := lv_sql || ' (DB_ID#,OBJ_ID,USER_ID#,OBJ_NAME,OBJ_TYPE_ID#,CREATOR,CREATED_TIME,MODIFIER,MODIFIED_TIME,DB_OBJ_ID#)';
+    lv_sql := lv_sql || ' SELECT '''||in_db_id||''',SYS_GUID(),USER_ID,A.OBJECT_NAME,';
+    lv_sql := lv_sql || ' DECODE(OBJECT_TYPE,''TABLE'',''1'',''VIEW'',''2'',''SEQUENCE'',3,NULL) AS OBJECT_TYPE#,';
+    lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER''),SYSDATE,';
+    lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER''),SYSDATE,OBJECT_ID';
+    lv_sql := lv_sql || ' FROM DBA_OBJECTS@'||in_db_link||' A , ZOESTD.META_USER$ B';
+    lv_sql := lv_sql || ' WHERE A.OWNER=B.USERNAME AND A.OWNER LIKE ''ZOE%'' ';
+    lv_sql := lv_sql || ' AND OBJECT_TYPE IN (''TABLE'',''VIEW'',''SEQUENCE'')';
+    lv_sql := lv_sql || ' AND B.USERNAME NOT IN (''ZOETMP'')';
+    lv_sql := lv_sql || ' AND NOT EXISTS (SELECT 1 FROM ZOESTD.META_OBJ$ Z ,ZOESTD.META_USER$ Y ';
+    lv_sql := lv_sql || ' WHERE A.OBJECT_NAME=Z.OBJ_NAME AND Y.USERNAME=A.OWNER AND Z.USER_ID#=Y.USER_ID)';
+    lv_sql := lv_sql || ' ORDER BY TIMESTAMP';
+--    DBMS_OUTPUT.PUT_LINE(lv_sql);
+    EXECUTE IMMEDIATE lv_sql;
+    COMMIT;
   EXCEPTION
     WHEN OTHERS THEN
         ROLLBACK;
@@ -73,22 +114,33 @@ AS
         
   END increment_sync_object;
   
-  PROCEDURE increment_sync_table
+  PROCEDURE increment_sync_table(in_db_id IN VARCHAR2, in_db_link IN VARCHAR2)
   AS
     -- =======================================
     -- 局部变量声明
     -- =======================================
+    lv_sql      VARCHAR2(4000);
   BEGIN
-    INSERT INTO ZOESTD.META_TAB$
-    (OBJ_ID#,USER_ID#,TAB_NAME,MODIFIER,MODIFIED_TIME
-    )
-    SELECT  OBJ_ID,USER_ID#,A.OBJ_NAME,
-        SYS_CONTEXT('USERENV','SESSION_USER'),
-        SYSDATE
-    FROM ZOESTD.META_OBJ$ A 
-    WHERE OBJ_TYPE_ID#=1 
-        AND NOT EXISTS (SELECT 1 FROM ZOESTD.META_TAB$ Z 
-                        WHERE A.USER_ID#=Z.USER_ID# AND A.OBJ_NAME=Z.TAB_NAME );
+    --同步删除表
+    lv_sql := 'DELETE from ZOESTD.meta_tab$ a';
+    lv_sql := lv_sql || ' where not exists (select 1 from zoestd.meta_user$ b ,dba_tables@'||in_db_link||' c ';
+    lv_sql := lv_sql || ' where a.user_id#=b.user_id and b.username=c.owner and a.tab_name=c.table_name';
+    lv_sql := lv_sql || ' and b.db_id#='''||in_db_id||''')';
+    lv_sql := lv_sql || ' and a.db_id#='''||in_db_id||'''';
+--    DBMS_OUTPUT.PUT_LINE(lv_sql);
+    EXECUTE IMMEDIATE lv_sql;
+    COMMIT;
+    --同步新增表
+    lv_sql := 'INSERT INTO ZOESTD.META_TAB$';
+    lv_sql := lv_sql || ' (DB_ID#,OBJ_ID#,USER_ID#,TAB_NAME,MODIFIER,MODIFIED_TIME)';
+    lv_sql := lv_sql || ' SELECT  '''||in_db_id||''',OBJ_ID,USER_ID#,A.OBJ_NAME,';
+    lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER''),SYSDATE';
+    lv_sql := lv_sql || ' FROM ZOESTD.META_OBJ$ A ';
+    lv_sql := lv_sql || ' WHERE OBJ_TYPE_ID#=1 ';
+    lv_sql := lv_sql || ' AND NOT EXISTS (SELECT 1 FROM ZOESTD.META_TAB$ Z ';
+    lv_sql := lv_sql || ' WHERE A.USER_ID#=Z.USER_ID# AND A.OBJ_NAME=Z.TAB_NAME )';
+--    DBMS_OUTPUT.PUT_LINE(lv_sql);
+    EXECUTE IMMEDIATE lv_sql;
     COMMIT;
   EXCEPTION
     WHEN OTHERS THEN
@@ -96,33 +148,72 @@ AS
         RAISE;
   END increment_sync_table;
   
-  PROCEDURE increment_sync_column
+  PROCEDURE increment_sync_column(in_db_id IN VARCHAR2, in_db_link IN VARCHAR2)
   AS
     -- =======================================
     -- 局部变量声明
     -- =======================================
-    ln NUMBER;
+    lv_sql                 VARCHAR2(4000);
+    ld_last_modified_time  DATE;
+    lv_obj_id              VARCHAR2(64);
+    lv_username            VARCHAR2(64);
+    lv_table_name          VARCHAR2(64);
+    lc_ref_cursor SYS_REFCURSOR;
   BEGIN
-    INSERT INTO ZOESTD.META_COL$
-      (
-        OBJ_ID#,COL_ID,COL_NAME,COL_CHN_NAME,
-        DATA_TYPE,DATA_LENGTH,DATA_PRECISION,DATA_SCALE,
-        DATA_DEFAULT,MEMO,CREATED_TIME
-      )
-    SELECT t.OBJ_ID#,cl.COLUMN_ID,cl.COLUMN_NAME, 
-      SUBSTR(cm.COMMENTS,1,DECODE(INSTR(cm.COMMENTS,'#|'),0,LENGTH(cm.COMMENTS),INSTR(cm.COMMENTS,'#|')-1)) AS COLUMN_CHN_NAME,
-      cl.DATA_TYPE,cl.DATA_LENGTH,cl.DATA_PRECISION,cl.DATA_SCALE,to_lob(cl.DATA_DEFAULT), 
-      SUBSTR(cm.COMMENTS,DECODE(INSTR(cm.COMMENTS,'#|'),0,LENGTH(cm.COMMENTS)+1,INSTR(cm.COMMENTS,'#|')+2),LENGTH(cm.COMMENTS)) AS MEMO,SYSDATE
-    FROM DBA_TAB_COLUMNS@ZOEMDB141ZOEAGENT cl ,DBA_COL_COMMENTS@ZOEMDB141ZOEAGENT cm ,ZOESTD.META_TAB$ t ,ZOESTD.META_USER$ u
-    WHERE cl.OWNER      =cm.OWNER
-      AND cl.TABLE_NAME =cm.TABLE_NAME
-      AND cl.COLUMN_NAME=cm.COLUMN_NAME
-      AND t.USER_ID#       =u.USER_ID
-      AND u.USERNAME    =cl.OWNER
-      AND t.TAB_NAME  =cl.TABLE_NAME
-      AND NOT EXISTS (SELECT NULL FROM ZOESTD.META_COL$ mc WHERE  t.OBJ_ID#=mc.OBJ_ID# AND cl.COLUMN_NAME=mc.COL_NAME);
-    
+    --同步删除列
+    lv_sql := 'DELETE from ZOESTD.meta_col$ a';
+    lv_sql := lv_sql || ' where not exists (select 1 from zoestd.meta_user$ b ,ZOESTD.meta_tab$ c ,dba_tab_columns@'||in_db_link||' d';
+    lv_sql := lv_sql || ' where a.obj_id#=c.obj_id# and b.user_id=c.user_id#';
+    lv_sql := lv_sql || ' and b.username=d.owner and c.tab_name=d.table_name and a.col_name=d.column_name';
+    lv_sql := lv_sql || ' and b.db_id#='''||in_db_id||'''';
+    lv_sql := lv_sql || ' and c.db_id#='''||in_db_id||''')';
+    lv_sql := lv_sql || ' and a.db_id#='''||in_db_id||'''';
+--    DBMS_OUTPUT.PUT_LINE(lv_sql);
+    EXECUTE IMMEDIATE lv_sql;
     COMMIT;
+    --同步新增列
+    SELECT MAX(MODIFIED_TIME) INTO ld_last_modified_time FROM ZOESTD.meta_col$;
+    lv_sql := 'select b.obj_id#,c.owner,c.object_name from zoestd.meta_user$ a, zoestd.meta_tab$ b,dba_objects@'||in_db_link||' c';
+    lv_sql := lv_sql || ' where c.last_ddl_time >= TO_DATE('''||to_char(ld_last_modified_time,'YYYY-MM-DD')||''',''YYYY-MM-DD'')';
+    lv_sql := lv_sql || ' and a.user_id=b.user_id# and a.username=c.owner and b.tab_name=c.object_name';
+    OPEN lc_ref_cursor FOR lv_sql;
+    LOOP 
+        FETCH lc_ref_cursor INTO lv_obj_id,lv_username,lv_table_name; 
+        EXIT WHEN lc_ref_cursor%NOTFOUND;
+        --删除表改变列
+        lv_sql := 'DELETE from zoestd.meta_col$';
+        lv_sql := lv_sql || ' where db_id#='''||in_db_id||'''';
+        lv_sql := lv_sql || ' and obj_id#='''||lv_obj_id||'''';
+--        DBMS_OUTPUT.PUT_LINE(lv_sql);
+        EXECUTE IMMEDIATE lv_sql;
+        COMMIT;
+        --重新同步表改变列
+        lv_sql := 'INSERT INTO ZOESTD.META_COL$(';
+        lv_sql := lv_sql || ' DB_ID#,OBJ_ID#,COL_ID,COL_NAME,COL_CHN_NAME,';
+        lv_sql := lv_sql || ' DATA_TYPE,DATA_LENGTH,DATA_PRECISION,DATA_SCALE,NULLABLE,PK_FLAG,';
+        lv_sql := lv_sql || ' MEMO, CREATOR,CREATED_TIME,MODIFIER,MODIFIED_TIME)';
+        lv_sql := lv_sql || ' SELECT '''||in_db_id||''', '''||lv_obj_id||''',cl.COLUMN_ID,cl.COLUMN_NAME, ';
+        lv_sql := lv_sql || ' SUBSTR(cm.COMMENTS,1,DECODE(INSTR(cm.COMMENTS,''#|''),';
+        lv_sql := lv_sql || ' 0,LENGTH(cm.COMMENTS),INSTR(cm.COMMENTS,''#|'')-1)) AS COLUMN_CHN_NAME,';
+        lv_sql := lv_sql || ' cl.DATA_TYPE,cl.DATA_LENGTH,cl.DATA_PRECISION,cl.DATA_SCALE, ';
+        lv_sql := lv_sql || ' cl.nullable, ';
+        lv_sql := lv_sql || ' nvl((select ''1'' from dba_constraints@'||in_db_link||' a, dba_cons_columns@'||in_db_link||' b';
+        lv_sql := lv_sql || ' where a.constraint_type = ''P'' and a.constraint_name=b.constraint_name and a.owner=b.owner';
+        lv_sql := lv_sql || ' and a.owner=cl.owner and a.table_name=cl.table_name and b.column_name=cl.column_name), null),';
+        lv_sql := lv_sql || ' SUBSTR(cm.COMMENTS,DECODE(INSTR(cm.COMMENTS,''#|''),';
+        lv_sql := lv_sql || ' 0,LENGTH(cm.COMMENTS)+1,INSTR(cm.COMMENTS,''#|'')+2),LENGTH(cm.COMMENTS)) AS MEMO,';
+        lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER''),SYSDATE,';
+        lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER''),SYSDATE';
+        lv_sql := lv_sql || ' FROM DBA_TAB_COLUMNS@'||in_db_link||' cl ,DBA_COL_COMMENTS@'||in_db_link||' cm ';
+        lv_sql := lv_sql || ' WHERE cl.OWNER = cm.OWNER';
+        lv_sql := lv_sql || ' AND cl.TABLE_NAME = cm.TABLE_NAME';
+        lv_sql := lv_sql || ' AND cl.COLUMN_NAME = cm.COLUMN_NAME';
+        lv_sql := lv_sql || ' AND cl.OWNER = '''||lv_username||'''';
+        lv_sql := lv_sql || ' AND cl.TABLE_NAME = '''||lv_table_name||'''';
+--        DBMS_OUTPUT.PUT_LINE(lv_sql);
+        EXECUTE IMMEDIATE lv_sql;
+        COMMIT;
+    END LOOP;
   EXCEPTION
     WHEN OTHERS THEN
         ROLLBACK;
@@ -162,8 +253,8 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
     lv_sql := lv_sql || ' FROM DBA_USERS@'||lv_db_link||' A ';
     lv_sql := lv_sql || ' ORDER BY CREATED';
 --    DBMS_OUTPUT.PUT_LINE(lv_sql);
-    --EXECUTE IMMEDIATE lv_sql;
---    COMMIT;
+    EXECUTE IMMEDIATE lv_sql;
+    COMMIT;
 --  初始化META_OBJ$，从DBA_TABLES。排除Oracle用户，依据ZOEDEVOPS.ZOEPKG_UTILITY.GET_ORACLE_USER
     lv_sql := 'INSERT INTO ZOESTD.META_OBJ$';
     lv_sql := lv_sql || ' (DB_ID#,OBJ_ID,DB_OBJ_ID#,USER_ID#,OBJ_NAME,OBJ_TYPE_ID#,';
@@ -178,8 +269,8 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
     lv_sql := lv_sql || ' ( SELECT COLUMN_VALUE FROM TABLE(ZOEDEVOPS.ZOEPKG_UTILITY.GET_ORACLE_USER))';
     lv_sql := lv_sql || ' AND OBJECT_TYPE IN (''TABLE'',''VIEW'',''SEQUENCE'')';
 --    DBMS_OUTPUT.PUT_LINE(lv_sql);
-    --EXECUTE IMMEDIATE lv_sql;
---    COMMIT;
+    EXECUTE IMMEDIATE lv_sql;
+    COMMIT;
 --  初始化META_TAB$，从META_OBJ$视图
     lv_sql := 'INSERT INTO ZOESTD.META_TAB$';
     lv_sql := lv_sql || ' (DB_ID#,obj_ID#,user_ID#,tab_name,tab_chn_name,tab_checksum,memo)';
@@ -202,8 +293,8 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
     lv_sql := lv_sql || ' AND tm.OWNER     =u.USERNAME';
     lv_sql := lv_sql || ' AND tm.TABLE_NAME=o.OBJ_NAME';
 --    DBMS_OUTPUT.PUT_LINE(lv_sql);
-    --EXECUTE IMMEDIATE lv_sql;
---    COMMIT;
+    EXECUTE IMMEDIATE lv_sql;
+    COMMIT;
 --  初始化META_COL$，从META_TAB$，DBA_TAB_COLS视图
     FOR c1 IN (SELECT u.USERNAME, t.TAB_NAME, t.OBJ_ID# FROM ZOESTD.META_TAB$ t, ZOESTD.META_USER$ u WHERE t.USER_ID# = u.USER_ID)
     LOOP
@@ -252,6 +343,12 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
     SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE DB_ID#=in_db_id;
     --增量同步用户
     increment_sync_user(in_db_id,lv_db_link);
+    --增量同步对象
+    increment_sync_object(in_db_id,lv_db_link);
+    --增量同步表
+    increment_sync_table(in_db_id,lv_db_link);
+    --增量同步列
+    increment_sync_column(in_db_id,lv_db_link);
   EXCEPTION
     WHEN OTHERS THEN
         ROLLBACK;

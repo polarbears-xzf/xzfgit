@@ -1,4 +1,4 @@
-<link href="zoe_docs.css" rel="stylesheet" type="text/css" />
+<link href="../zoe_docs.css" rel="stylesheet" type="text/css" />
 
 [文档主页](../index.html)
 
@@ -8,6 +8,7 @@
 3.	[数据库版本与发布管理](database_version_release_desc.html)
 4.	[数据库监控](database_monitor_desc.html)
 5.	[OGG监控与管理](ogg_monitor_desc.html)
+6.	[标准管理](standard_manage_desc.html)
 ###	运维管理系统功能变更记录
 1.	基础组件
 2.	数据库版本与发布管理

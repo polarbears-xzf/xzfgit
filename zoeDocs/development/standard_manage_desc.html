@@ -1,0 +1,37 @@
+<!DOCTYPE html []>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="MarkdownViewer++" />
+    <title>standard_manage_desc.txt</title>
+    <style type="text/css">
+            
+/* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
+td, h1, h2, h3, h4, h5, p, ul, ol, li {
+    page-break-inside: avoid; 
+}
+
+        </style>
+  </head>
+  <body>
+    <link href="../zoe_docs.css" rel="stylesheet" type="text/css" />
+    <p>
+      <a href="./devops_index.html">上一页</a>
+    </p>
+    <h3 id="section">数据库标准管理</h3>
+    <blockquote>
+      <p>
+        <strong>功能说明</strong>
+      </p>
+    </blockquote>
+    <ol>
+      <li>数据库元数据同步
+<ul><li>实现功能：目标数据库对象元数据完全同步数据库到标准管理库</li><li>实现方法：Oracle存储过程</li><li>传入参数：数据库唯一标识，强制同步标识“YES”</li><li>使用示例：
+<ul><li>ZOEDEVOPS.ZOEPKG_METADATA_SYNC.INTI_SYNC_ALL('db_id')</li></ul></li><li>实现功能：目标数据库对象元数据完全同步数据库到标准管理库</li><li>实现方法：Oracle存储过程</li><li>传入参数：数据库唯一标识</li><li>使用示例：
+<ul><li>ZOEDEVOPS.ZOEPKG_METADATA_SYNC.INCREMENT_SYNC_ALL('db_id')</li></ul></li></ul></li>
+    </ol>
+    <p>
+      <a href="./devops_index.html">上一页</a>
+    </p>
+  </body>
+</html>
