@@ -22,6 +22,7 @@
 1.	[运维管理系统](installguide/installguide_index.html)
 2.	[Oracle DataGuard](installguide/oracle_data_guard.html)
 3.	[Oracle GoldenGata](installguide/oracle_goldengate.html)
+4.	[zabbix4.2安装](installguide/zabbix_install_index.html)
 ###	软件开发
 1.	[运维管理系统](development/devops_index.html)
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>index</title>
+<title>zabbix_client_install_guide</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -292,43 +292,47 @@ img {
 </head>
 <body>
 <p><link href="zoe_docs.css" rel="stylesheet" type="text/css" /></p>
-<h3>标准与规范</h3>
-<ol>
-<li><a href="norm/devops_norm.html">运维管理基本规范</a></li>
-<li><a href="norm/oa_demand_register.html">OA需求登记规范</a></li>
-</ol>
-<h3>运维项目管理</h3>
-<ol>
-<li><a href="opsproject/checkup_process.html">项目巡检流程</a></li>
-<li><a href="opsproject/checkup_db_ora.html">项目巡检报告输出内容</a></li>
-<li><a href="opsproject/checkup_metric_list.html">项目巡检指标列表</a></li>
-</ol>
-<h3>使用手册</h3>
-<ol>
-<li><a href="manual/manual_markdown.html">markdown使用手册</a></li>
-<li><a href="manual/manual_sqlloader.html">sqloader使用手册</a></li>
-<li><a href="manual/manual_flashback.html">flashback使用手册</a></li>
-<li><a href="manual/manual_expdp&amp;impdp.html">数据泵使用手册</a></li>
-<li><a href="manual/manual_logminer.html">logminer使用手册</a></li>
-<li><a href="manual/manual_redo_log.html">重做日志修改手册</a></li>
-</ol>
-<h3>操作手册</h3>
-<ol>
-<li><a href="opmanual/opmanual_index.html">运维管理系统</a></li>
-<li><a href="opmanual/oracle_rac_switch_ip.html">Oracle RAC IP切换</a></li>
-<li><a href="opmanual/oracle_rac_cdp_switch.html">Oracle RAC 存储CDP容灾切换测试</a></li>
-</ol>
-<h3>安装指导</h3>
-<ol>
-<li><a href="installguide/installguide_index.html">运维管理系统</a></li>
-<li><a href="installguide/oracle_data_guard.html">Oracle DataGuard</a></li>
-<li><a href="installguide/oracle_goldengate.html">Oracle GoldenGata</a></li>
-<li><a href="installguide/zabbix_install_index.html">zabbix4.2安装</a></li>
-</ol>
-<h3>软件开发</h3>
-<ol>
-<li><a href="development/devops_index.html">运维管理系统</a></li>
-</ol>
+<p><a href="../../index.html">文档主页</a>
+<a href="../zabbix_install_index.html">上一页</a></p>
+<blockquote>
+<p><em>Created in 2019.07.23 by natsume</em><br />
+<em>Copyright (c) 20xx, CHINA and/or affiliates.</em>  
+</p>
+</blockquote>
+<h2>linux下的客户端安装</h2>
+<h4>1.	安装zabbix的yum配置并安装</h4>
+<pre><code>* rpm -i https://repo.zabbix.com/zabbix/4.2/rhel/6/x86_64/zabbix-release-4.2-1.el6.noarch.rpm
+* yum -y install zabbix zabbix-agent 
+</code></pre>
+
+<h4>2.	修改zabbix agentd 的配置文件</h4>
+<pre><code>/etc/zabbix/zabbix_agentd.conf
+Server=127.0.0.1  #被动模式，允许哪台服务区连接agent,多个服务器逗号隔开
+ListenPort=10050
+ListenIP=0.0.0.0
+hostname=127.0.0.1  #名字是标识符，zabbix网页配置里面的名字要和这个一致
+ServerActive=127.0.0.1 #主动模式，允许向哪台服务器传送监控数据,多个服务器逗号隔开
+启动zabbix agent端
+service zabbix-agent restart
+chkconfig zabbix-agent on
+</code></pre>
+
+<h2>windows下的客户端安装</h2>
+<h4>1.	下载并安装</h4>
+<pre><code>https://www.zabbix.com/download_agents 下载Windows版本
+zabbix_agentd.win.conf里的配置和linux的一样
+cmd里输入以下命令启动zabbix客户端服务和开启自启动
+cd D:\zabbix_agents\bin\win64
+Zabbix_agentd.exe -c D:\zabbix_agents\conf\zabbix_agentd.win.conf –i
+Zabbix_agentd.exe -c D:\zabbix_agents\conf\zabbix_agentd.win.conf –s
+</code></pre>
+
+<h4>2.在服务端可以输入下面命令来测试客户端是否安装成功</h4>
+<pre><code>zabbix_get -s 192.168.2.233 -k system.uname 
+</code></pre>
+
+<p><a href="../../index.html">文档主页</a>
+<a href="../zabbix_install_index.html">上一页</a></p>
 
 </body>
 </html>
