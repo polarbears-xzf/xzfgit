@@ -732,7 +732,10 @@ EXEC ZOEDEVOPS.zoepkg_metadata_sync.increment_sync_all('F03C824215D9A43F1AE9CED2
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
 			<query>
-				<sql><![CDATA[SELECT a.product_name, c.db_name,c.db_chn_name,c.db_role_name,c.db_deploy_type_name,b.db_id# as "db_id",b.product_id#
+				<sql><![CDATA[SELECT a.product_name, c.db_name,c.db_chn_name,
+(select role_name from zoedevops.ver_db_role$ where role_id=b.db_role_id#) as "DB_ROLE_NAME",
+(select TYPE_NAME from zoedevops.DVP_DB_DEPLOY_TYPE$ where TYPE_ID=c.DB_DEPLOY_TYPE_ID#) as "DB_TYPE_NAME",
+b.db_id# as "DB_ID",b.product_id#
 FROM ZOEDEVOPS.VER_PRODUCT_INFO a , ZOEDEVOPS.VER_PRODUCT_DB_CONFIG b,
     ZOEDEVOPS.dvp_proj_db_basic_info c
 where a.product_id=b.product_id# and b.db_id#=c.db_id]]></sql>
@@ -766,11 +769,53 @@ where a.product_id=b.product_id# and b.db_id#=c.db_id]]></sql>
 				<query>
 					<sql><![CDATA[SELECT  c.db_name,c.db_chn_name,c.db_role_name,c.db_deploy_type_name,a.product_db_id#
 from zoedevops.VER_PRODUCT_PROJECT_CFG a, ZOEDEVOPS.dvp_proj_db_basic_info c
-where a.product_db_id# = :db_id and a.project_db_id# = c.db_id]]></sql>
+where a.product_db_id# = :DB_ID
+    and a.project_db_id# = c.db_id]]></sql>
 					<binds>
-						<bind id="db_id">
-							<prompt><![CDATA[db_id]]></prompt>
-							<tooltip><![CDATA[db_id]]></tooltip>
+						<bind id="DB_ID">
+							<prompt><![CDATA[DB_ID]]></prompt>
+							<tooltip><![CDATA[DB_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+					<pdf version="VERSION_1_7" compression="CONTENT">
+						<docproperty title="null" author="null" subject="null" keywords="null" />
+						<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+						<column>
+							<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+							<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+							<blob blob="NONE" zip="false" />
+						</column>
+						<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+						<header enable="false" generatedate="false">
+							<data>
+							null							</data>
+						</header>
+						<footer enable="false" generatedate="false">
+							<data value="null" />
+						</footer>
+						<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+					</pdf>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[数据库详细信息]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from ZOEDEVOPS.dvp_proj_db_basic_info c
+where c.db_id = :DB_ID
+or c.db_id in (select project_db_id# from zoedevops.VER_PRODUCT_PROJECT_CFG a where a.product_db_id#=:DB_ID)]]></sql>
+					<binds>
+						<bind id="DB_ID">
+							<prompt><![CDATA[DB_ID]]></prompt>
+							<tooltip><![CDATA[DB_ID]]></tooltip>
 							<value><![CDATA[NULL_VALUE]]></value>
 							<bracket><![CDATA[null]]></bracket>
 						</bind>

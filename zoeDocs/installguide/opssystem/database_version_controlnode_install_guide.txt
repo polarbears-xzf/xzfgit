@@ -25,13 +25,13 @@
 4.	控制节点：产品与项目数据库维护
 	1.	添加产品
 		*	编辑产品信息表-VER_PRODUCT_INFO
-			>	增加“产品ID”:sys_guid
-			>	增加“产品名称”
+			>	增加“产品ID”:sys_guid  
+			>	增加“产品名称”  
 	2.	添加产品数据库
 		*	前提条件：为需要加入的产品数据库安装“运维管理基础组件”-“数据节点”
 		*	编辑产品数据库配置表-VER_PRODUCT_DB_CONFIG
-			>	增加“产品ID”：从VER_PRODUCT_INFO
-			>	增加“产品数据库ID”：从DVP_PROJ_DB_BASIC_INFO
+			>	增加“产品ID”：从VER_PRODUCT_INFO  
+			>	增加“产品数据库ID”：从DVP_PROJ_DB_BASIC_INFO  
 
 
 
