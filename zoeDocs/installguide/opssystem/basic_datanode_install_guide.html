@@ -99,6 +99,23 @@ SELECT PROJECT_ID#,DB_ID,DB_NAME,SERVER_NAME,SERVER_IP_ADDRESS#,DB_CREATED_TIME,
 FROM ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO@linkname;<br /><strong>注1：linkname 为上一步创建的数据库链路</strong><br /><strong>注2：部署控制节点时，此步骤无需执行</strong></p>
             </blockquote>
           </li>
+          <li>
+            <p>编辑数据库基本信息表-ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO</p>
+            <blockquote>
+              <p>增加“数据库中文名”
+增加“数据库角色ID”
+增加“数据库部署类型ID”
+增加“数据库角色名”
+增加“数据库部署类型名”</p>
+            </blockquote>
+          </li>
+          <li>
+            <p>编辑产品项目数据库表-VER_PRODUCT_PROJECT_CFG</p>
+            <blockquote>
+              <p>增加“产品数据库ID”：从VER_PRODUCT_DB_CONFIG
+增加“项目数据库ID”：从ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO</p>
+            </blockquote>
+          </li>
         </ul>
       </li>
       <li>

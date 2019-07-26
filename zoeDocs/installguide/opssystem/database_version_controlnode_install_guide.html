@@ -1,0 +1,59 @@
+<!DOCTYPE html []>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="MarkdownViewer++" />
+    <title>database_version_controlnode_install_guide.txt</title>
+    <style type="text/css">
+            
+/* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
+td, h1, h2, h3, h4, h5, p, ul, ol, li {
+    page-break-inside: avoid; 
+}
+
+        </style>
+  </head>
+  <body>
+    <link href="../../zoe_docs.css" rel="stylesheet" type="text/css" />
+    <p>
+      <a href="../../index.html">文档主页</a>
+      <a href="../installguide_index.html">上一页</a>
+    </p>
+    <blockquote>
+      <p>
+        <em>Created in 2019.07.26 by polarbears</em>
+        <br />
+        <em>Copyright (c) 20xx, CHINA and/or affiliates.</em>
+        <br />
+        <em>docname database_version_controlnode_install_guide</em>
+      </p>
+    </blockquote>
+    <h3 id="section">安装数据版本与发布管理控制节点</h3>
+    <blockquote>
+      <p>
+        <strong>脚本目录：zoeDevops\database_version_release</strong>
+      </p>
+    </blockquote>
+    <ol>
+      <li>创建标准目录
+<blockquote><p>create_standard_dir.sh</p></blockquote></li>
+      <li>前置条件：运维管理基础组件</li>
+      <li>控制节点：组件部署
+<blockquote><p>@controlnode_install.sql<br /><strong>内容说明</strong></p></blockquote><ol><li>创建用户
+<ul><li>运维管理系统模式用户：ZOEDEVOPS</li></ul></li><li>创建表对象
+<ul><li>数据库版本管理操作员信息、数据库版本管理子系统字典、数据库变更数据类型字典、数据库角色字典</li><li>数据库变更登记记录、数据库变更数据结构记录、数据库变更字典数据记录、数据库变更关联子系统</li><li>产品信息、产品数据库配置、产品项目数据库配置</li><li>版本发布记录、数据库变更数据字典配置主表、数据库变更数据字典配置细表</li></ul></li></ol></li>
+      <li>控制节点：产品与项目数据库维护
+<ol><li>添加产品
+<ul><li>编辑产品信息表-VER_PRODUCT_INFO
+<blockquote><p>增加“产品ID”:sys_guid
+增加“产品名称”</p></blockquote></li></ul></li><li>添加产品数据库
+<ul><li>前提条件：为需要加入的产品数据库安装“运维管理基础组件”-“数据节点”</li><li>编辑产品数据库配置表-VER_PRODUCT_DB_CONFIG
+<blockquote><p>增加“产品ID”：从VER_PRODUCT_INFO
+增加“产品数据库ID”：从DVP_PROJ_DB_BASIC_INFO</p></blockquote></li></ul></li></ol></li>
+    </ol>
+    <p>
+      <a href="../../index.html">文档主页</a>
+      <a href="../installguide_index.html">上一页</a>
+    </p>
+  </body>
+</html>
