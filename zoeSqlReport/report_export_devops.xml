@@ -1,0 +1,801 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<displays>
+<folder>
+	<name><![CDATA[运维管理]]></name>
+	<tooltip><![CDATA[运维管理]]></tooltip>
+	<description><![CDATA[ ]]></description>
+		<folder>
+		<name><![CDATA[基本信息维护]]></name>
+		<tooltip><![CDATA[基本信息维护]]></tooltip>
+		<description><![CDATA[ ]]></description>
+			<display id="e1c86bb2-0166-1000-8001-c0a889019ae5" type="" style="Table" enable="true">
+			<name><![CDATA[省市代码查询]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT *  
+FROM ZOEDEVOPS.DVP_PROVINCE$
+WHERE PROVINCE_NAME LIKE '%' || :P_PROVINCE_NAME || '%'
+ORDER BY PROVINCE_CODE]]></sql>
+				<binds>
+					<bind id="P_PROVINCE_NAME">
+						<prompt><![CDATA[P_PROVINCE_NAME]]></prompt>
+						<tooltip><![CDATA[P_PROVINCE_NAME]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+				<pdf version="VERSION_1_7" compression="CONTENT">
+					<docproperty title="null" author="null" subject="null" keywords="null" />
+					<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+					<column>
+						<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+						<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+						<blob blob="NONE" zip="false" />
+					</column>
+					<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+					<header enable="false" generatedate="false">
+						<data>
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+						
+						
+						null																																																																																																																																																																																																																																								</data>
+					</header>
+					<footer enable="false" generatedate="false">
+						<data value="null" />
+					</footer>
+					<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+				</pdf>
+		</display>
+		<display id="77654e3f-016b-1000-8003-c0a8890128be" type="" style="Table" enable="true">
+			<name><![CDATA[数据库部署类型查询]]></name>
+			<description><![CDATA[数据库部署类型，用于判断数据库部署为测试库，正式库等]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT * FROM ZOEDEVOPS.DVP_DB_DEPLOY_TYPE$]]></sql>
+			</query>
+				<pdf version="VERSION_1_7" compression="CONTENT">
+					<docproperty title="null" author="null" subject="null" keywords="null" />
+					<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+					<column>
+						<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+						<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+						<blob blob="NONE" zip="false" />
+					</column>
+					<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+					<header enable="false" generatedate="false">
+						<data>
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						null																																																																														</data>
+					</header>
+					<footer enable="false" generatedate="false">
+						<data value="null" />
+					</footer>
+					<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+				</pdf>
+		</display>
+		<display id="77a23d3f-016b-1000-8008-c0a8890128be" type="" style="Table" enable="true">
+			<name><![CDATA[项目基本信息查询]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[with project_info as 
+(SELECT PROJECT_ID, (select province_name from ZOEDEVOPS.dvp_province$ where province_code=a.province_code#) province_name,
+     (select province_name from ZOEDEVOPS.dvp_province$ where province_code=a.city_code#) city_name, project_name
+FROM ZOEDEVOPS.DVP_PROJ_BASIC_INFO a
+order by province_name,city_name,project_name)
+select * from project_info
+where project_name like '%' || :project_name || '%']]></sql>
+				<binds>
+					<bind id="project_name">
+						<prompt><![CDATA[project_name]]></prompt>
+						<tooltip><![CDATA[project_name]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+				<pdf version="VERSION_1_7" compression="CONTENT">
+					<docproperty title="null" author="null" subject="null" keywords="null" />
+					<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+					<column>
+						<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+						<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+						<blob blob="NONE" zip="false" />
+					</column>
+					<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+					<header enable="false" generatedate="false">
+						<data>
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						null																																																																														</data>
+					</header>
+					<footer enable="false" generatedate="false">
+						<data value="null" />
+					</footer>
+					<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+				</pdf>
+		</display>
+		<display id="77c9c840-016b-1000-800a-c0a8890128be" type="" style="Table" enable="true">
+			<name><![CDATA[项目数据库信息查询]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[with db_info as
+(select (select project_name from ZOEDEVOPS.DVP_PROJ_BASIC_INFO where project_id=a.project_id#) project_name,
+    db_id,db_name,db_chn_name,
+    server_name,server_ip_address#,port_no,
+    (select role_name from ZOEDEVOPS.ver_db_role$ where ROLE_ID=a.db_ROLE_ID#) role_name,
+    (select type_name from ZOEDEVOPS.DVP_DB_DEPLOY_TYPE$ WHERE TYPE_ID=a.DB_DEPLOY_TYPE_ID#) deploy_type_name,
+    a.db_initial_version,a.db_created_time,a.db_product,a.db_version
+from ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO a)
+select * from db_info
+where project_name like '%' || :project_name || '%']]></sql>
+				<binds>
+					<bind id="project_name">
+						<prompt><![CDATA[project_name]]></prompt>
+						<tooltip><![CDATA[project_name]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+				<pdf version="VERSION_1_7" compression="CONTENT">
+					<docproperty title="null" author="null" subject="null" keywords="null" />
+					<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+					<column>
+						<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+						<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+						<blob blob="NONE" zip="false" />
+					</column>
+					<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+					<header enable="false" generatedate="false">
+						<data>
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						null																																																																														</data>
+					</header>
+					<footer enable="false" generatedate="false">
+						<data value="null" />
+					</footer>
+					<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+				</pdf>
+		</display>
+		<display id="77d62122-016b-1000-800c-c0a8890128be" type="" style="Table" enable="true">
+			<name><![CDATA[项目服务器信息查询]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[WITH SERVER_INFO AS
+(SELECT (select project_name from ZOEDEVOPS.DVP_PROJ_BASIC_INFO where project_id=a.project_id#) project_name ,
+ server_ip_address,server_name,server_chn_name,os_name,a.os_version
+FROM ZOEDEVOPS.DVP_PROJ_SERVER_BASIC_INFO a )
+SELECT * FROM SERVER_INFO
+where project_name like '%' || :project_name || '%'
+order by project_name]]></sql>
+				<binds>
+					<bind id="project_name">
+						<prompt><![CDATA[project_name]]></prompt>
+						<tooltip><![CDATA[project_name]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+				<pdf version="VERSION_1_7" compression="CONTENT">
+					<docproperty title="null" author="null" subject="null" keywords="null" />
+					<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+					<column>
+						<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+						<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+						<blob blob="NONE" zip="false" />
+					</column>
+					<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+					<header enable="false" generatedate="false">
+						<data>
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						null																																																																														</data>
+					</header>
+					<footer enable="false" generatedate="false">
+						<data value="null" />
+					</footer>
+					<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+				</pdf>
+		</display>
+		<display id="77d9910e-016b-1000-800d-c0a8890128be" type="" style="Table" enable="true">
+			<name><![CDATA[项目用户信息]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[WITH USER_INFO AS
+(SELECT (select project_name from ZOEDEVOPS.DVP_PROJ_BASIC_INFO where project_id=a.project_id#) project_name ,
+ USER_ID,USER_NAME,ACCOUNT_STATUS
+FROM ZOEDEVOPS.DVP_USER_BASIC_INFO a )
+SELECT * FROM USER_INFO
+where project_name like '%' || :project_name || '%'
+order by project_name]]></sql>
+				<binds>
+					<bind id="project_name">
+						<prompt><![CDATA[project_name]]></prompt>
+						<tooltip><![CDATA[project_name]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+				<pdf version="VERSION_1_7" compression="CONTENT">
+					<docproperty title="null" author="null" subject="null" keywords="null" />
+					<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+					<column>
+						<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+						<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+						<blob blob="NONE" zip="false" />
+					</column>
+					<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+					<header enable="false" generatedate="false">
+						<data>
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						null																																																																														</data>
+					</header>
+					<footer enable="false" generatedate="false">
+						<data value="null" />
+					</footer>
+					<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+				</pdf>
+		</display>
+		<display id="77dfc0d7-016b-1000-800e-c0a8890128be" type="" style="Table" enable="true">
+			<name><![CDATA[项目合同信息]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[WITH CONTRACT_INFO AS
+(SELECT (select project_name from ZOEDEVOPS.DVP_PROJ_BASIC_INFO where project_id=a.project_id#) project_name ,
+ CONTRACT_ID,CONTRACT_NAME,CONTRACT_TYPE,a.signing_date,a.signer,
+ a.db_service_amount,a.service_begin_date,a.service_end_date,a.service_content
+FROM ZOEDEVOPS.DVP_PROJ_CONTRACT_BASIC_INFO a )
+SELECT * FROM CONTRACT_INFO
+where project_name like '%' || :project_name || '%'
+order by project_name]]></sql>
+				<binds>
+					<bind id="project_name">
+						<prompt><![CDATA[project_name]]></prompt>
+						<tooltip><![CDATA[project_name]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+				<pdf version="VERSION_1_7" compression="CONTENT">
+					<docproperty title="null" author="null" subject="null" keywords="null" />
+					<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+					<column>
+						<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+						<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+						<blob blob="NONE" zip="false" />
+					</column>
+					<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+					<header enable="false" generatedate="false">
+						<data>
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						null																																																																														</data>
+					</header>
+					<footer enable="false" generatedate="false">
+						<data value="null" />
+					</footer>
+					<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+				</pdf>
+		</display>
+		<display id="77eae92d-016b-1000-800f-c0a8890128be" type="" style="Table" enable="true">
+			<name><![CDATA[项目合同回款记录]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[WITH CONTRACT_PAYBACK_INFO AS
+(SELECT (select project_name from ZOEDEVOPS.DVP_PROJ_BASIC_INFO where project_id=a.project_id#) project_name ,
+    (select CONTRACT_NAME from ZOEDEVOPS.DVP_PROJ_CONTRACT_BASIC_INFO where CONTRACT_ID=a.CONTRACT_ID#) CONTRACT_NAME , 
+    payback_no,contract_payback_date,payback_dept,payback_owner,payback_amount,
+    payback_condition,a.mark_invioce_flag,a.payback_date
+FROM ZOEDEVOPS.DVP_PROJ_CONTRACT_PAYBACK a )
+SELECT * FROM CONTRACT_PAYBACK_INFO
+where project_name like '%' || :project_name || '%'
+order by project_name,CONTRACT_NAME,payback_no]]></sql>
+				<binds>
+					<bind id="project_name">
+						<prompt><![CDATA[project_name]]></prompt>
+						<tooltip><![CDATA[project_name]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+				<pdf version="VERSION_1_7" compression="CONTENT">
+					<docproperty title="null" author="null" subject="null" keywords="null" />
+					<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+					<column>
+						<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+						<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+						<blob blob="NONE" zip="false" />
+					</column>
+					<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+					<header enable="false" generatedate="false">
+						<data>
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						null																																																																														</data>
+					</header>
+					<footer enable="false" generatedate="false">
+						<data value="null" />
+					</footer>
+					<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+				</pdf>
+		</display>
+		<display id="8c02a259-016b-1000-8003-c0a8890116e3" type="" style="Table" enable="true">
+			<name><![CDATA[项目key]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[with password_key as
+(select (select db_chn_name from ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO where db_id=a.key_id#) db_chn_name,
+    key_type,key_value
+    from zoedevops.DVP_PROJECT_SECRET_KEY a
+)
+select db_chn_name,key_type,substr(key_value,1,16),substr(key_value,17,16) from password_key
+where db_chn_name like '%' || :db_chn_name || '%']]></sql>
+				<binds>
+					<bind id="db_chn_name">
+						<prompt><![CDATA[db_chn_name]]></prompt>
+						<tooltip><![CDATA[db_chn_name]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+				<pdf version="VERSION_1_7" compression="CONTENT">
+					<docproperty title="null" author="null" subject="null" keywords="null" />
+					<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+					<column>
+						<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+						<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+						<blob blob="NONE" zip="false" />
+					</column>
+					<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+					<header enable="false" generatedate="false">
+						<data>
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						null																																																																		</data>
+					</header>
+					<footer enable="false" generatedate="false">
+						<data value="null" />
+					</footer>
+					<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+				</pdf>
+		</display>
+		<display id="8c188496-016b-1000-8005-c0a8890116e3" type="" style="Table" enable="true">
+			<name><![CDATA[项目管理数据库链路信息]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[with dblink_info as
+(select (select project_name from ZOEDEVOPS.DVP_PROJ_BASIC_INFO where project_id=a.project_id#) project_name,
+    (select db_chn_name from ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO where db_id=a.db_id#) db_chn_name,
+    (select db_name from ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO where db_id=a.db_id#) db_name,
+    db_link_name,connect_to_user
+ from ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS a)
+select * from dblink_info
+where project_name like '%' || :project_name || '%']]></sql>
+				<binds>
+					<bind id="project_name">
+						<prompt><![CDATA[project_name]]></prompt>
+						<tooltip><![CDATA[project_name]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+				<pdf version="VERSION_1_7" compression="CONTENT">
+					<docproperty title="null" author="null" subject="null" keywords="null" />
+					<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+					<column>
+						<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+						<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+						<blob blob="NONE" zip="false" />
+					</column>
+					<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+					<header enable="false" generatedate="false">
+						<data>
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						null																																																																		</data>
+					</header>
+					<footer enable="false" generatedate="false">
+						<data value="null" />
+					</footer>
+					<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+				</pdf>
+		</display>
+	</folder>
+	<folder>
+		<name><![CDATA[管理信息维护]]></name>
+		<tooltip><![CDATA[管理信息维护]]></tooltip>
+		<description><![CDATA[ ]]></description>
+			<display id="8cbf17bb-016b-1000-8007-c0a8890116e3" type="" style="Table" enable="true">
+			<name><![CDATA[数据库用户管理信息]]></name>
+			<description><![CDATA[exec ZOEDEVOPS.ZOEPRC_SET_DEVOPS_CONTEXT('DB_KEY','B82C969F0D4114F40EB3452C5CEC92C2B78A19EB')]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[with dblink_info as
+(select (select project_name from ZOEDEVOPS.DVP_PROJ_BASIC_INFO where project_id=a.project_id#) project_name,
+    (select db_chn_name from ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO where db_id=a.db_id#) db_chn_name,
+    (select db_name from ZOEDEVOPS.DVP_PROJ_DB_BASIC_INFO where db_id=a.db_id#) db_name,
+    username,zoedevops.zoefun_decrypt_user(username,user_password,'5H8EF5GIMEINRXKL') PASSWORD
+ from ZOEDEVOPS.DVP_PROJ_DB_USER_ADMIN_INFO a)
+select * from dblink_info
+where project_name like '%' || :project_name || '%']]></sql>
+				<binds>
+					<bind id="project_name">
+						<prompt><![CDATA[project_name]]></prompt>
+						<tooltip><![CDATA[project_name]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+				<pdf version="VERSION_1_7" compression="CONTENT">
+					<docproperty title="null" author="null" subject="null" keywords="null" />
+					<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+					<column>
+						<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+						<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+						<blob blob="NONE" zip="false" />
+					</column>
+					<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+					<header enable="false" generatedate="false">
+						<data>
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						null																																																																		</data>
+					</header>
+					<footer enable="false" generatedate="false">
+						<data value="null" />
+					</footer>
+					<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+				</pdf>
+		</display>
+	</folder>
+	<folder>
+		<name><![CDATA[数据库版本管理]]></name>
+		<tooltip><![CDATA[数据库版本管理]]></tooltip>
+		<description><![CDATA[ ]]></description>
+			<display id="775c5fe7-016b-1000-8001-c0a8890128be" type="" style="Table" enable="true">
+			<name><![CDATA[数据库角色查询]]></name>
+			<description><![CDATA[数据库角色，用于判断数据库所承载的系统]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT * FROM ZOEDEVOPS.VER_DB_ROLE$]]></sql>
+			</query>
+				<pdf version="VERSION_1_7" compression="CONTENT">
+					<docproperty title="null" author="null" subject="null" keywords="null" />
+					<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+					<column>
+						<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+						<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+						<blob blob="NONE" zip="false" />
+					</column>
+					<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+					<header enable="false" generatedate="false">
+						<data>
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						null																																																																														</data>
+					</header>
+					<footer enable="false" generatedate="false">
+						<data value="null" />
+					</footer>
+					<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+				</pdf>
+		</display>
+		<display id="22f6363e-016c-1000-8001-c0a889011975" type="" style="Table" enable="true">
+			<name><![CDATA[同步管理]]></name>
+			<description><![CDATA[增量同步zoemdb对象
+EXEC ZOEDEVOPS.zoepkg_metadata_sync.increment_sync_all('F03C824215D9A43F1AE9CED251EECD13868A29B6');]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[]]></sql>
+			</query>
+				<pdf version="VERSION_1_7" compression="CONTENT">
+					<docproperty title="null" author="null" subject="null" keywords="null" />
+					<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+					<column>
+						<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+						<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+						<blob blob="NONE" zip="false" />
+					</column>
+					<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+					<header enable="false" generatedate="false">
+						<data>
+						
+						null												</data>
+					</header>
+					<footer enable="false" generatedate="false">
+						<data value="null" />
+					</footer>
+					<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+				</pdf>
+		</display>
+		<display id="2c12ff19-016c-1000-8001-c0a88901ffcf" type="" style="Table" enable="true">
+			<name><![CDATA[产品数据库查询]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT a.product_name, c.db_name,c.db_chn_name,c.db_role_name,c.db_deploy_type_name,b.db_id# as "db_id",b.product_id#
+FROM ZOEDEVOPS.VER_PRODUCT_INFO a , ZOEDEVOPS.VER_PRODUCT_DB_CONFIG b,
+    ZOEDEVOPS.dvp_proj_db_basic_info c
+where a.product_id=b.product_id# and b.db_id#=c.db_id]]></sql>
+			</query>
+				<pdf version="VERSION_1_7" compression="CONTENT">
+					<docproperty title="null" author="null" subject="null" keywords="null" />
+					<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+					<column>
+						<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+						<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+						<blob blob="NONE" zip="false" />
+					</column>
+					<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+					<header enable="false" generatedate="false">
+						<data>
+						null						</data>
+					</header>
+					<footer enable="false" generatedate="false">
+						<data value="null" />
+					</footer>
+					<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+				</pdf>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[项目数据信息]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT  c.db_name,c.db_chn_name,c.db_role_name,c.db_deploy_type_name,a.product_db_id#
+from zoedevops.VER_PRODUCT_PROJECT_CFG a, ZOEDEVOPS.dvp_proj_db_basic_info c
+where a.product_db_id# = :db_id and a.project_db_id# = c.db_id]]></sql>
+					<binds>
+						<bind id="db_id">
+							<prompt><![CDATA[db_id]]></prompt>
+							<tooltip><![CDATA[db_id]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+					<pdf version="VERSION_1_7" compression="CONTENT">
+						<docproperty title="null" author="null" subject="null" keywords="null" />
+						<cell toppadding="2" bottompadding="2" leftpadding="2" rightpadding="2" horizontalalign="LEFT" verticalalign="TOP" wrap="true" />
+						<column>
+							<heading font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="FIRST_PAGE" />
+							<footing font="null" size="10" style="NORMAL" color="-16777216" rowshading="-1" labeling="NONE" />
+							<blob blob="NONE" zip="false" />
+						</column>
+						<table font="null" size="10" style="NORMAL" color="-16777216" userowshading="false" oddrowshading="-1" evenrowshading="-1" showborders="true" spacingbefore="12" spacingafter="12" horizontalalign="LEFT" />
+						<header enable="false" generatedate="false">
+							<data>
+							null							</data>
+						</header>
+						<footer enable="false" generatedate="false">
+							<data value="null" />
+						</footer>
+						<pagesetup papersize="LETTER" orientation="1" measurement="in" margintop="1.0" marginbottom="1.0" marginleft="1.0" marginright="1.0" />
+					</pdf>
+			</display>
+		</display>
+	</folder>
+</folder>
+</displays>
