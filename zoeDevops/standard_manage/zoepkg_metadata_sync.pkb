@@ -355,7 +355,139 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
         RAISE;
   END increment_sync_all;
 
+  PROCEDURE compare_user_struct(in_source_db_id IN VARCHAR2, in_source_username IN VARCHAR2, in_target_db_id IN VARCHAR2, in_target_username IN VARCHAR2)
+  AS
+    -- =======================================
+    -- 局部变量声明
+    -- =======================================
+    lv_source_db_link  VARCHAR2(64);
+    lv_target_db_link  VARCHAR2(64);
+    lv_owner           VARCHAR2(64);
+    lv_table_name      VARCHAR2(64);
+    lv_column_name     VARCHAR2(64);
+    lv_data_type       VARCHAR2(64);
+    ln_data_length     NUMBER;
+    lv_nullable        VARCHAR2(1);
+    lv_char_used       VARCHAR2(1);
+    lv_sql             VARCHAR2(2000);
+    lv_change_sql      VARCHAR2(2000);
+    lv_remode_sql      VARCHAR2(4000);
+    lv_remode_exec     VARCHAR2(2000);
+    lv_table_sql       VARCHAR2(4000);
+   lc_ref_cursor SYS_REFCURSOR;
+    ln_count NUMBER;
+    ln_rows  NUMBER;
+  BEGIN
+    SELECT DB_LINK_NAME INTO lv_source_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE DB_ID#=in_source_db_id;
+    SELECT DB_LINK_NAME INTO lv_target_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE DB_ID#=in_target_db_id;
+--  处理源数据库新增表
+    lv_sql := 'select a.owner, a.table_name ';
+    lv_sql := lv_sql || ' from dba_tables@'||lv_source_db_link||' a';
+    lv_sql := lv_sql || ' where not exists ';
+    lv_sql := lv_sql || ' (select 1 from dba_tables@'||lv_target_db_link||' b';
+    lv_sql := lv_sql || ' where b.owner=UPPER('''||in_target_username||''')';
+    lv_sql := lv_sql || ' and a.table_name=b.table_name)';
+    lv_sql := lv_sql || ' and a.owner=UPPER('''||in_source_username||''')';
+    lv_sql := lv_sql || ' and a.table_name not like ''BIN$%''';
+    OPEN lc_ref_cursor FOR lv_sql;
+    ln_count:=0;
+    lv_remode_exec :='BEGIN ZOEDEVOPS.ZOEPRC_EXEC_SQL@'||lv_source_db_link||'(:1, :2); END;';
+    lv_remode_sql := 'CREATE TABLE ZOEDEVOPS.ZOERPCEXEC_TEMPTABLE (OWNER VARCHAR2(64),TABLE_NAME VARCHAR2(64),TABLE_DDL VARCHAR2(4000))';
+    EXECUTE IMMEDIATE lv_remode_exec using IN lv_remode_sql,OUT ln_rows;
+    LOOP
+        FETCH lc_ref_cursor INTO lv_owner, lv_table_name;
+        EXIT WHEN lc_ref_cursor%NOTFOUND;
+        ln_count:=ln_count+1; 
+        lv_remode_sql := 'DECLARE';
+        lv_remode_sql := lv_remode_sql || ' lv_sql VARCHAR2(4000);';
+        lv_remode_sql := lv_remode_sql || ' BEGIN';
+        lv_remode_sql := lv_remode_sql || ' SELECT DBMS_METADATA.GET_DDL(''TABLE'','''||lv_table_name||''','''||lv_owner||''')';
+        lv_remode_sql := lv_remode_sql || ' INTO lv_sql';
+        lv_remode_sql := lv_remode_sql || ' FROM DUAL;';
+        lv_remode_sql := lv_remode_sql || ' lv_sql := SUBSTR(lv_sql,1,INSTR(lv_sql,''USING INDEX'',1)+11);';
+        lv_remode_sql := lv_remode_sql || ' INSERT INTO ZOEDEVOPS.ZOERPCEXEC_TEMPTABLE (OWNER,TABLE_NAME,TABLE_DDL) VALUES ('''||lv_owner||''','''||lv_table_name||''',lv_sql);';
+        lv_remode_sql := lv_remode_sql || ' COMMIT;';
+        lv_remode_sql := lv_remode_sql || ' END;';
+        EXECUTE IMMEDIATE lv_remode_exec using IN lv_remode_sql,OUT ln_rows;
+        lv_remode_sql := 'SELECT TABLE_DDL FROM ZOEDEVOPS.ZOERPCEXEC_TEMPTABLE@'||lv_source_db_link;
+        lv_remode_sql := lv_remode_sql || ' WHERE OWNER='''||lv_owner||''' AND TABLE_NAME='''||lv_table_name||'''';
+        EXECUTE IMMEDIATE lv_remode_sql INTO lv_table_sql;
+        DBMS_OUTPUT.PUT_LINE(lv_table_sql);
+    END LOOP;
+        lv_remode_sql := 'DROP TABLE ZOEDEVOPS.ZOERPCEXEC_TEMPTABLE PURGE';
+        EXECUTE IMMEDIATE lv_remode_exec using IN lv_remode_sql,OUT ln_rows;
+     DBMS_OUTPUT.PUT_LINE(ln_count);
+--  处理源表增加的列
+    lv_sql := 'select a.owner, a.table_name, a.column_name,a.data_type,a.data_length,a.nullable,char_used ';
+    lv_sql := lv_sql || ' from dba_tab_columns@'||lv_source_db_link||' a, dba_tables@'||lv_target_db_link||' c';
+    lv_sql := lv_sql || ' where not exists ';
+    lv_sql := lv_sql || ' (select 1 from dba_tab_columns@'||lv_target_db_link||' b';
+    lv_sql := lv_sql || ' where b.owner=UPPER('''||in_target_username||''')';
+    lv_sql := lv_sql || ' and a.table_name=b.table_name';
+    lv_sql := lv_sql || ' and a.column_name=b.column_name)';
+    lv_sql := lv_sql || ' and a.owner=UPPER('''||in_source_username||''')';
+    lv_sql := lv_sql || ' and c.owner=UPPER('''||in_target_username||''')';
+    lv_sql := lv_sql || ' and a.table_name not like ''BIN$%''';
+    lv_sql := lv_sql || ' and a.table_name = c.table_name';
+    OPEN lc_ref_cursor FOR lv_sql;
+    ln_count:=0;
+    LOOP
+        FETCH lc_ref_cursor INTO lv_owner, lv_table_name, lv_column_name,lv_data_type,ln_data_length,lv_nullable,lv_char_used;
+        EXIT WHEN lc_ref_cursor%NOTFOUND;
+        ln_count:=ln_count+1; 
+        IF lv_char_used = 'C' THEN
+            lv_change_sql := 'ALTER TABLE '||in_target_username||'.'||lv_table_name;
+            lv_change_sql := lv_change_sql || ' ADD ('||lv_column_name||' '||lv_data_type||'('||ln_data_length||' CHAR));';
+        ELSIF lv_data_type = 'DATE' OR lv_data_type = 'BLOB' OR lv_data_type = 'CLOB' THEN
+            lv_change_sql := 'ALTER TABLE '||in_target_username||'.'||lv_table_name;
+            lv_change_sql := lv_change_sql || ' ADD ('||lv_column_name||' '||lv_data_type||');';
+        ELSE
+            lv_change_sql := 'ALTER TABLE '||in_target_username||'.'||lv_table_name;
+            lv_change_sql := lv_change_sql || ' ADD ('||lv_column_name||' '||lv_data_type||'('||ln_data_length||'));';
+        END IF;
+        DBMS_OUTPUT.PUT_LINE(lv_change_sql);
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE(ln_count);
+--  处理源表修改的列
+    lv_sql := 'select a.owner, a.table_name, a.column_name,a.data_type,a.data_length,a.nullable,char_used  ';
+    lv_sql := lv_sql || ' from dba_tab_columns@'||lv_source_db_link||' a ';
+    lv_sql := lv_sql || ' where exists ';
+    lv_sql := lv_sql || ' (select 1 from dba_tab_columns@'||lv_target_db_link||' b';
+    lv_sql := lv_sql || ' where b.owner=UPPER('''||in_target_username||''')';
+    lv_sql := lv_sql || ' and a.table_name=b.table_name';
+    lv_sql := lv_sql || ' and a.column_name=b.column_name';
+    lv_sql := lv_sql || ' and (a.data_type<>a.data_type';
+    lv_sql := lv_sql || ' or a.data_length<>a.data_length';
+    lv_sql := lv_sql || ' or a.nullable<>b.nullable))';
+    lv_sql := lv_sql || ' and a.owner=UPPER('''||in_source_username||''')';
+    lv_sql := lv_sql || ' and a.table_name not like ''BIN$%''';
+    OPEN lc_ref_cursor FOR lv_sql;
+    ln_count:=0;
+    LOOP
+        FETCH lc_ref_cursor INTO lv_owner, lv_table_name, lv_column_name,lv_data_type,ln_data_length,lv_nullable,lv_char_used;
+        EXIT WHEN lc_ref_cursor%NOTFOUND;
+        ln_count:=ln_count+1;
+        IF lv_char_used = 'C' THEN
+            lv_change_sql := 'ALTER TABLE '||in_target_username||'.'||lv_table_name;
+            lv_change_sql := lv_change_sql || ' MODIFY ('||lv_column_name||' '||lv_data_type||'('||ln_data_length||' CHAR));';
+        ELSIF lv_data_type = 'DATE' OR lv_data_type = 'BLOB' OR lv_data_type = 'CLOB' THEN
+            lv_change_sql := 'ALTER TABLE '||in_target_username||'.'||lv_table_name;
+            lv_change_sql := lv_change_sql || ' MODIFY ('||lv_column_name||' '||lv_data_type||');';
+        ELSE
+            lv_change_sql := 'ALTER TABLE '||in_target_username||'.'||lv_table_name;
+            lv_change_sql := lv_change_sql || ' MODIFY ('||lv_column_name||' '||lv_data_type||'('||ln_data_length||'));';
+        END IF;
+        DBMS_OUTPUT.PUT_LINE(lv_change_sql);
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE(ln_count);
+  EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        DBMS_OUTPUT.PUT_LINE(SQLERRM);
+        RAISE;
+  END compare_user_struct;
 
+    
 
   END zoepkg_metadata_sync;
 /
