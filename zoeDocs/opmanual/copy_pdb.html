@@ -1,0 +1,37 @@
+<!DOCTYPE html []>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="MarkdownViewer++" />
+    <title>oracle_rac_cdp_switch.txt</title>
+    <style type="text/css">
+            
+/* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
+td, h1, h2, h3, h4, h5, p, ul, ol, li {
+    page-break-inside: avoid; 
+}
+
+        </style>
+  </head>
+  <body>
+    <link href="../zoe_docs.css" rel="stylesheet" type="text/css" />
+    <p>
+      <a href="../index.html">文档主页</a>
+    </p>
+    <h3 id="oracle-12c-pdb">Oracle 12C 克隆pdb操作手册</h3>
+    <blockquote>
+      <p>Linux平台</p>
+    </blockquote>
+    <ol>
+      <li>在源端创建用户并授权
+<ul><li>create user c##zoedba identified by "zoe$worldhello";</li><li>GRANT CREATE SESSION, CREATE PLUGGABLE DATABASE TO c##zoedba CONTAINER=ALL;</li></ul></li>
+      <li>目标端
+<ul><li>创建dblink：create database link pzyycdb50 connect to c##zoedba identified by "zoe$worldhello" using '172.30.8.50/pzyycdb';</li><li>查询db_create_file_dest是否为空：如果这个参数是空值，需要克隆pdb时，需要使用file_name_convert进行文件名转换。如果非空或使用OMF进行文件管理，那数据文件自动命名，可省去file_name_convert参数。</li><li>在目标端使用dblink传数据：create pluggable database mdbtest from pzyymdb@pzyycdb50 file_name_convert=('pzyymdb','mdbtest');</li><li>使用拔插方法创建pdb
+<ul><li>在源端克隆pdb：create pluggable database mdbtest from file_name_convert=('pzyymdb','mdbtest');</li><li>拔出PDB生成.PDB压缩文件：ALTER PLUGGABLE DATABASE mdbtest UNPLUG INTO '/home/oracle/mdbtest.pdb';</li><li>将PDB压缩文件传输至目标端并使用unzip解压</li><li>drop源克隆pdb：DROP PLUGGABLE DATABASE pzyymdb2 ;</li><li>插入pdb：CREATE PLUGGABLE DATABASE mdbtest USING '/home/oracle/home/oracle/pzyymdb2.xml'
+NOCOPY SOURCE_FILE_NAME_CONVERT=('/oracle/database/PZYYCDB/8CC55AE97D2866C1E05332081EACC7C1/datafile/','/oracle/datatabse/PZYYCDB/mdbtest/datafile/') STORAGE (MAXSIZE 16G);</li></ul></li><li>打开pdb：alter pluggable database mdbtest open;</li><li>保持CDB重启后PDB的状态: alter pluggable database all save state;</li></ul></li>
+    </ol>
+    <p>
+      <a href="../index.html">文档主页</a>
+    </p>
+  </body>
+</html>
