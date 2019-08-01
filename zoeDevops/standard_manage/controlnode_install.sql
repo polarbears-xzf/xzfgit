@@ -23,6 +23,7 @@ SET VERIFY OFF
 -- 创建标准管理相关表
 @@create_table.sql
 -- 创建标准管理相关视图
+--	包含表：ZOESTD.META_USER$ ，
 @@create_view.sql
 
 -- 元数据管理组件

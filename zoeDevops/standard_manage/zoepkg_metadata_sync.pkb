@@ -62,7 +62,7 @@ AS
     lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER''),SYSDATE,';
     lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER''),SYSDATE,USER_ID';
     lv_sql := lv_sql || ' FROM DBA_USERS@'||in_db_link||' A ';
-    lv_sql := lv_sql || ' WHERE NOT EXISTS (SELECT 1 FROM ZOESTD.META_USER$ C WHERE A.USERNAME=C.USERNAME)';
+    lv_sql := lv_sql || ' WHERE NOT EXISTS (SELECT 1 FROM ZOESTD.META_USER$ C WHERE A.USERNAME=C.USERNAME AND C.DB_ID#='''||in_db_id||''')';
     lv_sql := lv_sql || ' ORDER BY CREATED';
 --    DBMS_OUTPUT.PUT_LINE(lv_sql);
     EXECUTE IMMEDIATE lv_sql;
@@ -101,8 +101,11 @@ AS
     lv_sql := lv_sql || ' WHERE A.OWNER=B.USERNAME AND A.OWNER LIKE ''ZOE%'' ';
     lv_sql := lv_sql || ' AND OBJECT_TYPE IN (''TABLE'',''VIEW'',''SEQUENCE'')';
     lv_sql := lv_sql || ' AND B.USERNAME NOT IN (''ZOETMP'')';
+    lv_sql := lv_sql || ' AND B.DB_ID#='''||in_db_id||'''';
     lv_sql := lv_sql || ' AND NOT EXISTS (SELECT 1 FROM ZOESTD.META_OBJ$ Z ,ZOESTD.META_USER$ Y ';
-    lv_sql := lv_sql || ' WHERE A.OBJECT_NAME=Z.OBJ_NAME AND Y.USERNAME=A.OWNER AND Z.USER_ID#=Y.USER_ID)';
+    lv_sql := lv_sql || ' WHERE A.OBJECT_NAME=Z.OBJ_NAME AND Y.USERNAME=A.OWNER AND Z.USER_ID#=Y.USER_ID';
+    lv_sql := lv_sql || ' AND Z.DB_ID#='''||in_db_id||'''';
+    lv_sql := lv_sql || ' AND Y.DB_ID#='''||in_db_id||''')';
     lv_sql := lv_sql || ' ORDER BY TIMESTAMP';
 --    DBMS_OUTPUT.PUT_LINE(lv_sql);
     EXECUTE IMMEDIATE lv_sql;
@@ -137,8 +140,10 @@ AS
     lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER''),SYSDATE';
     lv_sql := lv_sql || ' FROM ZOESTD.META_OBJ$ A ';
     lv_sql := lv_sql || ' WHERE OBJ_TYPE_ID#=1 ';
+    lv_sql := lv_sql || ' AND A.DB_ID#='''||in_db_id||'''';
     lv_sql := lv_sql || ' AND NOT EXISTS (SELECT 1 FROM ZOESTD.META_TAB$ Z ';
-    lv_sql := lv_sql || ' WHERE A.USER_ID#=Z.USER_ID# AND A.OBJ_NAME=Z.TAB_NAME )';
+    lv_sql := lv_sql || ' WHERE A.USER_ID#=Z.USER_ID# AND A.OBJ_NAME=Z.TAB_NAME ';
+    lv_sql := lv_sql || ' AND Z.DB_ID#='''||in_db_id||''')';
 --    DBMS_OUTPUT.PUT_LINE(lv_sql);
     EXECUTE IMMEDIATE lv_sql;
     COMMIT;
@@ -172,10 +177,11 @@ AS
     EXECUTE IMMEDIATE lv_sql;
     COMMIT;
     --同步新增列
-    SELECT MAX(MODIFIED_TIME) INTO ld_last_modified_time FROM ZOESTD.meta_col$;
+    SELECT MAX(MODIFIED_TIME) INTO ld_last_modified_time FROM ZOESTD.meta_col$ WHERE db_id#=in_db_id;
     lv_sql := 'select b.obj_id#,c.owner,c.object_name from zoestd.meta_user$ a, zoestd.meta_tab$ b,dba_objects@'||in_db_link||' c';
     lv_sql := lv_sql || ' where c.last_ddl_time >= TO_DATE('''||to_char(ld_last_modified_time,'YYYY-MM-DD')||''',''YYYY-MM-DD'')';
     lv_sql := lv_sql || ' and a.user_id=b.user_id# and a.username=c.owner and b.tab_name=c.object_name';
+    lv_sql := lv_sql || ' and a.db_id#='''||in_db_id||''' and b.db_id#='''||in_db_id||'''';
     OPEN lc_ref_cursor FOR lv_sql;
     LOOP 
         FETCH lc_ref_cursor INTO lv_obj_id,lv_username,lv_table_name; 
@@ -253,14 +259,15 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
     lv_sql := lv_sql || ' FROM DBA_USERS@'||lv_db_link||' A ';
     lv_sql := lv_sql || ' ORDER BY CREATED';
 --    DBMS_OUTPUT.PUT_LINE(lv_sql);
-    EXECUTE IMMEDIATE lv_sql;
+    --EXECUTE IMMEDIATE lv_sql;
     COMMIT;
 --  初始化META_OBJ$，从DBA_TABLES。排除Oracle用户，依据ZOEDEVOPS.ZOEPKG_UTILITY.GET_ORACLE_USER
     lv_sql := 'INSERT INTO ZOESTD.META_OBJ$';
     lv_sql := lv_sql || ' (DB_ID#,OBJ_ID,DB_OBJ_ID#,USER_ID#,OBJ_NAME,OBJ_TYPE_ID#,';
     lv_sql := lv_sql || ' CREATOR,CREATED_TIME,MODIFIER,MODIFIED_TIME)';
     lv_sql := lv_sql || ' SELECT '''||in_db_id||''', SYS_GUID(), OBJECT_ID,';
-    lv_sql := lv_sql || ' (SELECT USER_ID FROM ZOESTD.META_USER$ u WHERE u.USERNAME=o.OWNER) AS USER#,OBJECT_NAME,';
+    lv_sql := lv_sql || ' (SELECT USER_ID FROM ZOESTD.META_USER$ u WHERE u.USERNAME=o.OWNER AND u.DB_ID#='''||in_db_id||''') AS USER#,';
+    lv_sql := lv_sql || ' OBJECT_NAME,';
     lv_sql := lv_sql || ' DECODE(OBJECT_TYPE,''TABLE'',''1'',''VIEW'',''2'',''SEQUENCE'',3,NULL) AS OBJECT_TYPE#,'; 
     lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER'') AS CREATOR,SYSDATE,';
     lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER''),SYSDATE';
@@ -269,7 +276,7 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
     lv_sql := lv_sql || ' ( SELECT COLUMN_VALUE FROM TABLE(ZOEDEVOPS.ZOEPKG_UTILITY.GET_ORACLE_USER))';
     lv_sql := lv_sql || ' AND OBJECT_TYPE IN (''TABLE'',''VIEW'',''SEQUENCE'')';
 --    DBMS_OUTPUT.PUT_LINE(lv_sql);
-    EXECUTE IMMEDIATE lv_sql;
+--    EXECUTE IMMEDIATE lv_sql;
     COMMIT;
 --  初始化META_TAB$，从META_OBJ$视图
     lv_sql := 'INSERT INTO ZOESTD.META_TAB$';
@@ -289,14 +296,16 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
     lv_sql := lv_sql || ' 0,LENGTH(tm.COMMENTS)+1,INSTR(tm.COMMENTS,''#|'')+2),LENGTH(tm.COMMENTS)) AS MEMO';
     lv_sql := lv_sql || ' FROM ZOESTD.META_OBJ$ o , ZOESTD.META_USER$ u , DBA_TAB_COMMENTS@'||lv_db_link||' tm';
     lv_sql := lv_sql || ' WHERE o.OBJ_TYPE_ID#  =1';
-    lv_sql := lv_sql || ' AND o.USER_ID#      =u.USER_ID';
+    lv_sql := lv_sql || ' AND o.USER_ID# = u.USER_ID';
+    lv_sql := lv_sql || ' AND o.DB_ID# ='''||in_db_id||'''';
+    lv_sql := lv_sql || ' AND u.DB_ID# ='''||in_db_id||'''';
     lv_sql := lv_sql || ' AND tm.OWNER     =u.USERNAME';
     lv_sql := lv_sql || ' AND tm.TABLE_NAME=o.OBJ_NAME';
 --    DBMS_OUTPUT.PUT_LINE(lv_sql);
     EXECUTE IMMEDIATE lv_sql;
     COMMIT;
 --  初始化META_COL$，从META_TAB$，DBA_TAB_COLS视图
-    FOR c1 IN (SELECT u.USERNAME, t.TAB_NAME, t.OBJ_ID# FROM ZOESTD.META_TAB$ t, ZOESTD.META_USER$ u WHERE t.USER_ID# = u.USER_ID)
+    FOR c1 IN (SELECT u.USERNAME, t.TAB_NAME, t.OBJ_ID# FROM ZOESTD.META_TAB$ t, ZOESTD.META_USER$ u WHERE t.USER_ID# = u.USER_ID AND u.DB_ID#=in_db_id)
     LOOP
         lv_sql := 'INSERT INTO ZOESTD.META_COL$(';
         lv_sql := lv_sql || ' DB_ID#,OBJ_ID#,COL_ID,COL_NAME,COL_CHN_NAME,';
@@ -412,11 +421,18 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
         lv_remode_sql := 'SELECT TABLE_DDL FROM ZOEDEVOPS.ZOERPCEXEC_TEMPTABLE@'||lv_source_db_link;
         lv_remode_sql := lv_remode_sql || ' WHERE OWNER='''||lv_owner||''' AND TABLE_NAME='''||lv_table_name||'''';
         EXECUTE IMMEDIATE lv_remode_sql INTO lv_table_sql;
-        DBMS_OUTPUT.PUT_LINE(lv_table_sql);
+        INSERT INTO ZOESTD.CHK_OBJECT_COMPARE_RECORD 
+            (RECORD_NO,SOURCE_DB_ID#,TARGET_DB_ID#,CHECK_TIME,OBJECT_OWNER,OBJECT_NAME,OBJECT_TYPE,CHECKER,ATTRIBUTE_DATA,SYNC_SQL) 
+            VALUES 
+            (SYS_GUID(),lv_source_db_link,lv_target_db_link,SYSDATE,
+                lv_owner,lv_table_name,'TABLE','ZOEDEVOPS.zoepkg_metadata_sync.compare_user_struct',
+                '{"operation":"add","operation_content":"table"}',lv_table_sql);
+--        DBMS_OUTPUT.PUT_LINE(lv_table_sql);
     END LOOP;
         lv_remode_sql := 'DROP TABLE ZOEDEVOPS.ZOERPCEXEC_TEMPTABLE PURGE';
         EXECUTE IMMEDIATE lv_remode_exec using IN lv_remode_sql,OUT ln_rows;
-     DBMS_OUTPUT.PUT_LINE(ln_count);
+        COMMIT;
+--     DBMS_OUTPUT.PUT_LINE(ln_count);
 --  处理源表增加的列
     lv_sql := 'select a.owner, a.table_name, a.column_name,a.data_type,a.data_length,a.nullable,char_used ';
     lv_sql := lv_sql || ' from dba_tab_columns@'||lv_source_db_link||' a, dba_tables@'||lv_target_db_link||' c';
@@ -445,9 +461,16 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
             lv_change_sql := 'ALTER TABLE '||in_target_username||'.'||lv_table_name;
             lv_change_sql := lv_change_sql || ' ADD ('||lv_column_name||' '||lv_data_type||'('||ln_data_length||'));';
         END IF;
-        DBMS_OUTPUT.PUT_LINE(lv_change_sql);
+        INSERT INTO ZOESTD.CHK_OBJECT_COMPARE_RECORD 
+            (RECORD_NO,SOURCE_DB_ID#,TARGET_DB_ID#,CHECK_TIME,OBJECT_OWNER,OBJECT_NAME,OBJECT_TYPE,CHECKER,ATTRIBUTE_DATA,SYNC_SQL) 
+            VALUES 
+            (SYS_GUID(),lv_source_db_link,lv_target_db_link,SYSDATE,
+                lv_owner,lv_table_name,'TABLE','ZOEDEVOPS.zoepkg_metadata_sync.compare_user_struct',
+                '{"operation":"add","operation_content":"column"}',lv_change_sql);
+--        DBMS_OUTPUT.PUT_LINE(lv_change_sql);
     END LOOP;
-    DBMS_OUTPUT.PUT_LINE(ln_count);
+      COMMIT;
+--    DBMS_OUTPUT.PUT_LINE(ln_count);
 --  处理源表修改的列
     lv_sql := 'select a.owner, a.table_name, a.column_name,a.data_type,a.data_length,a.nullable,char_used  ';
     lv_sql := lv_sql || ' from dba_tab_columns@'||lv_source_db_link||' a ';
@@ -477,9 +500,16 @@ SELECT DB_LINK_NAME INTO lv_db_link FROM ZOEDEVOPS.DVP_PROJ_NODE_DB_LINKS WHERE 
             lv_change_sql := 'ALTER TABLE '||in_target_username||'.'||lv_table_name;
             lv_change_sql := lv_change_sql || ' MODIFY ('||lv_column_name||' '||lv_data_type||'('||ln_data_length||'));';
         END IF;
-        DBMS_OUTPUT.PUT_LINE(lv_change_sql);
+        INSERT INTO ZOESTD.CHK_OBJECT_COMPARE_RECORD 
+            (RECORD_NO,SOURCE_DB_ID#,TARGET_DB_ID#,CHECK_TIME,OBJECT_OWNER,OBJECT_NAME,OBJECT_TYPE,CHECKER,ATTRIBUTE_DATA,SYNC_SQL) 
+            VALUES 
+            (SYS_GUID(),lv_source_db_link,lv_target_db_link,SYSDATE,
+                lv_owner,lv_table_name,'TABLE','ZOEDEVOPS.zoepkg_metadata_sync.compare_user_struct',
+                '{"operation":"add","operation_content":"column"}',lv_change_sql);
+--        DBMS_OUTPUT.PUT_LINE(lv_change_sql);
     END LOOP;
-    DBMS_OUTPUT.PUT_LINE(ln_count);
+        COMMIT;
+--    DBMS_OUTPUT.PUT_LINE(ln_count);
   EXCEPTION
     WHEN OTHERS THEN
         ROLLBACK;

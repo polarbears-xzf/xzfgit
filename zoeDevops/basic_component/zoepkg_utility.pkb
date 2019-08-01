@@ -117,6 +117,8 @@ BEGIN
 	lt_oracle_user(lt_oracle_user.count) := 'GGSYS';
 	lt_oracle_user.extend;
 	lt_oracle_user(lt_oracle_user.count) := 'SYSMAN';
+	lt_oracle_user.extend;
+	lt_oracle_user(lt_oracle_user.count) := 'APEX_180200';
     
 	RETURN lt_oracle_user;
 END GET_ORACLE_USER;
