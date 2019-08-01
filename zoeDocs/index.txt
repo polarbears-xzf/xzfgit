@@ -14,6 +14,7 @@
 4.	[数据泵使用手册](manual/manual_expdp&impdp.html)
 5.	[logminer使用手册](manual/manual_logminer.html)
 6.	[重做日志修改手册](manual/manual_redo_log.html)
+7.	[巡检报告查询手册](manual/checkup_report_query_item.html)
 ###	操作手册
 1.	[运维管理系统](opmanual/opmanual_index.html)
 2.	[Oracle RAC IP切换](opmanual/oracle_rac_switch_ip.html)
