@@ -1,0 +1,13 @@
+<link href="../../zoe_docs.css" rel="stylesheet" type="text/css" />
+
+
+[上一页](../devops_index.html)
+
+###	2019.08.06
+*	功能变更
+	*	![图片](../images/数据库版本管理-2019.08.06.png "数据库版本管理")
+	*	菜单：系统维护-用户密码修改 移动到  基本信息维护
+	*	增加配置文件参数：根据配置文件参数隐藏菜单项
+
+
+[上一页](../devops_index.html)
