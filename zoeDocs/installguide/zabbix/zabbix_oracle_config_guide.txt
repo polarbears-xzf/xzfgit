@@ -3,39 +3,57 @@
 [文档主页](../../index.html)
 [上一页](../zabbix_install_index.html)
 
->	_Created in 2019.08.05 by natsume_  
+>	_Created in 2019.08.06 by natsume_  
 >	_Copyright (c) 20xx, CHINA and/or affiliates._  
  
-##	 服务端和客户端安装好后进入zabbix页面进行监控配置
-####1.	zabbix的ip地址
-	* http://127.0.0.1/zabbix
-	* 用户名admin  密码 zabbix
-####2.	语言配置
-	* 右上角用户标志-->可设置中文界面显示
-	上传windows自带的中文字体宋体到/usr/share/zabbix/assets/fonts目录里
-    rm -f /etc/alternatives/zabbix-web-font
-    ln -s /usr/share/zabbix/assets/fonts/simkai.ttf /etc/alternatives/zabbix-web-font
-    以上步骤是防止图形显示时中文乱码的问题
-####3.	zabbix的菜单结构
-	* 监测：仪表盘，问题，概览，web监测，最新数据，图形，聚合图形，拓扑图，自动发现，服务（主要是查看监控数据、数据图形、发现的问题）
-	* 资产记录：概览，主机（主要是登记服务器硬件信息的）
-	* 报表：系统信息，可用性报表，触发器，Top 100，审计，动作日志，警报
-	* 配置：主机群组，模板，主机，维护，动作，关联项事件，自动发现，服务（主要是配置监控模板、触发器、群组、主机的相关设置都在这里）
-	* 管理：一般,agent代理程序,认证,用户群组,用户,报警媒介类型,脚本,队列(管理zabbix应用的相关设置)
-####4.	监控配置
-	* 配置-->主机-->创建主机-->填写安装过zabbix客户端的主机ip和端口，主机名要和zabbix客户端安装时的主机名一致（这个步骤也可以通过配置里的自动发现和动作去设置自动发现主机的规则来自动创建主机，配置方式可以去查看我的配置信息，看了就懂不难）
-	* 配置-->主机群组-->创建linux群组-->把添加的主机拉到linux群组里,做好分类
-	* 配置-->模板-->创建linux监控模板-->把linux监控模板拉到linux群组里,这样以后再linux群组里的主机都对应linux监控模板
-	* 点开linux监控模板-->点击监控项-->新建监控项
-	* 这里来创建一个监控剩余内存大小的监控:填写监控名称,监控类型,键值,单位,更新间隔,数据保留时间,归属于哪个应用集.(这里的键值是vm.memory.size[available],这个命令用来监控内存剩余大小,可在zabbix服务器上测试zabbix_get -s 192.168.1.144 -k vm.memory.size[available] 是否有监控到数值)
-####5.	配置触发器
-    * 配置-->模板-->linux监控模板-->触发器-->创建触发器
-    * 触发器可以设置一个阈值,当超过这个阈值zabbix就会警报.填入名称,严重程度,表达式(表达式这里我监控的是内存剩余小于20M就告警,{Template OS Linux:vm.memory.size[available].last(0)}<20M 格式是模板名称:键值.最后一条监控到的信息值<20M)
-####6.	配置监控图形
-    * 配置-->模板-->linux监控模板-->图形-->创建图形
-    * 输入图形名称,图形大小,图形类别,选择监控项
-####7.	总结
-    * 到此就配置了一个简单的内存可用大小的监控,其他的配置以此类推,zabbix也提供了很多默认的模板可以供我们参考,提供的模板也很全,改一改就可以用了,基本的监控信息都有,我们可以登录上去看一下各个配置,就知道怎么配置了.
+##	 oracle监控用orabbix插件来进行监控，zabbix自带的没有oracle监控项，需要自行安装设置
+####1.	下载zabbix，安装包找我拿，网上下的orabbix1.2.3在zabbix4.2上用不了，要去下个编译版的重新编译，我这里已经编译好包了。
+####2.	安装jdk1.7或者1.8，安装很简单这里就不说了
+####3.	安装orabbix
+	* mkdir -p /opt/orabbix ，把安装包放到这个目录
+	* unzip orabbix1.2.3.zip
+	* chmod -R a+x orabbix/ 
+	* cd /opt/orabbix/conf/ 
+	* cp config.props.sample config.props 
+	*  vim config.props 配置文件参数如下:连接数据库的信息
+	     ZabbixServerList=zabbixserver
+         zabbixserver.Address=192.168.1.44
+         zabbixserver.Port=10051
+         DatabaseList=test192.168.1.144
+         DatabaseList.MaxWait=100
+         DatabaseList.MaxIdle=1
+         test192.168.1.144.Url=jdbc:oracle:thin:@192.168.1.144:1521/zoepub
+         test192.168.1.144.User=zabbix
+         test192.168.1.144.Password=zabbix_144
+         test192.168.1.144.MaxActive=10
+         test192.168.1.144.MaxWait=100
+         test192.168.1.144.MaxIdle=1
+         test192.168.1.144.QueryListFile=./conf/query.props
+        其中query.props文件是监控脚本，后续有需要增加数据库监控可在这里增加脚本语句。
+####4.	在oracle数据库创建zabbix用户并赋予权限
+	* CREATE     USER     zabbix  
+        IDENTIFIED    BY     zabbix  
+        DEFAULT     TABLESPACE SYSTEM  
+        TEMPORARY     TABLESPACE    TEMP  
+        PROFILE    DEFAULT  ;  
+        GRANT     CONNECT     TO     ZABBIX;  
+        GRANT     RESOURCE    TO     ZABBIX;  
+        GRANT     DBA   TO     ZABBIX;  
+####5.	启动orabbix
+    * cp init.d/orabbix /etc/init.d/ 
+    * /etc/init.d/orabbix start 
+    * chkconfig --add orabbix 
+    * systemctl start orabbix
+    * chkconfig orabbix on
+####6.	开放acl访问控制
+    * exec     dbms_network_acl_admin.create_acl(acl =>    'resolve.xml'   ,description =>    'resolve acl'   , principal =>   'ZABBIX'   , is_grant =>    true   , privilege =>    'resolve'   );  
+    * exec     dbms_network_acl_admin.assign_acl(acl =>    'resolve.xml'   , host =>   '*'   ); 
+    * commit；
+####7.	导入模板
+    * 模版放置在/opt/orabbix/template下，有个Orabbix_export_full.xml 的模板
+    * 打开zabbix网页端-->点击配置--->模板--->导入--->选择xml模板--->完成导入
+####8.	总结
+    * 模板导入完成后就能看到oracle的监控项、触发器、图形等等，可以打开每个配置项去修改，并应用到对应的主机或群组里，相关设置可参考zabbix监控配置。
 
 [文档主页](../../index.html)
 [上一页](../zabbix_install_index.html)
