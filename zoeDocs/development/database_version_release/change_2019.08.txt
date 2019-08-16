@@ -16,6 +16,18 @@
 	*	![图片](../images/数据库版本管理-2019.08.06.png "数据库版本管理")
 	*	菜单：系统维护-用户密码修改 移动到  基本信息维护
 	*	增加配置文件参数：根据配置文件参数隐藏菜单项
+		*	[ZOEVER_CONFIG]  
+			版本管理配置信息：1：只允许选择有配置的数据库信息；9：可以手工输入数据库信息  
+			DATABASE_MONITOR_CONFIG = 9  
+			菜单隐藏设置1：可见；0：不可见  
+			程序版本控制  
+			VERSION_CONCTOL  = 1  
+			数据库运维与监控  
+			DATABASE_MONITOR = 1  
+			基本信息维护  
+			BASE_INFO_CONFIG = 1  
+			系统维护  
+			SYSTEM_CONFIG    = 1  
 
 
 [上一页](../devops_index.html)
