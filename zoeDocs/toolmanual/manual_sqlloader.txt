@@ -4,7 +4,8 @@
 [文档主页](../index.html)
 
 ###	sqlloader使用说明
->	sqlloader用于将文本文件数据加载到Oracle表中
+>	sqlloader用于将文本文件数据加载到Oracle表中  
+>	实例脚本：zoescript/sqlloader
 1.	sqlloader使用方式
 	>	通过sqlldr命令连接数据库，使用.ctl控制文件申明的内容，将文本文件数据加载到Oracle表中
 2.	sqlloader命令

@@ -6,6 +6,7 @@
 ###	[日常运维操作手册](dailymanual/dailymanual_index.html)
 ### [安装指导](installguide/installguide_index.html)
 ###	[软件开发](development/development_index.html)
+###	[故障处理](faultprocess/faultprocess_index.html)
 ###	[FAQ](faq/faq_index.html)
 
 
