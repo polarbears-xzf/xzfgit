@@ -26,8 +26,8 @@ SET VERIFY OFF
 @@controlnode_dvp_db_deploy_type$.sql
 @@controlnode_dvp_db_role$.sql
 	--控制节点公共功能包
-@@controlnode_zoepkg_ops_com.pks
-@@controlnode_zoepkg_ops_com.pkb
+@@controlnode_zoepkg_ops_comm.pks
+@@controlnode_zoepkg_ops_comm.pkb
 	--sqlldr数据加载功能包
 @@zoepkg_sqlldr.pks
 @@zoepkg_sqlldr.pkb

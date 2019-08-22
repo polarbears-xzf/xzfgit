@@ -30,7 +30,7 @@ SET VERIFY OFF
 @@zoepkg_security.pkb
 @@zoefun_encrypt_user.pls
 @@zoefun_decrypt_user.pls
-@@zoepro_set_devops_context.pls
+@@zoeprc_set_devops_context.pls
 	--创建上下文
 @@create_context.sql
 	--加密安全函数

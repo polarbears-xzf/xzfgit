@@ -1,0 +1,83 @@
+1.	获取警告索引中指定时间范围内执行时间大于0.5秒的SQL语句并按语句进行分组计数
+	GET _search
+	{
+	  "size":0,
+	  "query": {
+		"bool":{
+		  "must":[
+			{"match": {"type":"sqlTimeout" }},
+			{"range": {"runTime":{"gte":"0.5" }}},
+					{"range": {"createTime":{"gte":"1565784138000","lte":"1566389106000" }}}
+			]
+		}
+	  },
+	  "aggs":{
+		"group_by_sqlcontent":{
+			"terms": {
+			  "field": "taskHash.keyword",
+			  "size": 10
+			}
+		}
+	  }
+	}
+2.	获取sql索引中指定时间范围内执行时间大于0.5秒的SQL语句并按语句进行分组计数
+	GET /t_log_sql/doc/_search
+	{
+	  "size":0,
+	  "query": {
+		"bool":{
+		  "must":[
+			{"range": {"runTime":{"gte":"500" }}},
+					{"range": {"createTime":{"gte":"1565784138000","lte":"1566389106000" }}}
+			]
+		}
+	  },
+	  "aggs":{
+		"group_by_sqlcontent":{
+			"terms": {
+			  "field": "sqlHash.keyword",
+			  "size": 10
+			}
+		}
+	  }
+	}
+3.	获取sql索引中单个请求最大执行sql数
+	GET /t_log_sql/doc/_search
+	{
+	  "size":0,
+	  "query": {
+		"bool":{
+		  "must":[
+			{"range": {"runTime":{"gte":"500" }}},
+					{"range": {"createTime":{"gte":"1565784138000","lte":"1566389106000" }}}
+			]
+		}
+	  },
+	  "aggs":{
+		"group_by_sqlcontent":{
+			"terms": {
+			  "field": "sqlHash.keyword",
+			  "size": 10
+			}
+		}
+	  }
+	}
+4.	获取req索引中请求平均执行时间
+	GET /t_log_req/doc/_search
+	{
+	  "size":0,
+	  "aggs":{
+		"group_by_request":{
+			"terms": {
+			  "field": "requestId.keyword",
+			},
+			"aggs":{
+				"average_runtime":{
+					"avg":{
+						"field":"runTime"
+					}
+				}
+			},
+			"size":20
+	  }
+	 }
