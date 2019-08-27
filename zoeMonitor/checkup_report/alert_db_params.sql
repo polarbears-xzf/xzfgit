@@ -51,13 +51,8 @@ BEGIN
 */	
 
 	--判断当前连接数是否超过阈值
-	select (LISTAGG('节点'||a.inst_id||',进程数是'||count(a.INST_ID)||',会话数是'||(select count(b.INST_ID)from gv$session b where a.INST_ID = b.inst_id)||'','；') WITHIN GROUP(ORDER BY a.inst_id))into lv_session_status from gv$process a group by a.inst_id;
 	select count(*) into PROCESSES from gv$process;
 	select p.VALUE  into MAX_PROCESSES from v$parameter p where p.NAME = 'processes';
-	select to_char(count(*)) into lv_sessions from gv$session;
-		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE('<td>节点最大连接数：'||MAX_PROCESSES||'，其'||lv_session_status||'。</td>');
-		DBMS_OUTPUT.PUT_LINE('</table> ');
 	IF (0 < MAX_PROCESSES AND MAX_PROCESSES <= 2500 and PROCESSES > 0.8* MAX_PROCESSES)  THEN
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
 		DBMS_OUTPUT.PUT_LINE('当前连接较接近最大连接数,请关注');
@@ -91,12 +86,7 @@ BEGIN
 		DBMS_OUTPUT.PUT_LINE('<td>当前为自动内存管理模式，可分配内存memory_target值为'||MEMORY_TARGET||'G，建议更改为自动共享内存管理模式</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	END IF;	
-	
-	/*IF MEMORY_TARGET > 0 THEN
-		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE(' <td> 当前数据库使用自动内存管理,建议使用手动管理');
-		DBMS_OUTPUT.PUT_LINE('</table> ');	
-*/		
+		
 	--问题1:自动内存管理的情况 
 	IF MEMORY_TARGET = 0 AND PGA_USED_PCT > 2 THEN
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');

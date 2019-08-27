@@ -52,67 +52,54 @@ BEGIN
 	select (LISTAGG(substr(value,10), ' ; ') WITHIN GROUP(ORDER BY value)) into log_archive_dest_n from v$parameter where name not like 'log_archive_dest_s%'   and name like 'log_archive_dest_%' and value like 'location%' or value like 'LOCATION%';
 	IF lv_is_archive = '否' THEN 
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE(' <td> 紧急：数据库未开启归档模式，存在严重安全隐患</td>');
+		DBMS_OUTPUT.PUT_LINE(' <td> 紧急：数据库未开启归档模式，存在严重安全隐患，已开启</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
-			ELSE IF log_archive_dest is not null  THEN 
-				DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-				DBMS_OUTPUT.PUT_LINE('<td>当前归档路径参数使用log_archive_dest，路径为'||log_archive_dest||'</td>');
-				DBMS_OUTPUT.PUT_LINE('</table> ');
-			else if db_recovery_file_dest is not null and log_archive_dest_n is null then
+			ELSE IF log_archive_dest is null  and  db_recovery_file_dest is not null and log_archive_dest_n is null then
 					select round(space_limit/1024/1024,2) into slimit from v$recovery_file_dest;
 					select round(space_used/1024/1024,2) into sused from v$recovery_file_dest;
 					DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-					DBMS_OUTPUT.PUT_LINE('<td>当前归档路径在指定闪回恢复区：'||db_recovery_file_dest||',其大小为'||slimit||'M,已使用'||sused||'M</td>');
+					DBMS_OUTPUT.PUT_LINE('<td>警告：当前归档路径在闪回恢复区,其大小为'||slimit||'M,已使用'||sused||'M</td>');
 					DBMS_OUTPUT.PUT_LINE('</table> ');
-				else if db_recovery_file_dest is not null and log_archive_dest_n is not null then
-						DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-						DBMS_OUTPUT.PUT_LINE('<td>当前归档路径参数使用log_archive_dest_n，路径为'||log_archive_dest_n||'</td>');
-						DBMS_OUTPUT.PUT_LINE('</table> ');
-					else if db_recovery_file_dest is null and log_archive_dest_n is not null then
-							DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-							DBMS_OUTPUT.PUT_LINE('<td>当前归档路径参数使用log_archive_dest_n，路径为'||log_archive_dest_n||'</td>');
-							DBMS_OUTPUT.PUT_LINE('</table> ');
-						else if db_recovery_file_dest is null and log_archive_dest_n is null then
-								DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-								DBMS_OUTPUT.PUT_LINE('<td>当前归档路径在%ORACLE_HOME%\RDBMS</td>');
-								DBMS_OUTPUT.PUT_LINE('</table> ');
-						END IF;
-					END IF;	
-				END IF;	
+			else if log_archive_dest is not null then
+					DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
+					DBMS_OUTPUT.PUT_LINE('<td>警告：当前归档参数使用log_archive_dest</td>');
+					DBMS_OUTPUT.PUT_LINE('</table> ');
 			END IF;
 		END IF;
 	END IF;
-	--实例及数据库状态
-	select LISTAGG('实例：'||instance_name||'；实例状态：'||status||',数据库状态：'||database_status||'','<br />') WITHIN GROUP(ORDER BY inst_id) into lv_dbstatus from gv$instance;
+	--实例及数据库状态（rac环境下判断）
+	IF lv_is_rac = '是' THEN 
+	select LISTAGG('警告：实例：'||instance_name||'；实例状态：'||status||',数据库状态：'||database_status||'','<br />') WITHIN GROUP(ORDER BY inst_id) into lv_dbstatus from gv$instance where status !='OPEN' or database_status!='ACTIVE';
 	    DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>'); 
 		DBMS_OUTPUT.PUT_LINE('<td>'||lv_dbstatus||'</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
+	END IF;
 	--是否有offline状态的表空间
 	select to_char(COUNT(*)) INTO lv_is_offlinetablespace from dba_tablespaces where status!='ONLINE';
 	IF lv_is_offlinetablespace > 0 THEN 
 	select (LISTAGG(tablespace_name,',') WITHIN GROUP(ORDER BY tablespace_name))into lv_tbsname  from dba_tablespaces where status!='ONLINE';
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE('<td>存在offline状态的表空间，请检查'||lv_tbsname||'表空间</td>');
+		DBMS_OUTPUT.PUT_LINE('<td>存在offline状态的表空间，已检查'||lv_tbsname||'表空间</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	END IF;
 	--审计检查
 	select decode(tablespace_name,'SYSTEM','是','否')INTO lv_is_audit from dba_tables where table_name='AUD$';
 	IF lv_is_archive = '是' THEN 
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE(' <td> 审计日志表存放于SYSTEM表空间，尽快调整审计</td>');
+		DBMS_OUTPUT.PUT_LINE(' <td> 审计日志表存放于SYSTEM表空间,按需调整</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	END IF;
 	--密码属性检查
 	select decode(limit,'UNLIMITED','是','否')INTO lv_is_password1 from dba_profiles t where t.resource_name='PASSWORD_LIFE_TIME' and t.profile='DEFAULT';
 	IF lv_is_password1 = '否' THEN 
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE(' <td> 密码参数(PASSWORD_LIFE_TIME)不是无限制，存在密码无效隐患</td>');
+		DBMS_OUTPUT.PUT_LINE(' <td> 密码参数(PASSWORD_LIFE_TIME)不是无限制，存在密码无效隐患，按需调整</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	END IF;
 	select decode(limit,'UNLIMITED','是','否')INTO lv_is_password2 from dba_profiles t where t.resource_name='FAILED_LOGIN_ATTEMPTS' and t.profile='DEFAULT';
 	IF lv_is_password1 = '否' THEN 
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE(' <td> 密码参数(FAILED_LOGIN_ATTEMPTS)不是无限制，存在用户被锁隐患</td>');
+		DBMS_OUTPUT.PUT_LINE(' <td> 密码参数(FAILED_LOGIN_ATTEMPTS)不是无限制，存在用户被锁隐患，按需调整</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	END IF;
 END; 
