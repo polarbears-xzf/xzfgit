@@ -17,7 +17,7 @@
 	--
 
 set markup html off
-prompt  <H3 class='zoecomm'>  <center><a name="#awr_status"></a>性能报告指标</center>  </H3>
+prompt  <H3 class='zoecomm'>  <center><a name="awr_status"></a>性能报告指标</center>  </H3>
 
 declare
 z_beg_snap number(20);

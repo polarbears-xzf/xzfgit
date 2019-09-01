@@ -116,6 +116,7 @@ set markup html on spool on preformat off entmap on -
 			h2.zoecomm     {font:bold 18pt Arial,Helvetica,Geneva,sans-serif;color:#336699;background-color:White;margin-top:4pt; margin-bottom:0pt;} -
 			h3.zoecomm     {font:bold 16pt Arial,Helvetica,Geneva,sans-serif;color:#336699;background-color:White;margin-top:4pt; margin-bottom:0pt;} -
 			li.zoecomm     {font: 8pt Arial,Helvetica,Geneva,sans-serif; color:black; background:White;} -
+			h4.pos_left{position:relative;left:-300px} h4.pos_right{position:relative;left:320px} -
 			th.zoecommnobg {font:bold 8pt Arial,Helvetica,Geneva,sans-serif; color:black; background:White;padding-left:4px; padding-right:4px;padding-bottom:2px} -
 			th.zoecommbg   {font:bold 8pt Arial,Helvetica,Geneva,sans-serif; color:White; background:#0066CC;padding-left:4px; padding-right:4px;padding-bottom:2px} -
 			td.zoecommnc   {font:8pt Arial,Helvetica,Geneva,sans-serif;color:black;background:White;vertical-align:top;} -
@@ -141,16 +142,16 @@ prompt  <center>&porjectName 健康检查报告</center>
 prompt  </H1>
 prompt  <center><hr>Copyright (c) 2018-2020 <a target=""_blank"" href=""http://www.zoesoft.com.cn/"">智业软件股份有限公司</a>. All rights reserved.</center>
 prompt <ul>
-prompt <h4><a  name="#top"></a>目录</h4>
-prompt <li><a  href="#00001">系统综合评价</a></li>
-prompt <li><a  href="#00002">项目基本信息</a></li>
-prompt <li><a  href="#00003">操作系统基本状态信息</a></li>
-prompt <li><a  href="#00004">数据库基本状态信息</a></li>
-prompt <li><a  href="#00005">数据库空间状态信息</a></li>
-prompt <li><a  href="#00006">非默认初始化参数设置</a></li>
-prompt <li><a  href="#00007">表空间使用情况</a></li>
-prompt <li><a  href="#rman_status">RMAN备份情况</a></li>
-prompt <li><a  href="#awr_status">性能报告指标</a></li>
+prompt <h1><center><a  name="top"></a>目录</center></h1>
+prompt <h4 class="pos_right"><li><a  href="#00001">系统综合评价</a></li></h4>
+prompt <h4 class="pos_right"><li><a  href="#00002">项目基本信息</a></li></h4>
+prompt <h4 class="pos_right"><li><a  href="#00003">操作系统基本状态信息</a></li></h4>
+prompt <h4 class="pos_right"><li><a  href="#00004">数据库基本状态信息</a></li></h4>
+prompt <h4 class="pos_right"><li><a  href="#00005">数据库空间状态信息</a></li></h4>
+prompt <h4 class="pos_right"><li><a  href="#00006">非默认初始化参数设置</a></li></h4>
+prompt <h4 class="pos_right"><li><a  href="#00007">表空间使用情况</a></li></h4>
+prompt <h4 class="pos_right"><li><a  href="#rman_status">RMAN备份情况</a></li></h4>
+prompt <h4 class="pos_right"><li><a  href="#awr_status">性能报告指标</a></li></h4>
 prompt </ul>
 
 -- =======================================
@@ -166,7 +167,7 @@ prompt  </center>
 -- =======================================
 -- 系统综合评价
 -- =======================================
-prompt  <H2 class='zoecomm'><center><a name="#00001"></a>系统综合评价 </H2>
+prompt  <H2 class='zoecomm'><center><a name="00001"></a>系统综合评价 </H2>
 -- -- =======================================
 -- 数据库部署违规告警
 -- -- =======================================

@@ -26,7 +26,7 @@
 	--当前热备状态文件数
 	
 set markup html off
-prompt  <H3 class='zoecomm'> <center> <a name="#00004"></a>数据库基本状态信息 </center>  </H3>
+prompt  <H3 class='zoecomm'> <center> <a name="00004"></a>数据库基本状态信息 </center>  </H3>
 set markup html on entmap off
 
 column column1  format A80  heading '状态'

@@ -27,7 +27,7 @@
 set markup html off
 
 
-prompt  <H3 class='zoecomm'>  <center><a name="#00002"></a> 项目基本信息 </center> </H3> <br>
+prompt  <H3 class='zoecomm'>  <center><a name="00002"></a> 项目基本信息 </center> </H3> <br>
 
 --定义巡检系统
 column systemname  NEW_VALUE systemname noprint

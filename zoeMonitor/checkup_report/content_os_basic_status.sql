@@ -42,7 +42,7 @@ prompt  </center>
 
 set markup html off
 
-prompt  <H3 class='zoecomm'>  <center> <a name="#00003"></a>操作系统基本状态信息 </center> </H3> <br>
+prompt  <H3 class='zoecomm'>  <center> <a name="00003"></a>操作系统基本状态信息 </center> </H3> <br>
 
 --操作系统活动cpu个数
 column NUM_CPUS  NEW_VALUE CPUS noprint

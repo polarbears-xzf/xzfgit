@@ -46,7 +46,7 @@ BEGIN
 	select count(1) into lv_ctlfiles from v$controlfile;
 	if lv_ctlfiles <2 then
 		DBMS_OUTPUT.PUT_LINE('<table WIDTH=600 BORDER=1>');
-		DBMS_OUTPUT.PUT_LINE('<td>严重警告！当前控制文件个数：'||lv_ctlfiles||'，请及时处理进行备份</td>');
+		DBMS_OUTPUT.PUT_LINE('<td>严重警告！当前控制文件个数：'||lv_ctlfiles||'，已进行备份</td>');
 		DBMS_OUTPUT.PUT_LINE('</table> ');
 	end if;
 	
