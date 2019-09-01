@@ -19,6 +19,14 @@
 		*	[ZOEVER_CONFIG]  
 			版本管理配置信息：1：只允许选择有配置的数据库信息；9：可以手工输入数据库信息  
 			DATABASE_MONITOR_CONFIG = 9  
+			数据库监控显示0：版本管理；1：数据库服务监控  
+			MONITOR_DATABASE_FLAG = 0  
+			写入被阻塞的记录数  
+			KILL_SESSION_WRITE_RECORDS_NUM = 5  
+			自动刷新标志0：不自动刷新；1：自动刷新  
+			AUTO_RETRIEVE = 1  
+			自动刷新间隔，单位秒  
+			AUTO_RETRIEVE_TIME = 10  
 			菜单隐藏设置1：可见；0：不可见  
 			程序版本控制  
 			VERSION_CONCTOL  = 1  
