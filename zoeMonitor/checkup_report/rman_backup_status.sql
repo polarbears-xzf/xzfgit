@@ -17,7 +17,7 @@
 -- =======================================
 
 set markup html off
-prompt  <H3 class='zoecomm'>  <center><a name="#rman_status"></a>RMAN备份情况(最近10条记录)</center>  </H3>
+prompt  <H3 class='zoecomm'>  <center><a name="rman_status"></a>RMAN备份情况(最近10条记录)</center>  </H3>
 set markup html on entmap off
 
 column column1  format A30  heading '类型'

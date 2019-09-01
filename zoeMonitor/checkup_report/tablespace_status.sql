@@ -17,7 +17,7 @@
 -- =======================================
 
 set markup html off
-prompt  <H3 class='zoecomm'>  <center><a name="#00007"></a>表空间使用情况</center>  </H3>
+prompt  <H3 class='zoecomm'>  <center><a name="00007"></a>表空间使用情况</center>  </H3>
 set markup html on entmap off
 
 column column1  format A80  heading '表空间名'
