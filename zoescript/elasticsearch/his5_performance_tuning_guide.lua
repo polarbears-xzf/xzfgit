@@ -69,6 +69,117 @@
 		}
 
 2.	API总体执行情况分析
+	*	获取req索引根据API分组按次数、总执行时间、平均运行时间、最大运行时间排序。以分析API使用量情况。
+		GET /t_log_req/doc/_search
+		{
+		  "size":0,
+		  "query": {
+		    "bool": {
+			  "must": {
+			    "range": {
+			      "createTime": {
+			        "gte": 1467209600000,
+			        "lt": 1667209600000
+			      }
+			    }
+			  }
+		    }
+		  },
+		  "aggs": {
+			"terms_requestUri": {
+			  "terms": {
+				"field": "requestUri.keyword",
+				"size": 10
+			  },
+			  "aggs": {
+				"terms_ipAndPort": {
+				  "terms": {
+					"field": "ipAndPort.keyword",
+					"size": 10
+				  }, 
+			  "aggs": {
+				"stats_runTime": {
+				  "extended_stats": {
+					"field": "runTime"
+				  }
+				}
+			  }
+				}
+			  }
+			}
+		  }
+		}
+	*	获取req索引指定时间范围直接按服务分组以平均执行时间为降序统计，以分析
+		GET /t_log_req/doc/_search
+		{
+		  "size":0,
+		  "query": {
+		    "bool": {
+			  "must": {
+			    "range": {
+			      "createTime": {
+			        "gte": 1467209600000,
+			        "lt": 1667209600000
+			      }
+			    }
+			  }
+		    }
+		  },
+		  "aggs": {
+			"terms_ipAndPort": {
+			  "terms": {
+				"field": "ipAndPort.keyword",
+				"size": 50
+				, "order": {
+				  "stats_runTime.avg": "desc"
+				}
+			  }, 
+  		  "aggs": {
+    			"stats_runTime": {
+    			  "extended_stats": {
+    				"field": "runTime"
+    			  }
+    			}
+  		  }
+		  }
+		}
+		}
+	*	获取req索引指定时间范围以执行次数为降序按日分组，以分析
+		GET /t_log_req/doc/_search
+		{
+		  "size":0,
+		  "query": {
+		    "bool": {
+			  "must": {
+			    "range": {
+			      "createTime": {
+			        "gte": 1567209600000,
+			        "lt": 1667209600000
+			      }
+			    }
+			  }
+		    }
+		  },
+		  "aggs": {
+			"terms_ipAndPort": {
+			  "terms": {
+				"field": "ipAndPort.keyword",
+				"size": 50
+				, "order": {
+				  "_key": "desc"
+				}
+			  }, 
+  		  "aggs": {
+    			"date_createTime": {
+    			  "date_histogram": {
+    				"field": "createTime",
+    				"interval": "day"
+    			  }
+    			}
+  		  }
+		  }
+		}
+		}
 	*	获取指定某日按执行时间分组以最大执行时间为降序的API统计，以分析不同时间分布消耗时间最高API情况
 		GET /t_log_req/doc/_search
 		{

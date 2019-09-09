@@ -1,0 +1,1022 @@
+<!DOCTYPE html []>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="MarkdownViewer++" />
+    <title>his5_performance_tuning_guide.md</title>
+    <style type="text/css">
+            
+/* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
+td, h1, h2, h3, h4, h5, p, ul, ol, li {
+    page-break-inside: avoid; 
+}
+
+        </style>
+  </head>
+  <body>
+    <link href="../../zoe_docs.css" rel="stylesheet" type="text/css" />
+    <p>
+      <a href="../faultprocess_index.html">上一页</a>
+    </p>
+    <h3 id="his5.0">HIS5.0性能优化指导</h3>
+    <ol>
+      <li>
+        <p>HIS5.0系统架构<br /><img src="../images/HIS5%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84.png" alt="系统架构" /></p>
+      </li>
+      <li>
+        <p>软件基本组件</p>
+        <blockquote>
+          <table>
+            <thead>
+              <tr>
+                <th style="text-align: left;">应用模块</th>
+                <th style="text-align: left;">模块名</th>
+                <th style="text-align: left;">应用模块</th>
+                <th style="text-align: left;">模块名</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="text-align: left;">HIS医生API</td>
+                <td style="text-align: left;">zoe-emr-doctor-service</td>
+                <td style="text-align: left;">HIS护士API</td>
+                <td style="text-align: left;">zoe-emr-nurse-service</td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">HIS收费API</td>
+                <td style="text-align: left;">zoe-split-charge-service</td>
+                <td style="text-align: left;">HIS门诊API</td>
+                <td style="text-align: left;">zoe-emr-outpatient-service</td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">HIS票据API</td>
+                <td style="text-align: left;">zoe-emr-billreport-service</td>
+                <td style="text-align: left;">后台管理前端-票据</td>
+                <td style="text-align: left;">zoe-emr-billreport-web</td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">HIS模板API</td>
+                <td style="text-align: left;">zoe-emr-template-service</td>
+                <td style="text-align: left;">后台管理前端-模板</td>
+                <td style="text-align: left;">zoe-emr-template-web</td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">HIS病案API</td>
+                <td style="text-align: left;">zoe-emr-archive-service</td>
+                <td style="text-align: left;">智能书写提示</td>
+                <td style="text-align: left;">zoe-intellisense-service</td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">报表管理后端服务</td>
+                <td style="text-align: left;">zoe-optimus-report</td>
+                <td style="text-align: left;">报表查看服务</td>
+                <td style="text-align: left;">zoe-optimus-web-report</td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">HIS后端服务</td>
+                <td style="text-align: left;">zoe-optimus-web-api</td>
+                <td style="text-align: left;">后台管理前端服务</td>
+                <td style="text-align: left;">zoehis-web-manage</td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">数据中心后端服务</td>
+                <td style="text-align: left;">zoe-optimus-dc-web</td>
+                <td style="text-align: left;"></td>
+                <td style="text-align: left;"></td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">门户后端服务</td>
+                <td style="text-align: left;">zoe-optimus-web-portal</td>
+                <td style="text-align: left;">门户前端服务</td>
+                <td style="text-align: left;">zoehis-web-portal</td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">数据中心应用后端服务</td>
+                <td style="text-align: left;">zoe-optimus-web-dc-app</td>
+                <td style="text-align: left;">数据中心应用前端服务</td>
+                <td style="text-align: left;">zoehis-web-hip</td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">消息中心管理后端</td>
+                <td style="text-align: left;">zoe-optimus-web-message</td>
+                <td style="text-align: left;">消息应用中心服务</td>
+                <td style="text-align: left;">zoe-optimus-message-app</td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">消息消费者服务</td>
+                <td style="text-align: left;">zoe-optimus-message-consumer-web</td>
+                <td style="text-align: left;">数据加工引擎服务</td>
+                <td style="text-align: left;">zoe-optimus-dc-service-working-engine</td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">数据质量管理平台后端服务</td>
+                <td style="text-align: left;">zoe-optimus-qual-web</td>
+                <td style="text-align: left;">数据质量管理平台前端服务</td>
+                <td style="text-align: left;">zoehis-web-qual</td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">第三方接口</td>
+                <td style="text-align: left;">zoe-optimus-web-adapter</td>
+                <td style="text-align: left;">规则引擎后端服务</td>
+                <td style="text-align: left;">zoe-optimus-rule-web</td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">定时器后端服务</td>
+                <td style="text-align: left;">zoe-optimus-web-quartz</td>
+                <td style="text-align: left;">监控后端服务</td>
+                <td style="text-align: left;">zoe-defensor-monitor</td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">浏览器更新后端服务</td>
+                <td style="text-align: left;">zoe-update-service</td>
+                <td style="text-align: left;">浏览器更新前端服务</td>
+                <td style="text-align: left;">zoe-update-manager</td>
+              </tr>
+              <tr>
+                <td style="text-align: left;">订阅引擎服务</td>
+                <td style="text-align: left;">zoe-optimus-dc-service-subscpt-engine</td>
+                <td style="text-align: left;"></td>
+                <td style="text-align: left;"></td>
+              </tr>
+            </tbody>
+          </table>
+        </blockquote>
+      </li>
+      <li>
+        <p>性能优化指导</p>
+        <ol>
+          <li>总体性能分析
+<ul><li>基本数据情况分析：本次数据采样基于邳州人民医院HIS5系统，系统上线一个月。基本业务指标如下：
+<blockquote><table><thead><tr><th style="text-align: left;">基本指标</th><th style="text-align: right;">指标值</th><th style="text-align: left;">基本指标</th><th style="text-align: right;">指标值</th></tr></thead><tbody><tr><td style="text-align: left;">总数据量</td><td style="text-align: right;">20GB</td><td style="text-align: left;"></td><td style="text-align: right;"></td></tr><tr><td style="text-align: left;">门诊诊病数</td><td style="text-align: right;">2603</td><td style="text-align: left;">在院数</td><td style="text-align: right;">722</td></tr><tr><td style="text-align: left;">门诊费用条目数</td><td style="text-align: right;">17301</td><td style="text-align: left;">住院费用条目</td><td style="text-align: right;">28576</td></tr><tr><td style="text-align: left;">门诊摆药条目数</td><td style="text-align: right;">4047</td><td style="text-align: left;">住院摆药条目数</td><td style="text-align: right;">7760</td></tr></tbody></table></blockquote></li><li>分析业务指标，在以系统数据量20GB，门诊2000，在院500为基准时。操作系统性能指标要求：
+<blockquote><table><thead><tr><th style="text-align: left;">基本指标</th><th style="text-align: right;">指标值</th><th style="text-align: left;">基本指标</th><th style="text-align: right;">指标值</th></tr></thead><tbody><tr><td style="text-align: left;">磁盘iops</td><td style="text-align: right;">200</td><td style="text-align: left;">数据库登录数</td><td style="text-align: right;">3210</td></tr><tr><td style="text-align: left;">磁盘读带宽</td><td style="text-align: right;">10MB/秒</td><td style="text-align: left;">磁盘写带宽</td><td style="text-align: right;">3MB</td></tr><tr><td style="text-align: left;">业务网发送带宽</td><td style="text-align: right;">500KB/秒</td><td style="text-align: left;">业务网接收带宽</td><td style="text-align: right;">300KB/秒</td></tr><tr><td style="text-align: left;">心跳网发送带宽</td><td style="text-align: right;">1MB/秒</td><td style="text-align: left;">心跳网接收带宽</td><td style="text-align: right;">1.5MB/秒</td></tr></tbody></table></blockquote></li><li>应用服务指标分析
+<ul><li>应用服务负载主要集中在收费服务（100万/天），医嘱服务（50万/天），后台公用服务（50万/天），医生服务（10万/天），护士服务（10万/天）。负载数据分布上与业务特性吻合。</li><li>其中收费、医嘱、后台峰值负载分别为3000/分钟、1500/分钟、1500/分钟。平均延时40毫秒、20毫秒、40毫秒。根据负载数据分析，应用服务推荐部署收费4台，医嘱2台，后台2台。</li></ul></li></ul></li>
+          <li>API性能优化分析
+<ul><li>基本情况分析：从平均执行时间、总执行时间、最大执行时间获取最消耗资源以及执行稳定性较差的API。
+<ul><li>数据分析平均执行时间大于1秒的API，且和窗口业务相关的API，根据业务操作频率判断是否需要优化
+<blockquote><table><thead><tr><th style="text-align: left;">Uri</th><th style="text-align: left;">排序方式</th></tr></thead><tbody><tr><td style="text-align: left;">/dict/deduct/deduct/deductAllBill</td><td style="text-align: left;">平均执行时间：3600</td></tr><tr><td style="text-align: left;">/pres/presCtrl/saveChinese</td><td style="text-align: left;">平均执行时间：1991</td></tr><tr><td style="text-align: left;">/dict/settle/settleManage/inpSettle</td><td style="text-align: left;">平均执行时间：1801</td></tr><tr><td style="text-align: left;">/pres/apply/execApplys</td><td style="text-align: left;">平均执行时间：1609</td></tr><tr><td style="text-align: left;">/pres/collate/collatePrescribes</td><td style="text-align: left;">平均执行时间：1480</td></tr><tr><td style="text-align: left;">/charge/convert/inpRate/inpRateConvert</td><td style="text-align: left;">平均执行时间：1044</td></tr><tr><td style="text-align: left;">/pres/presCtrl/saveWesternMedicine</td><td style="text-align: left;">平均执行时间：1037</td></tr><tr><td style="text-align: left;">/dispensing/inp/dispensing/dispensingDrugs</td><td style="text-align: left;">平均执行时间：952</td></tr></tbody></table></blockquote></li><li>数据分析总执行时间TOP 10的API，且和窗口业务相关的API，根据业务量判断执行数是否合理
+<blockquote><table><thead><tr><th style="text-align: left;">Uri</th><th style="text-align: left;">排序方式</th></tr></thead><tbody><tr><td style="text-align: left;">/dict/patient/manager/getAutoPatientInfo</td><td style="text-align: left;">总执行次数：60173</td></tr><tr><td style="text-align: left;">/dict/prescribe/manager/getPendingPatientInfo</td><td style="text-align: left;">总执行次数：215171</td></tr><tr><td style="text-align: left;">/insur/insurManager/insurInterface</td><td style="text-align: left;">总执行次数：42404</td></tr><tr><td style="text-align: left;">/pres/collate/collatePrescribes</td><td style="text-align: left;">总执行次数：1711</td></tr><tr><td style="text-align: left;">/pres/presCtrl/saveWesternMedicine</td><td style="text-align: left;">总执行次数：2205</td></tr><tr><td style="text-align: left;">/pres/presCtrl/save</td><td style="text-align: left;">总执行次数：3567</td></tr><tr><td style="text-align: left;">/dict/drug/getDrugList</td><td style="text-align: left;">总执行次数：40225</td></tr><tr><td style="text-align: left;">/i18n/dictLanguageInfo/findI18nListByClassCode</td><td style="text-align: left;">总执行次数：155056</td></tr><tr><td style="text-align: left;">/dict/settle/settleManage/outpSettle</td><td style="text-align: left;">总执行次数：4732</td></tr><tr><td style="text-align: left;">/pres/apply/execApplys</td><td style="text-align: left;">总执行次数：779</td></tr></tbody></table></blockquote></li><li>数据分析最大执行时间TOP 10的API，且和窗口业务相关的API，根据业务时间要求判断是否需要优化
+<blockquote><table><thead><tr><th style="text-align: left;">Uri</th><th style="text-align: left;">排序方式</th></tr></thead><tbody><tr><td style="text-align: left;">/dict/deduct/deduct/deductAllBill</td><td style="text-align: left;">最大执行时间：61570</td></tr><tr><td style="text-align: left;">/pres/collate/collatePrescribes</td><td style="text-align: left;">最大执行时间：49743</td></tr><tr><td style="text-align: left;">/dispensing/inp/dispensing/layDrugDeductReturnDrug</td><td style="text-align: left;">最大执行时间：13128</td></tr><tr><td style="text-align: left;">/dispensing/inp/dispensing/dispensingDrugsSingle</td><td style="text-align: left;">最大执行时间：10551</td></tr><tr><td style="text-align: left;">/insur/insurManager/insurInterface</td><td style="text-align: left;">最大执行时间：9652</td></tr><tr><td style="text-align: left;">/dict/prescribe/inpDrugPrintRecord/print</td><td style="text-align: left;">最大执行时间：8492</td></tr><tr><td style="text-align: left;">/emr/dataAide/emrDataAide/toImageList</td><td style="text-align: left;">最大执行时间：7745</td></tr></tbody></table></blockquote></li></ul></li></ul></li>
+        </ol>
+      </li>
+      <li>
+        <p>系统基线指标</p>
+        <ol>
+          <li>业务指标（获取SQLDEVEOPER 报告）
+<ul><li>日在院人数</li><li>最大住院日摆药条目数</li><li>最大住院日费用条目数</li><li>最大日门诊诊病数</li><li>最大门诊日摆药条目数</li><li>最大门诊日费用条目数</li><li>最大日消息记录</li><li>最大日通知记录</li></ul></li>
+          <li>操作系统指标（获取sar语法）
+<ul><li>磁盘读（KB）/秒</li><li>磁盘写（KB）/秒</li><li>磁盘读写次数/秒</li><li>磁盘平均等待时间</li><li>业务网络发送（KB）/每秒</li><li>业务网络接收（KB）/每秒</li><li>心跳网络发送（KB）/每秒</li><li>心跳网络接收（KB）/每秒</li></ul></li>
+          <li>数据库指标（获取SQLDEVEOPER 报告）
+<ul><li>日总连接数</li></ul></li>
+          <li>应用指标（获取应用流量监控与Elastic脚本）<br /><strong>脚本位置：elasticsearch/his5_performance_tuning.lua</strong><ol><li>总体性能分析
+<ul><li>HIS后端服务-8082 日请求数、高峰请求时（小时）、高峰请求数（分钟）</li><li>HIS收费API-6055  日请求数、高峰请求时（小时）、高峰请求数（分钟）</li><li>HIS医嘱API-6054	 日请求数、高峰请求时（小时）、高峰请求数（分钟）</li><li>HIS医生API-6051	 日请求数、高峰请求时（小时）、高峰请求数（分钟）</li><li>HIS护士API-6052	 日请求数、高峰请求时（小时）、高峰请求数（分钟）</li><li>HIS模版API-6050	 日请求数、高峰请求时（小时）、高峰请求数（分钟）</li><li>HIS病案API-6057	 日请求数、高峰请求时（小时）、高峰请求数（分钟）</li><li>HIS票据API-6053	 日请求数、高峰请求时（小时）、高峰请求数（分钟）</li><li>HIS门诊API-6056  日请求数、高峰请求时（小时）、高峰请求数（分钟）</li><li>HIS后端服务-8082 平均请求时间（毫秒）、最大请求时间（毫秒）</li><li>HIS收费API-6055	 平均请求时间（毫秒）、最大请求时间（毫秒）</li><li>HIS医嘱API-6054	 平均请求时间（毫秒）、最大请求时间（毫秒）</li><li>HIS医生API-6051	 平均请求时间（毫秒）、最大请求时间（毫秒）</li><li>HIS护士API-6052	 平均请求时间（毫秒）、最大请求时间（毫秒）</li><li>HIS模版API-6050	 平均请求时间（毫秒）、最大请求时间（毫秒）</li><li>HIS病案API-6057	 平均请求时间（毫秒）、最大请求时间（毫秒）</li><li>HIS票据API-6053	 平均请求时间（毫秒）、最大请求时间（毫秒）</li><li>HIS门诊API-6056	 平均请求时间（毫秒）、最大请求时间（毫秒）</li></ul></li><li>单项API性能分析
+<ul><li>分析API以平均执行时间、最大执行时间、总执行时间降序排列</li></ul></li></ol></li>
+        </ol>
+      </li>
+      <li>
+        <p>指标记录</p>
+        <ol>
+          <li>
+            <p>业务指标</p>
+            <blockquote>
+              <table>
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">基线指标</th>
+                    <th style="text-align: left;">指标时间</th>
+                    <th style="text-align: right;">指标值</th>
+                    <th style="text-align: left;">基线指标</th>
+                    <th style="text-align: left;">指标时间</th>
+                    <th style="text-align: right;">指标值</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align: left;">当前在院数</td>
+                    <td style="text-align: left;">2019/9/3 19:14</td>
+                    <td style="text-align: right;">547</td>
+                    <td style="text-align: left;">当前在院数</td>
+                    <td style="text-align: left;">2019/9/4 20:57</td>
+                    <td style="text-align: right;">722</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">最大住院日摆药条目数</td>
+                    <td style="text-align: left;">2019/9/3 0:00</td>
+                    <td style="text-align: right;">4783</td>
+                    <td style="text-align: left;">最大住院日摆药条目数</td>
+                    <td style="text-align: left;">2019/9/4 0:00</td>
+                    <td style="text-align: right;">7760</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">最大住院日费用条目数</td>
+                    <td style="text-align: left;">2019/8/28 0:00</td>
+                    <td style="text-align: right;">16866</td>
+                    <td style="text-align: left;">最大住院日费用条目数</td>
+                    <td style="text-align: left;">2019/9/4 0:00</td>
+                    <td style="text-align: right;">28567</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">最大日门诊诊病数</td>
+                    <td style="text-align: left;">2019/9/3 0:00</td>
+                    <td style="text-align: right;">2298</td>
+                    <td style="text-align: left;">最大日门诊诊病数</td>
+                    <td style="text-align: left;">2019/9/4 0:00</td>
+                    <td style="text-align: right;">2603</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">最大门诊日摆药条目数</td>
+                    <td style="text-align: left;">2019/9/3 0:00</td>
+                    <td style="text-align: right;">2961</td>
+                    <td style="text-align: left;">最大门诊日摆药条目数</td>
+                    <td style="text-align: left;">2019/9/4 0:00</td>
+                    <td style="text-align: right;">4047</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">最大门诊日费用条目数</td>
+                    <td style="text-align: left;">2019/9/3 0:00</td>
+                    <td style="text-align: right;">13739</td>
+                    <td style="text-align: left;">最大门诊日费用条目数</td>
+                    <td style="text-align: left;">2019/9/4 0:00</td>
+                    <td style="text-align: right;">17301</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">消息日志</td>
+                    <td style="text-align: left;">2019/9/3 0:00</td>
+                    <td style="text-align: right;">179465</td>
+                    <td style="text-align: left;">消息日志</td>
+                    <td style="text-align: left;">2019/9/4 0:00</td>
+                    <td style="text-align: right;">238325</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">通知记录</td>
+                    <td style="text-align: left;">2019/9/3 0:00</td>
+                    <td style="text-align: right;">148927</td>
+                    <td style="text-align: left;">通知记录</td>
+                    <td style="text-align: left;">2019/9/4 0:00</td>
+                    <td style="text-align: right;">218764</td>
+                  </tr>
+                </tbody>
+              </table>
+            </blockquote>
+          </li>
+          <li>
+            <p>操作系统指标</p>
+            <blockquote>
+              <table>
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">指标说明</th>
+                    <th style="text-align: left;">性能指标</th>
+                    <th style="text-align: right;">指标值</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align: left;">上午高峰期8-10点平均值</td>
+                    <td style="text-align: left;">磁盘读写次数/秒</td>
+                    <td style="text-align: right;">116.02</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">上午高峰期8-10点平均值</td>
+                    <td style="text-align: left;">磁盘读（KB）/秒</td>
+                    <td style="text-align: right;">5108.85</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">上午高峰期8-10点平均值</td>
+                    <td style="text-align: left;">磁盘写（KB）/秒</td>
+                    <td style="text-align: right;">1396.66</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">上午高峰期8-10点平均值</td>
+                    <td style="text-align: left;">bond0网络接收（KB）/秒</td>
+                    <td style="text-align: right;">168</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">上午高峰期8-10点平均值</td>
+                    <td style="text-align: left;">bond0网络发送（KB）/秒</td>
+                    <td style="text-align: right;">373</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">上午高峰期8-10点平均值</td>
+                    <td style="text-align: left;">bond1网络接收（KB）/秒</td>
+                    <td style="text-align: right;">717</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">上午高峰期8-10点平均值</td>
+                    <td style="text-align: left;">bond1网络发送（KB）/秒</td>
+                    <td style="text-align: right;">665</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">上午高峰期8-10点平均值</td>
+                    <td style="text-align: left;">bond0网络接收包/秒</td>
+                    <td style="text-align: right;">362</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">上午高峰期8-10点平均值</td>
+                    <td style="text-align: left;">bond0网络发送包/秒</td>
+                    <td style="text-align: right;">486</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">上午高峰期8-10点平均值</td>
+                    <td style="text-align: left;">bond1网络接收包/秒</td>
+                    <td style="text-align: right;">1161</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">上午高峰期8-10点平均值</td>
+                    <td style="text-align: left;">bond1网络发送包/秒</td>
+                    <td style="text-align: right;">1120</td>
+                  </tr>
+                </tbody>
+              </table>
+            </blockquote>
+          </li>
+          <li>
+            <p>数据库指标</p>
+            <blockquote>
+              <table>
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">指标说明</th>
+                    <th style="text-align: left;">指标日期</th>
+                    <th style="text-align: right;">指标值</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align: left;">近一个月来单日最大登录数</td>
+                    <td style="text-align: left;">2019.09.03</td>
+                    <td style="text-align: right;">3210</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">表空间大小（MB）</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">20477.56</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOECOMM_TAB</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">11058.5</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOEMSG_TAB</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">3532.75</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOEEMR_TAB</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">2142.56</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOETMP_TAB</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">1244.25</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOEINSUR_TAB</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">385.75</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOEQUARTZ_TAB</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">353.93</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOEINTERCHANGE_TAB</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">288.12</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOETEMPLATE_TAB</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">287.43</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">USERS</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">242.18</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOEAPPLY_TAB</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">138.06</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOECHARGE_IND</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">119.5</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOESECURITY_TAB</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">96.25</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOEPATIENT_TAB</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">92.56</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOEPORTAL_TAB</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">91.81</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOEPRES_IND</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">84.43</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOEMSG_IND</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">80.18</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOEAPPLY_IND</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">69.93</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOEDRUG_TAB</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">52.62</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOEEMR_IND</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">29.43</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOEDICT_TAB</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">28.25</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">ZOEINSUR_IND</td>
+                    <td style="text-align: left;">2019.09.04</td>
+                    <td style="text-align: right;">20</td>
+                  </tr>
+                </tbody>
+              </table>
+            </blockquote>
+          </li>
+          <li>
+            <p>应用指标</p>
+            <blockquote>
+              <table>
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">应用服务</th>
+                    <th style="text-align: left;">请求日期</th>
+                    <th style="text-align: right;">请求数</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align: left;">HIS票据API-6053</td>
+                    <td style="text-align: left;">2019.09.03</td>
+                    <td style="text-align: right;">15479</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS门诊API-6056</td>
+                    <td style="text-align: left;">2019.09.03</td>
+                    <td style="text-align: right;">49587</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS后端服务-8082</td>
+                    <td style="text-align: left;">2019.09.03</td>
+                    <td style="text-align: right;">496149</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS收费API-6055</td>
+                    <td style="text-align: left;">2019.09.03</td>
+                    <td style="text-align: right;">1014769</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS医嘱API-6054</td>
+                    <td style="text-align: left;">2019.09.03</td>
+                    <td style="text-align: right;">470693</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS医生API-6051</td>
+                    <td style="text-align: left;">2019.09.03</td>
+                    <td style="text-align: right;">146513</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS护士API-6052</td>
+                    <td style="text-align: left;">2019.09.03</td>
+                    <td style="text-align: right;">126619</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS模版API-6050</td>
+                    <td style="text-align: left;">2019.09.03</td>
+                    <td style="text-align: right;">40692</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS病案API-6057</td>
+                    <td style="text-align: left;">2019.09.03</td>
+                    <td style="text-align: right;">3490</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS票据API-6053</td>
+                    <td style="text-align: left;">2019.09.03</td>
+                    <td style="text-align: right;">19592</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS门诊API-6056</td>
+                    <td style="text-align: left;">2019.09.03</td>
+                    <td style="text-align: right;">53307</td>
+                  </tr>
+                </tbody>
+              </table>
+            </blockquote>
+            <blockquote>
+              <table>
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">应用服务</th>
+                    <th style="text-align: left;">高峰时段</th>
+                    <th style="text-align: right;">小时请求数</th>
+                    <th style="text-align: right;">分钟请求数</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align: left;">HIS票据API-6053</td>
+                    <td style="text-align: left;">10:00:00</td>
+                    <td style="text-align: right;">2477</td>
+                    <td style="text-align: right;"></td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS门诊API-6056</td>
+                    <td style="text-align: left;">10:00:00</td>
+                    <td style="text-align: right;">7903</td>
+                    <td style="text-align: right;"></td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS后端服务-8082</td>
+                    <td style="text-align: left;">8:00:00</td>
+                    <td style="text-align: right;">57404</td>
+                    <td style="text-align: right;">1336</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS收费API-6055</td>
+                    <td style="text-align: left;">8:00:00</td>
+                    <td style="text-align: right;">148328</td>
+                    <td style="text-align: right;">3000</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS医嘱API-6054</td>
+                    <td style="text-align: left;">9:00:00</td>
+                    <td style="text-align: right;">61512</td>
+                    <td style="text-align: right;">1272</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS医生API-6051</td>
+                    <td style="text-align: left;">15:00:00</td>
+                    <td style="text-align: right;">16344</td>
+                    <td style="text-align: right;"></td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS护士API-6052</td>
+                    <td style="text-align: left;">15:00:00</td>
+                    <td style="text-align: right;">17072</td>
+                    <td style="text-align: right;"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </blockquote>
+            <blockquote>
+              <table>
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">应用服务</th>
+                    <th style="text-align: right;">最大请求时间（毫秒）</th>
+                    <th style="text-align: right;">平均请求时间（毫秒）</th>
+                    <th style="text-align: right;">标准差</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align: left;">HIS后端服务-8082</td>
+                    <td style="text-align: right;">9006</td>
+                    <td style="text-align: right;">34</td>
+                    <td style="text-align: right;">151</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS收费API-6055</td>
+                    <td style="text-align: right;">6661</td>
+                    <td style="text-align: right;">31</td>
+                    <td style="text-align: right;">76</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS医嘱API-6054</td>
+                    <td style="text-align: right;">2130</td>
+                    <td style="text-align: right;">16</td>
+                    <td style="text-align: right;">34</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS医生API-6051</td>
+                    <td style="text-align: right;">5580</td>
+                    <td style="text-align: right;">48</td>
+                    <td style="text-align: right;">107</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS护士API-6052</td>
+                    <td style="text-align: right;">2458</td>
+                    <td style="text-align: right;">41</td>
+                    <td style="text-align: right;">69</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS模版API-6050</td>
+                    <td style="text-align: right;">1392</td>
+                    <td style="text-align: right;">21</td>
+                    <td style="text-align: right;">59</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS病案API-6057</td>
+                    <td style="text-align: right;">1026</td>
+                    <td style="text-align: right;">23</td>
+                    <td style="text-align: right;">27</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS票据API-6053</td>
+                    <td style="text-align: right;">5776</td>
+                    <td style="text-align: right;">122</td>
+                    <td style="text-align: right;">167</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">HIS门诊API-6056</td>
+                    <td style="text-align: right;">4397</td>
+                    <td style="text-align: right;">41</td>
+                    <td style="text-align: right;">117</td>
+                  </tr>
+                </tbody>
+              </table>
+            </blockquote>
+            <p>
+              <strong>平均执行时间</strong>
+            </p>
+            <blockquote>
+              <table>
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">APIURI</th>
+                    <th style="text-align: right;">平均执行时间</th>
+                    <th style="text-align: right;">执行次数</th>
+                    <th style="text-align: right;">最大执行时间</th>
+                    <th style="text-align: right;">最小执行时间</th>
+                    <th style="text-align: right;">标准差</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align: left;">/reservation/scheduleTemplManager/createDoctorSchedule</td>
+                    <td style="text-align: right;">5402</td>
+                    <td style="text-align: right;">16</td>
+                    <td style="text-align: right;">14566</td>
+                    <td style="text-align: right;">5</td>
+                    <td style="text-align: right;">4976</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/reservation/scheduleManager/updateDoctorScheduleNew</td>
+                    <td style="text-align: right;">4623</td>
+                    <td style="text-align: right;">32</td>
+                    <td style="text-align: right;">11953</td>
+                    <td style="text-align: right;">8</td>
+                    <td style="text-align: right;">4367</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/i18n/dictLanguageInfo/refreshCache</td>
+                    <td style="text-align: right;">3797</td>
+                    <td style="text-align: right;">21</td>
+                    <td style="text-align: right;">4828</td>
+                    <td style="text-align: right;">2479</td>
+                    <td style="text-align: right;">589</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/dict/deduct/deduct/deductAllBill</td>
+                    <td style="text-align: right;">3600</td>
+                    <td style="text-align: right;">135</td>
+                    <td style="text-align: right;">61570</td>
+                    <td style="text-align: right;">54</td>
+                    <td style="text-align: right;">9215</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/reservation/scheduleManager/saveDoctorScheduleNew</td>
+                    <td style="text-align: right;">2733</td>
+                    <td style="text-align: right;">38</td>
+                    <td style="text-align: right;">11087</td>
+                    <td style="text-align: right;">11</td>
+                    <td style="text-align: right;">3210</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/pres/presCtrl/saveChinese</td>
+                    <td style="text-align: right;">1991</td>
+                    <td style="text-align: right;">12</td>
+                    <td style="text-align: right;">3960</td>
+                    <td style="text-align: right;">490</td>
+                    <td style="text-align: right;">1160</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/dict/settle/settleManage/inpSettle</td>
+                    <td style="text-align: right;">1801</td>
+                    <td style="text-align: right;">71</td>
+                    <td style="text-align: right;">7673</td>
+                    <td style="text-align: right;">176</td>
+                    <td style="text-align: right;">1445</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/pres/apply/execApplys</td>
+                    <td style="text-align: right;">1609</td>
+                    <td style="text-align: right;">779</td>
+                    <td style="text-align: right;">7070</td>
+                    <td style="text-align: right;">65</td>
+                    <td style="text-align: right;">1119</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/sys/param/refreshCache</td>
+                    <td style="text-align: right;">1593</td>
+                    <td style="text-align: right;">18</td>
+                    <td style="text-align: right;">2119</td>
+                    <td style="text-align: right;">1316</td>
+                    <td style="text-align: right;">203</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/pres/collate/collatePrescribes</td>
+                    <td style="text-align: right;">1480</td>
+                    <td style="text-align: right;">1711</td>
+                    <td style="text-align: right;">49743</td>
+                    <td style="text-align: right;">9</td>
+                    <td style="text-align: right;">2310</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/charge/convert/inpRate/inpRateConvert</td>
+                    <td style="text-align: right;">1044</td>
+                    <td style="text-align: right;">19</td>
+                    <td style="text-align: right;">2429</td>
+                    <td style="text-align: right;">116</td>
+                    <td style="text-align: right;">836</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/pres/presCtrl/saveWesternMedicine</td>
+                    <td style="text-align: right;">1037</td>
+                    <td style="text-align: right;">2205</td>
+                    <td style="text-align: right;">3646</td>
+                    <td style="text-align: right;">16</td>
+                    <td style="text-align: right;">491</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/dispensing/inp/dispensing/dispensingDrugs</td>
+                    <td style="text-align: right;">952</td>
+                    <td style="text-align: right;">27</td>
+                    <td style="text-align: right;">5133</td>
+                    <td style="text-align: right;">114</td>
+                    <td style="text-align: right;">1434</td>
+                  </tr>
+                </tbody>
+              </table>
+            </blockquote>
+            <p>
+              <strong>总执行时间</strong>
+            </p>
+            <blockquote>
+              <table>
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">APIURI</th>
+                    <th style="text-align: right;">平均执行时间</th>
+                    <th style="text-align: right;">执行次数</th>
+                    <th style="text-align: right;">最大执行时间</th>
+                    <th style="text-align: right;">最小执行时间</th>
+                    <th style="text-align: right;">标准差</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align: left;">/dict/patient/manager/getAutoPatientInfo</td>
+                    <td style="text-align: right;">102</td>
+                    <td style="text-align: right;">60173</td>
+                    <td style="text-align: right;">1535</td>
+                    <td style="text-align: right;">5</td>
+                    <td style="text-align: right;">44</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/dict/prescribe/manager/getPendingPatientInfo</td>
+                    <td style="text-align: right;">18</td>
+                    <td style="text-align: right;">215171</td>
+                    <td style="text-align: right;">1716</td>
+                    <td style="text-align: right;">9</td>
+                    <td style="text-align: right;">16</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/insur/insurManager/insurInterface</td>
+                    <td style="text-align: right;">72</td>
+                    <td style="text-align: right;">42404</td>
+                    <td style="text-align: right;">9652</td>
+                    <td style="text-align: right;">3</td>
+                    <td style="text-align: right;">158</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/pres/collate/collatePrescribes</td>
+                    <td style="text-align: right;">1480</td>
+                    <td style="text-align: right;">1711</td>
+                    <td style="text-align: right;">49743</td>
+                    <td style="text-align: right;">9</td>
+                    <td style="text-align: right;">2310</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/pres/presCtrl/saveWesternMedicine</td>
+                    <td style="text-align: right;">1037</td>
+                    <td style="text-align: right;">2205</td>
+                    <td style="text-align: right;">3646</td>
+                    <td style="text-align: right;">16</td>
+                    <td style="text-align: right;">491</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/pres/presCtrl/save</td>
+                    <td style="text-align: right;">532</td>
+                    <td style="text-align: right;">3567</td>
+                    <td style="text-align: right;">5092</td>
+                    <td style="text-align: right;">27</td>
+                    <td style="text-align: right;">430</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/dict/drug/getDrugList</td>
+                    <td style="text-align: right;">46</td>
+                    <td style="text-align: right;">40225</td>
+                    <td style="text-align: right;">643</td>
+                    <td style="text-align: right;">15</td>
+                    <td style="text-align: right;">20</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/i18n/dictLanguageInfo/findI18nListByClassCode</td>
+                    <td style="text-align: right;">10</td>
+                    <td style="text-align: right;">155056</td>
+                    <td style="text-align: right;">1424</td>
+                    <td style="text-align: right;">2</td>
+                    <td style="text-align: right;">11</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/dict/settle/settleManage/outpSettle</td>
+                    <td style="text-align: right;">273</td>
+                    <td style="text-align: right;">4732</td>
+                    <td style="text-align: right;">4072</td>
+                    <td style="text-align: right;">71</td>
+                    <td style="text-align: right;">202</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/pres/apply/execApplys</td>
+                    <td style="text-align: right;">1609</td>
+                    <td style="text-align: right;">779</td>
+                    <td style="text-align: right;">7070</td>
+                    <td style="text-align: right;">65</td>
+                    <td style="text-align: right;">1119</td>
+                  </tr>
+                </tbody>
+              </table>
+            </blockquote>
+            <p>
+              <strong>最大执行时间</strong>
+            </p>
+            <blockquote>
+              <table>
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">APIURI</th>
+                    <th style="text-align: right;">平均执行时间</th>
+                    <th style="text-align: right;">执行次数</th>
+                    <th style="text-align: right;">最大执行时间</th>
+                    <th style="text-align: right;">最小执行时间</th>
+                    <th style="text-align: right;">标准差</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align: left;">/dict/deduct/deduct/deductAllBill</td>
+                    <td style="text-align: right;">3600</td>
+                    <td style="text-align: right;">135</td>
+                    <td style="text-align: right;">61570</td>
+                    <td style="text-align: right;">54</td>
+                    <td style="text-align: right;">9215</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/pres/collate/collatePrescribes</td>
+                    <td style="text-align: right;">1480</td>
+                    <td style="text-align: right;">1711</td>
+                    <td style="text-align: right;">49743</td>
+                    <td style="text-align: right;">9</td>
+                    <td style="text-align: right;">2310</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/reservation/scheduleTemplManager/createDoctorSchedule</td>
+                    <td style="text-align: right;">5402</td>
+                    <td style="text-align: right;">16</td>
+                    <td style="text-align: right;">14566</td>
+                    <td style="text-align: right;">5</td>
+                    <td style="text-align: right;">4976</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/dispensing/inp/dispensing/layDrugDeductReturnDrug</td>
+                    <td style="text-align: right;">253</td>
+                    <td style="text-align: right;">226</td>
+                    <td style="text-align: right;">13128</td>
+                    <td style="text-align: right;">12</td>
+                    <td style="text-align: right;">1033</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/reservation/scheduleManager/updateDoctorScheduleNew</td>
+                    <td style="text-align: right;">4623</td>
+                    <td style="text-align: right;">32</td>
+                    <td style="text-align: right;">11953</td>
+                    <td style="text-align: right;">8</td>
+                    <td style="text-align: right;">4367</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/reservation/scheduleManager/saveDoctorScheduleNew</td>
+                    <td style="text-align: right;">2733</td>
+                    <td style="text-align: right;">38</td>
+                    <td style="text-align: right;">11087</td>
+                    <td style="text-align: right;">11</td>
+                    <td style="text-align: right;">3210</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/dispensing/inp/dispensing/dispensingDrugsSingle</td>
+                    <td style="text-align: right;">192</td>
+                    <td style="text-align: right;">348</td>
+                    <td style="text-align: right;">10551</td>
+                    <td style="text-align: right;">72</td>
+                    <td style="text-align: right;">778</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/insur/insurManager/insurInterface</td>
+                    <td style="text-align: right;">72</td>
+                    <td style="text-align: right;">42404</td>
+                    <td style="text-align: right;">9652</td>
+                    <td style="text-align: right;">3</td>
+                    <td style="text-align: right;">158</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/dict/prescribe/inpDrugPrintRecord/print</td>
+                    <td style="text-align: right;">209</td>
+                    <td style="text-align: right;">481</td>
+                    <td style="text-align: right;">8492</td>
+                    <td style="text-align: right;">15</td>
+                    <td style="text-align: right;">644</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left;">/emr/dataAide/emrDataAide/toImageList</td>
+                    <td style="text-align: right;">614</td>
+                    <td style="text-align: right;">291</td>
+                    <td style="text-align: right;">7745</td>
+                    <td style="text-align: right;">10</td>
+                    <td style="text-align: right;">491</td>
+                  </tr>
+                </tbody>
+              </table>
+            </blockquote>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <p>附加信息</p>
+        <ol>
+          <li>
+            <p>ElasticSearch日志分析模式</p>
+            <ul>
+              <li>t_log_req：以API为主索引记录API执行情况，包含以下属性域：
+<ul><li>requestId： 一次API请求唯一标识</li><li>ipAndPort:  请求服务入口API地址</li><li>createTime: 请求服务时间</li><li>finishTime: 请求服务完成时间</li><li>runTime:    请求服务运行时间</li><li>requestUri: 请求服务入口API</li></ul></li>
+              <li>t_log_sql：以sql为主索引记录SQL执行情况，包含以下属性域：
+<ul><li>requestId： 一次API请求唯一标识</li><li>createTime: 请求SQL开始时间</li><li>finishTime: 请求SQL完成时间</li><li>runTime:    请求SQL运行时间</li><li>sqlHash:	请求SQL HASH值（传入参数变量前）</li><li>sql:		请求SQL</li></ul></li>
+              <li>t_log_warn：以warn为主索引记录执行时间告警情况，包含以下属性域
+<ul><li>requestId:	一次API请求唯一标识</li><li>type:		API或SQL</li><li>createTime:	请求开始时间</li><li>runTime:	请求运行时间</li><li>taskHash:</li><li>taskContent:</li></ul></li>
+            </ul>
+          </li>
+          <li>
+            <p>OracleSQL执行记录分析模式</p>
+            <ul>
+              <li>gv$sql_monitor：记录并行执行或是执行超过5秒CPU或IO时间的SQL，语句信息至少保留1分钟。包含以下属性：
+<ul><li>sql_id:  		库缓存中父游标的SQL标识符</li><li>sql_exec_id:	唯一标识一次SQL执行</li><li>ELAPSED_TIME：	语句执行时间，单位微秒</li><li>QUEUING_TIME：	语句执行排队时间，单位微秒</li><li>CPU_TIME:		语句执行CPU时间，单位微秒</li><li>FETCHES:</li><li>BUFFER_GETS:</li><li>DISK_READS:</li><li>DIRECT_WRITES:</li></ul></li>
+              <li>DBA_HIST_SQLSTAT，包含以下属性：
+<ul><li>snap_id:</li><li>instance_number:</li><li>sql_id: 库缓存中父游标的SQL标识符</li><li>MODULE:	通过DBMS_APPLICATION_INFO.SET_MODULE设置的HIS5应用服务器地址</li><li>ACTION:	通过DBMS_APPLICATION_INFO.SET_ACTION设置的HIS5请求ID</li><li>EXECUTIONS_TOTAL:	执行总次数</li><li>DISK_READS_TOTAL：	磁盘读总次数</li><li>BUFFER_GETS_TOTAL：	buffer get总次数</li><li>ELAPSED_TIME_TOTAL：	总消耗时间</li><li>IOWAIT_TOTAL：	io总消耗时间，单位微秒</li></ul></li>
+              <li>GV$SQLSTATS，包含以下属性：
+<ul><li>SQL_TEXT：当前游标的SQL文本的前1000个字符</li><li>sql_id:</li><li>MODULE:	通过DBMS_APPLICATION_INFO.SET_MODULE设置的HIS5应用服务器地址</li><li>ACTION:	通过DBMS_APPLICATION_INFO.SET_ACTION设置的HIS5请求ID</li><li>EXECUTIONS:	执行次数</li><li>DISK_READS：	磁盘读次数</li><li>BUFFER_GETS：	buffer get次数</li><li>ROWS_PROCESSED：解析的sql语句返回的行总数</li><li>VERSION_COUNT：具有此sql文本和计划的缓存中存在的游标数</li><li>ELAPSED_TIME_TOTAL：	消耗时间，单位微秒</li><li>USER_IO_WAIT_TIME：	用户IO等待时间，单位微秒</li><li>CONCURRENCY_WAIT_TIME：并发等待时间，单位微秒</li><li>CLUSTER_WAIT_TIME：	集群等待时间，单位微秒</li></ul></li>
+            </ul>
+          </li>
+          <li>
+            <p>常规分析从ElasticSearch日志记录中API请求与SQL执行情况<br /><strong>脚本路径：zoescript/elasticsearch/his5_performance_tuning_guide</strong></p>
+            <ol>
+              <li>单个API执行情况分析
+<ul><li>获取req索引指定API指定时间按日/小时分组以日期为降序，统计平均执行时间，最大执行时间，最小执行时间及标准方差。以分析执行API执行稳定性</li><li>获取req索引指定API指定时间范围内按运行时间排序，以分析指定API异常执行时间情况</li></ul></li>
+              <li>API总体执行情况分析
+<ul><li>获取req索引根据API分组按次数、总执行时间、平均运行时间、最大运行时间排序。以分析API使用量情况。</li><li>获取指定某日按执行时间分组以最大执行时间为降序的API统计。以分析不同时间分布消耗时间最高API情况</li><li>获取req索引dict/drug/getDrugList按日分组以平均执行时间降序。以通过执行频繁最高的API分析日性能稳定性</li></ul></li>
+            </ol>
+          </li>
+        </ol>
+      </li>
+    </ol>
+    <p>
+      <a href="../faultprocess_index.html">上一页</a>
+    </p>
+  </body>
+</html>
