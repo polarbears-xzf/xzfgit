@@ -50,7 +50,8 @@ select '日志日均增长量', trunc(a.total_size / b.days / 1024 / 1024) || 'M
                decode(count(distinct dest_id), 0, 1, count(distinct dest_id)) total_size
           From v$archived_log
          where standby_dest = 'NO'
-		   and completion_time>sysdate-30) a,
+		   and completion_time>sysdate-30
+		   and creator!='RMAN') a,
        (select max(completion_time) - min(completion_time) days
           from v$archived_log
          where standby_dest = 'NO'
@@ -60,11 +61,13 @@ select '最小日志切换时间' , trunc(min(next_time-first_time)*24*60,-2)||'
 from v$archived_log
 where standby_dest = 'NO'
   and completion_time>sysdate-30
+  and creator='ARCH'
 union all
 select '最大日志切换时间' , trunc(max(next_time-first_time)*24*60,-2)||'分钟'
 from v$archived_log
 where standby_dest = 'NO'
   and completion_time>sysdate-30
+  and creator!='RMAN'
 union all
 SELECT '上午9-12点日志平均切换时间',
        LISTAGG(DECODE(c.value, 'TRUE', '节点' || a.thread# || ' : ', NULL) ||
@@ -81,6 +84,7 @@ SELECT '上午9-12点日志平均切换时间',
            AND to_number(TO_CHAR(completion_time, 'hh24')) < 12
            AND standby_dest = 'NO'
 		   AND completion_time>sysdate-30
+		   and creator!='RMAN'
          GROUP BY thread#) a,
        (SELECT MAX(completion_time) - MIN(completion_time) days
 		from v$archived_log
@@ -103,6 +107,7 @@ SELECT '凌晨0-3点日志平均切换时间',
            AND to_number(TO_CHAR(completion_time, 'hh24')) <  3
            AND standby_dest = 'NO'
 		   AND completion_time>sysdate-30
+		   and creator!='RMAN'
          GROUP BY thread#) a,
        (SELECT MAX(completion_time) - MIN(completion_time) days
           From v$archived_log
