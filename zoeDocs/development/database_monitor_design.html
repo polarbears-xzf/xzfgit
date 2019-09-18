@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="author" content="MarkdownViewer++" />
-    <title>database_monitor_desc.txt</title>
+    <title>database_monitor_design.md</title>
     <style type="text/css">
             
 /* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
@@ -23,10 +23,15 @@ td, h1, h2, h3, h4, h5, p, ul, ol, li {
       <li>会话阻塞与锁监控
 <ol><li>界面元素：内容-样式
 <ul><li>会话阻塞情况-树</li><li>会话详细信息-表</li><li>对象锁信息-表</li></ul></li><li>操作元素
-<ul><li>结束指定会话</li><li>保存会话阻塞信息</li></ul></li></ol></li>
+<ul><li>结束指定会话</li><li>保存会话阻塞信息<br />
+以json格式保存
+记录保存该应用程序下面，文件名例如：'\kill_session_20190827.sql'<br /><img src="./images/%E8%AE%B0%E5%BD%95%E6%9D%80%E9%94%81%E8%A2%AB%E9%98%BB%E5%A1%9E%E4%BF%A1%E6%81%AF.png" alt="图片" title="记录杀锁被阻塞信息" /></li></ul></li></ol></li>
       <li>表空间使用监控
 <ol><li>界面元素：内容-样式
-<ul><li>表空间使用状态-表</li></ul></li></ol></li>
+<ul><li>表空间使用状态-表<br /><img src="./images/%E8%A1%A8%E7%A9%BA%E9%97%B4%E4%BD%BF%E7%94%A8%E7%8A%B6%E6%80%81.png" alt="图片" title="表空间使用状态" /><br />
+绿色：表示最大空间大小<br />
+蓝色：空闲已分配空间大小<br />
+红色：已使用空间大小</li></ul></li></ol></li>
     </ol>
     <p>
       <a href="./devops_index.html">上一页</a>

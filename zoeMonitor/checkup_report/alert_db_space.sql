@@ -77,6 +77,7 @@ select a.thread# thread#,
            and to_number(to_char(completion_time, 'hh24')) < 12
            and standby_dest = 'no'
            and completion_time > sysdate - 30
+		   and creator!='RMAN'
          group by thread#) a,
        (select max(completion_time) - min(completion_time) days
           from v$archived_log
