@@ -1,0 +1,155 @@
+{
+	"info": {
+		"_postman_id": "5ed4f160-fd26-4d30-967a-348fd917d343",
+		"name": "Zabbix_API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "basic_info",
+			"item": [
+				{
+					"name": "get_version",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json-rpc",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"jsonrpc\":\"2.0\",\"method\":\"apiinfo.version\",\"id\":1,\"auth\":null,\"params\":{}}"
+						},
+						"url": {
+							"raw": "{{base_url}}/{{zabbix_api}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{zabbix_api}}"
+							]
+						},
+						"description": "获取zabbix版本信息"
+					},
+					"response": []
+				},
+				{
+					"name": "get_hosts",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json-rpc",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"method\": \"host.get\",\n    \"params\": {\n        \"output\": [\n            \"hostid\",\n            \"host\"\n        ],\n        \"selectInterfaces\": [\n            \"interfaceid\",\n            \"ip\"\n        ]\n    },\n    \"id\": 2,\n    \"auth\": \"{{auth_token}}\"\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/{{zabbix_api}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{zabbix_api}}"
+							]
+						},
+						"description": "获取zabbix主机信息"
+					},
+					"response": []
+				},
+				{
+					"name": "get_authentication_token",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json-rpc"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"jsonrpc\": \"2.0\",\r\n    \"method\": \"user.login\",\r\n    \"params\": {\r\n        \"user\": \"Admin\",\r\n        \"password\": \"zabbix\"\r\n    },\r\n    \"id\": 1,\r\n    \"auth\": null\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/{{zabbix_api}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{zabbix_api}}"
+							]
+						},
+						"description": "获取zabbix验证令牌"
+					},
+					"response": []
+				},
+				{
+					"name": "get_scripts",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json-rpc",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"jsonrpc\": \"2.0\",\n    \"method\": \"script.get\",\n    \"params\": {\n        \"output\": \"extend\"\n    },\n    \"auth\": \"{{auth_token}}\",\n    \"id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/{{zabbix_api}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{zabbix_api}}"
+							]
+						},
+						"description": "获取zabbix脚本信息"
+					},
+					"response": []
+				}
+			],
+			"description": "获取Zabbix基本信息"
+		}
+	]
+}

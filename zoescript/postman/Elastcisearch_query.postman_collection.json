@@ -1,0 +1,135 @@
+{
+	"info": {
+		"_postman_id": "3cc0c6bb-0a58-4e00-98c3-142f4b666885",
+		"name": "Elastcisearch_query",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "basic_info",
+			"item": [
+				{
+					"name": "get_version",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"description": "获取elasticsearch版本"
+					},
+					"response": []
+				},
+				{
+					"name": "get_all_indexes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/_cat/indices?v",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"_cat",
+								"indices"
+							],
+							"query": [
+								{
+									"key": "v",
+									"value": null
+								}
+							]
+						},
+						"description": "获取elasticsearch所有索引"
+					},
+					"response": []
+				},
+				{
+					"name": "get_index_content",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/t_log_sql_req/doc/_search?pretty",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t_log_sql_req",
+								"doc",
+								"_search"
+							],
+							"query": [
+								{
+									"key": "pretty",
+									"value": null
+								}
+							]
+						},
+						"description": "获取elasticsearch所有索引"
+					},
+					"response": []
+				},
+				{
+					"name": "get_all_nodes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/_cat/nodes?v",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"_cat",
+								"nodes"
+							],
+							"query": [
+								{
+									"key": "v",
+									"value": null
+								}
+							]
+						},
+						"description": "获取elasticsearch所有索引"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "query",
+			"item": [
+				{
+					"name": "query_index",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/t_log_sql_req/doc/_search?pretty",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"t_log_sql_req",
+								"doc",
+								"_search"
+							],
+							"query": [
+								{
+									"key": "pretty",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
