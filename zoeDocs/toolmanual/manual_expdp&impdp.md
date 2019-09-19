@@ -23,8 +23,6 @@ where a.tablespace_name=b.tablespace_name(+) and a.file_id=b.file_id(+);
 1.	在导出端建立存放的逻辑目录
 	*	select * from dba_directories;
 	*	create or replace directory expdpdir as '/home/oracle/expdp';
-	*	create  directory expdpdir as '/home/oracle/expdp';
-	*	grant read,write on directory expdpdir to system;
 2.	全库导出
 	*	export ORACLE_SID=zyhis1
 	*	expdp system/oracle directory=expdpdir dumpfile=hisdata_%U.dmp logfile=expdata.log FULL=Y filesize=16G
@@ -36,13 +34,11 @@ where a.tablespace_name=b.tablespace_name(+) and a.file_id=b.file_id(+);
 1.	在导入端建立存放的逻辑目录
 	*	select * from dba_directories;
 	*	create or replace directory impdpdir as '/home/oracle/impdp';
-	*	create  directory impdpdir as '/home/oracle/impdp';
-	*	grant read,write on directory impdpdir to system;
-2.查看impdp文件夹所属用户及权限
+2.	查看impdp文件夹所属用户及权限
 	*	ls -al /home/oracle/impdp
 	*	chown -R oracle:oinstall /home/oracle/impdp
 	*	chmod 777 /home/oracle/impdp
-3.创建表空间（执行前，注意修改数据文件的存储路径）
+3.	创建表空间（执行前，注意修改数据文件的存储路径）
 	*	select file_id,file_name,tablespace_name from dba_data_files;
 	*	select name from v$tempfile;（通常情况下注释掉create_tabespace.sql中临时表空间的创建语法）
 	*	执行create_tabespace.sql脚本
@@ -50,9 +46,5 @@ where a.tablespace_name=b.tablespace_name(+) and a.file_id=b.file_id(+);
 	*	export ORACLE_SID=zyhis1
 	*	impdp system/oracle directory=impdpdir dumpfile=hisdata_%U.dmp logfile=impdata.log  cluster=N
 5.	检查日志，确认导入情况
-	*	通过语法get_create_tabespace.sql获取create_tabespace.sql，注意修改脚本生成路径
-根据源库表空间使用情况，修改create_tabespace.sql语法。
-4.	查看导出日志及拷贝并修改impdp文件权限
-	*	chmod 644 /home/oracle/impdp
 	
 [文档主页](../index.html)

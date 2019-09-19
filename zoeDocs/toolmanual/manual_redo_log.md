@@ -28,9 +28,9 @@
 	*	SQL> select group#,sequence#,bytes,members,status from v$log;
 9.	操作系统删除原日志组1、2、3中的文件
 10.	重建日志组1、2、3
-	*	SQL> ALTER DATABASE ADD LOGFILE GROUP 4 ('/u01/app/oracle/oradata/orcl/redo01.log') SIZE 500M;
-	*	SQL> ALTER DATABASE ADD LOGFILE GROUP 5 ('/u01/app/oracle/oradata/orcl/redo02.log') SIZE 500M;
-	*	SQL> ALTER DATABASE ADD LOGFILE GROUP 6 ('/u01/app/oracle/oradata/orcl/redo03.log') SIZE 500M;
+	*	SQL> ALTER DATABASE ADD LOGFILE GROUP 1 ('/u01/app/oracle/oradata/orcl/redo01.log') SIZE 500M;
+	*	SQL> ALTER DATABASE ADD LOGFILE GROUP 2 ('/u01/app/oracle/oradata/orcl/redo02.log') SIZE 500M;
+	*	SQL> ALTER DATABASE ADD LOGFILE GROUP 3 ('/u01/app/oracle/oradata/orcl/redo03.log') SIZE 500M;
 11.	重复步骤3-6，然后删除日志组4、5、6，并在操作系统删除对应的日志文件
 
 	

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="author" content="MarkdownViewer++" />
-    <title>manual_redo_log.txt</title>
+    <title>manual_redo_log.md</title>
     <style type="text/css">
             
 /* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
@@ -38,7 +38,7 @@ td, h1, h2, h3, h4, h5, p, ul, ol, li {
 <ul><li>SQL&gt; select group#,sequence#,bytes,members,status from v$log;</li></ul></li>
       <li>操作系统删除原日志组1、2、3中的文件</li>
       <li>重建日志组1、2、3
-<ul><li>SQL&gt; ALTER DATABASE ADD LOGFILE GROUP 4 ('/u01/app/oracle/oradata/orcl/redo01.log') SIZE 500M;</li><li>SQL&gt; ALTER DATABASE ADD LOGFILE GROUP 5 ('/u01/app/oracle/oradata/orcl/redo02.log') SIZE 500M;</li><li>SQL&gt; ALTER DATABASE ADD LOGFILE GROUP 6 ('/u01/app/oracle/oradata/orcl/redo03.log') SIZE 500M;</li></ul></li>
+<ul><li>SQL&gt; ALTER DATABASE ADD LOGFILE GROUP 1 ('/u01/app/oracle/oradata/orcl/redo01.log') SIZE 500M;</li><li>SQL&gt; ALTER DATABASE ADD LOGFILE GROUP 2 ('/u01/app/oracle/oradata/orcl/redo02.log') SIZE 500M;</li><li>SQL&gt; ALTER DATABASE ADD LOGFILE GROUP 3 ('/u01/app/oracle/oradata/orcl/redo03.log') SIZE 500M;</li></ul></li>
       <li>重复步骤3-6，然后删除日志组4、5、6，并在操作系统删除对应的日志文件</li>
     </ol>
     <p>
