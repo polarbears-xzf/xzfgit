@@ -32,21 +32,21 @@ AS
         --同步已删除表元数据
         lv_sql := 'DELETE from ZOESTD.meta_tab$ ';
         lv_sql := lv_sql || ' where db_id#='''||in_db_id||'''';
-        lv_sql := lv_sql || ' and user_id#='''||lv_user_id||''')';
+        lv_sql := lv_sql || ' and user_id#='''||lv_user_id||'''';
 --        DBMS_OUTPUT.PUT_LINE(lv_sql);
         EXECUTE IMMEDIATE lv_sql;
         COMMIT;
       --同步已删除对象元数据
         lv_sql := 'DELETE from ZOESTD.meta_obj$ ';
         lv_sql := lv_sql || ' where db_id#='''||in_db_id||'''';
-        lv_sql := lv_sql || ' and user_id#='''||lv_user_id||''')';
+        lv_sql := lv_sql || ' and user_id#='''||lv_user_id||'''';
 --        DBMS_OUTPUT.PUT_LINE(lv_sql);
         EXECUTE IMMEDIATE lv_sql;
         COMMIT;
         --删除用户元数据
         lv_sql := 'DELETE FROM ZOESTD.meta_user$';
         lv_sql := lv_sql || ' WHERE db_id#='''||in_db_id||'''';
-        lv_sql := lv_sql || '  AND user_id='''||lv_user_id||''')';
+        lv_sql := lv_sql || '  AND user_id='''||lv_user_id||'''';
 --        DBMS_OUTPUT.PUT_LINE(lv_sql);
         EXECUTE IMMEDIATE lv_sql;
         COMMIT;
