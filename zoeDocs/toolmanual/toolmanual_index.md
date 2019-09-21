@@ -10,5 +10,6 @@
 6.	[重做日志修改手册](manual_redo_log.html)
 7.	[巡检报告查询手册](checkup_report_query_item.html)
 8.	[dbupgrade使用手册](manual_dbupgrade.html)
+9.	[ORA-01555处理](manual_ORA-01555处理.html)
 
 [文档主页](../index.html)

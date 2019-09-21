@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="author" content="MarkdownViewer++" />
-        <title>manual_expdp&impdp.txt</title>
+        <title>manual_expdp&impdp.md</title>
         <style type="text/css">
             
 /* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
@@ -60,8 +60,6 @@ where a.tablespace_name=b.tablespace_name(+) and a.file_id=b.file_id(+);</li>
 <ul>
 <li>select * from dba_directories;</li>
 <li>create or replace directory expdpdir as '/home/oracle/expdp';</li>
-<li>create  directory expdpdir as '/home/oracle/expdp';</li>
-<li>grant read,write on directory expdpdir to system;</li>
 </ul>
 </li>
 <li>全库导出
@@ -86,13 +84,17 @@ where a.tablespace_name=b.tablespace_name(+) and a.file_id=b.file_id(+);</li>
 <ul>
 <li>select * from dba_directories;</li>
 <li>create or replace directory impdpdir as '/home/oracle/impdp';</li>
-<li>create  directory impdpdir as '/home/oracle/impdp';</li>
-<li>grant read,write on directory impdpdir to system;
-2.查看impdp文件夹所属用户及权限</li>
+</ul>
+</li>
+<li>查看impdp文件夹所属用户及权限
+<ul>
 <li>ls -al /home/oracle/impdp</li>
 <li>chown -R oracle:oinstall /home/oracle/impdp</li>
-<li>chmod 777 /home/oracle/impdp
-3.创建表空间（执行前，注意修改数据文件的存储路径）</li>
+<li>chmod 777 /home/oracle/impdp</li>
+</ul>
+</li>
+<li>创建表空间（执行前，注意修改数据文件的存储路径）
+<ul>
 <li>select file_id,file_name,tablespace_name from dba_data_files;</li>
 <li>select name from v$tempfile;（通常情况下注释掉create_tabespace.sql中临时表空间的创建语法）</li>
 <li>执行create_tabespace.sql脚本</li>
@@ -104,17 +106,7 @@ where a.tablespace_name=b.tablespace_name(+) and a.file_id=b.file_id(+);</li>
 <li>impdp system/oracle directory=impdpdir dumpfile=hisdata_%U.dmp logfile=impdata.log  cluster=N</li>
 </ul>
 </li>
-<li>检查日志，确认导入情况
-<ul>
-<li>通过语法get_create_tabespace.sql获取create_tabespace.sql，注意修改脚本生成路径
-根据源库表空间使用情况，修改create_tabespace.sql语法。</li>
-</ul>
-</li>
-<li>查看导出日志及拷贝并修改impdp文件权限
-<ul>
-<li>chmod 644 /home/oracle/impdp</li>
-</ul>
-</li>
+<li>检查日志，确认导入情况</li>
 </ol>
 <p><a href="../index.html">文档主页</a></p>
 
