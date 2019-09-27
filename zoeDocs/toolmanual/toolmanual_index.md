@@ -11,5 +11,6 @@
 7.	[巡检报告查询手册](checkup_report_query_item.html)
 8.	[dbupgrade使用手册](manual_dbupgrade.html)
 9.	[ORA-01555处理](manual_ORA-01555处理.html)
+10.	[利用FY_Recover_Data工具恢复truncate的数据](useFY_Recover_Data.html)
 
 [文档主页](../index.html)
