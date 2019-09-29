@@ -12,5 +12,6 @@
 8.	[dbupgrade使用手册](manual_dbupgrade.html)
 9.	[ORA-01555处理](manual_ORA-01555处理.html)
 10.	[利用FY_Recover_Data工具恢复truncate的数据](useFY_Recover_Data.html)
+11.	[dbv工具的介绍与使用](manual_dbv.html)
 
 [文档主页](../index.html)

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>manual_dbv工具使用</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+
+</style>
+<style type="text/css">
+.highlight  { background: #ffffff; }
+.highlight .c { color: #999988; font-style: italic } /* Comment */
+.highlight .err { color: #a61717; background-color: #e3d2d2 } /* Error */
+.highlight .k { font-weight: bold } /* Keyword */
+.highlight .o { font-weight: bold } /* Operator */
+.highlight .cm { color: #999988; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #999999; font-weight: bold } /* Comment.Preproc */
+.highlight .c1 { color: #999988; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #999999; font-weight: bold; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #000000; background-color: #ffdddd } /* Generic.Deleted */
+.highlight .gd .x { color: #000000; background-color: #ffaaaa } /* Generic.Deleted.Specific */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #aa0000 } /* Generic.Error */
+.highlight .gh { color: #999999 } /* Generic.Heading */
+.highlight .gi { color: #000000; background-color: #ddffdd } /* Generic.Inserted */
+.highlight .gi .x { color: #000000; background-color: #aaffaa } /* Generic.Inserted.Specific */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #555555 } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #aaaaaa } /* Generic.Subheading */
+.highlight .gt { color: #aa0000 } /* Generic.Traceback */
+.highlight .kc { font-weight: bold } /* Keyword.Constant */
+.highlight .kd { font-weight: bold } /* Keyword.Declaration */
+.highlight .kp { font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #445588; font-weight: bold } /* Keyword.Type */
+.highlight .m { color: #009999 } /* Literal.Number */
+.highlight .s { color: #d14 } /* Literal.String */
+.highlight .na { color: #008080 } /* Name.Attribute */
+.highlight .nb { color: #0086B3 } /* Name.Builtin */
+.highlight .nc { color: #445588; font-weight: bold } /* Name.Class */
+.highlight .no { color: #008080 } /* Name.Constant */
+.highlight .ni { color: #800080 } /* Name.Entity */
+.highlight .ne { color: #990000; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #990000; font-weight: bold } /* Name.Function */
+.highlight .nn { color: #555555 } /* Name.Namespace */
+.highlight .nt { color: #000080 } /* Name.Tag */
+.highlight .nv { color: #008080 } /* Name.Variable */
+.highlight .ow { font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #009999 } /* Literal.Number.Float */
+.highlight .mh { color: #009999 } /* Literal.Number.Hex */
+.highlight .mi { color: #009999 } /* Literal.Number.Integer */
+.highlight .mo { color: #009999 } /* Literal.Number.Oct */
+.highlight .sb { color: #d14 } /* Literal.String.Backtick */
+.highlight .sc { color: #d14 } /* Literal.String.Char */
+.highlight .sd { color: #d14 } /* Literal.String.Doc */
+.highlight .s2 { color: #d14 } /* Literal.String.Double */
+.highlight .se { color: #d14 } /* Literal.String.Escape */
+.highlight .sh { color: #d14 } /* Literal.String.Heredoc */
+.highlight .si { color: #d14 } /* Literal.String.Interpol */
+.highlight .sx { color: #d14 } /* Literal.String.Other */
+.highlight .sr { color: #009926 } /* Literal.String.Regex */
+.highlight .s1 { color: #d14 } /* Literal.String.Single */
+.highlight .ss { color: #990073 } /* Literal.String.Symbol */
+.highlight .bp { color: #999999 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #008080 } /* Name.Variable.Class */
+.highlight .vg { color: #008080 } /* Name.Variable.Global */
+.highlight .vi { color: #008080 } /* Name.Variable.Instance */
+.highlight .il { color: #009999 } /* Literal.Number.Integer.Long */
+.pl-c {
+    color: #969896;
+}
+
+.pl-c1,.pl-mdh,.pl-mm,.pl-mp,.pl-mr,.pl-s1 .pl-v,.pl-s3,.pl-sc,.pl-sv {
+    color: #0086b3;
+}
+
+.pl-e,.pl-en {
+    color: #795da3;
+}
+
+.pl-s1 .pl-s2,.pl-smi,.pl-smp,.pl-stj,.pl-vo,.pl-vpf {
+    color: #333;
+}
+
+.pl-ent {
+    color: #63a35c;
+}
+
+.pl-k,.pl-s,.pl-st {
+    color: #a71d5d;
+}
+
+.pl-pds,.pl-s1,.pl-s1 .pl-pse .pl-s2,.pl-sr,.pl-sr .pl-cce,.pl-sr .pl-sra,.pl-sr .pl-sre,.pl-src,.pl-v {
+    color: #df5000;
+}
+
+.pl-id {
+    color: #b52a1d;
+}
+
+.pl-ii {
+    background-color: #b52a1d;
+    color: #f8f8f8;
+}
+
+.pl-sr .pl-cce {
+    color: #63a35c;
+    font-weight: bold;
+}
+
+.pl-ml {
+    color: #693a17;
+}
+
+.pl-mh,.pl-mh .pl-en,.pl-ms {
+    color: #1d3e81;
+    font-weight: bold;
+}
+
+.pl-mq {
+    color: #008080;
+}
+
+.pl-mi {
+    color: #333;
+    font-style: italic;
+}
+
+.pl-mb {
+    color: #333;
+    font-weight: bold;
+}
+
+.pl-md,.pl-mdhf {
+    background-color: #ffecec;
+    color: #bd2c00;
+}
+
+.pl-mdht,.pl-mi1 {
+    background-color: #eaffea;
+    color: #55a532;
+}
+
+.pl-mdr {
+    color: #795da3;
+    font-weight: bold;
+}
+
+.pl-mo {
+    color: #1d3e81;
+}
+.task-list {
+padding-left:10px;
+margin-bottom:0;
+}
+
+.task-list li {
+    margin-left: 20px;
+}
+
+.task-list-item {
+list-style-type:none;
+padding-left:10px;
+}
+
+.task-list-item label {
+font-weight:400;
+}
+
+.task-list-item.enabled label {
+cursor:pointer;
+}
+
+.task-list-item+.task-list-item {
+margin-top:3px;
+}
+
+.task-list-item-checkbox {
+display:inline-block;
+margin-left:-20px;
+margin-right:3px;
+vertical-align:1px;
+}
+</style>
+</head>
+<body>
+<link href="../zoe_docs.css" rel="stylesheet" type="text/css" />
+
+<p><a href="../index.html">文档主页</a></p>
+<h2 id="dbv-">DBV工具的介绍与使用</h2>
+<hr>
+<p> DBV(DBVERIFY)是Oracle提供的一个命令行工具，它可以对数据文件物理和逻辑两种一致性检查。DBV只能检查可缓存管理的块(数据块)，所以只能用于数据文件，不支持控制文件和重做日志文件的块检查。DBV使用于offline或者online的数据文件，也可也验证备份文件，但是备份文件只能是rman的copy命令或者操作系统的cp(win下是copy)命令备份的数据文件。</p>
+<hr>
+<p>特点：<br>-</p>
+<ol>
+<li><p>以只读的方式打开数据文件，在检查过程中不会修改数据文件的内容。</p>
+</li><li><p>可以在线检查数据文件，而不需要关闭数据库。</p>
+</li><li><p>不能检查控制文件和日志文件，只能检查数据文件。</p>
+</li><li><p>这个工具可以检查ASM文件，但数据库必须Open状态，并且需要通过USERID指定用户，比如：dbv file=+DG1/ORCL/datafile/system01.dbf userid=system/sys</p>
+</li><li><p>在许多UNIX平台下，DBV要求数据文件有扩展名，如果没有可以通过建立链接的方法，然后对链接的方法，然后对链接文件进行操作，比如：ls -n /dev/rdsk/mydevice /tmp/mydevice.dbf</p>
+</li><li><p>某些平台，DBV工具不能检查超过2GB的文件，如果碰到DBV-100错误，请先检查文件大小，MOS Bug 710888对这个问题有描述。</p>
+</li><li><p>DBV只会检查数据块的正确性，但不会关系数据块是否属于哪个对象。</p>
+</li><li><p>对于祼设备建议指定END参数，避免超出数据文件范围。比如：dbv FILE=/dev/rdsk/r1.dbf END=<last_block_number>。可以在v$datafile视图中用bytes字段除以块大小来获得END值。</p>
+</li></ol>
+<hr>
+<p> 参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th style="text-align:center">含义</th>
+<th style="text-align:right">缺省值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FILE</td>
+<td style="text-align:center">要检查的数据文件名</td>
+<td style="text-align:right">没有缺省值</td>
+</tr>
+<tr>
+<td>START</td>
+<td style="text-align:center">检查起始数据块号</td>
+<td style="text-align:right">数据文件的第一个数据块</td>
+</tr>
+<tr>
+<td>END</td>
+<td style="text-align:center">检查的最后一个数据块号</td>
+<td style="text-align:right">数据文件的最后一个数据块</td>
+</tr>
+<tr>
+<td>BLOCKSIZE</td>
+<td style="text-align:center">数据块大小，这个值要和数据库的DB_BLOCK_SIZE参数值一致</td>
+<td style="text-align:right">8192</td>
+</tr>
+<tr>
+<td>LOGFILE</td>
+<td style="text-align:center">检查结果日志文件</td>
+<td style="text-align:right">没有缺省值</td>
+</tr>
+<tr>
+<td>FEEDBAK</td>
+<td style="text-align:center">显示进度</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>PARFILE</td>
+<td style="text-align:center">参数文件名</td>
+<td style="text-align:right">没有缺省值</td>
+</tr>
+<tr>
+<td>USERID</td>
+<td style="text-align:center">用户名、密码</td>
+<td style="text-align:right">没有缺省值</td>
+</tr>
+<tr>
+<td>SEGMENT_ID</td>
+<td style="text-align:center">段ID，参数格式<tsn.segfile.segblock></td>
+<td style="text-align:right">没有缺省值</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>使用示例：<br>-</p>
+<pre><code>    C:\Users\Administrator&gt;dbv file=D:\DATABASE\USER02.DBF
+    DBVERIFY: Release 11.2.0.1.0 Production on 星期五 9月 27 16:26:05 2019
+    Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+    DBVERIFY 开始验证: FILE = D:\DATABASE\USER02.DBF
+    DBVERIFY 验证完成
+    检查的页总数: 1280
+    处理的页总数 (数据): 0
+    失败的页总数 (数据): 0
+    处理的页总数 (索引): 0
+    失败的页总数 (索引): 0
+    处理的页总数 (其他): 127
+    处理的总页数 (段)  : 0
+    失败的总页数 (段)  : 0
+    空的页总数: 1153
+    标记为损坏的总页数: 0
+    流入的页总数: 0
+    加密的总页数        : 0
+    最高块 SCN            : 1002791 (0.1002791)
+</code></pre><p>这个工具报告使用的是page作为单位，含义和data block相同。从上面的检查结果可以看出文件没有坏块。</p>
+<p>除了检查数据文件，这个工具还允许检查单独的Segment，这时参数值的格式为<tsn.segfile.segblock><br>查看对象的tsn,segfile,segblock属性：</p>
+<pre><code>create table T as select * from dba_data_files;
+</code></pre><pre><code>select t.ts#, s.header_file, s.header_block from v$tablespace t, dba_segments s where s.segment_name = &#39;T&#39; and t.name = s.tablespace_name;
+
+    TS#  HEADER_FILE  HEADER_BLCK
+
+    0            1            87392
+</code></pre><p>从上面的查询结果可行参数值为<strong>0.1.87392</strong>。检查Segment：</p>
+<pre><code>    C:\Users\Administrator&gt;dbv userid=system/oracle segment_id=0.1.87392
+    DBVERIFY: Release 11.2.0.1.0 - Production on 星期五 9月 27 16:56:21 2019
+    Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+    DBVERIFY - 开始验证: SEGMENT_ID = 0.1.87392
+    DBVERIFY - 验证完成
+    检查的页总数: 9
+    处理的页总数 (数据): 0
+    失败的页总数 (数据): 0
+    处理的页总数 (索引): 0
+    失败的页总数 (索引): 0
+    处理的页总数 (其他): 1
+    处理的总页数 (段)  : 2
+    失败的总页数 (段)  : 0
+    空的页总数: 6
+    标记为损坏的总页数: 0
+    流入的页总数: 0
+    加密的总页数        : 0
+    最高块 SCN            : 988504 (0.988504)
+</code></pre><p>下面人为创造一个坏块，用dbv来检查。<br>    select tablespace_name from dba_segments s where s.segment_name = &#39;T&#39;;</p>
+<pre><code>    TABLESPACE_NAME
+
+    SYSTEM
+</code></pre><p>我们验证system的数据文件</p>
+<pre><code>C:\Users\Administrator&gt;dbv file=D:\APP\ADMINISTRATOR\ORADATA\TEST1\SYSTEM01.DBF
+DBVERIFY: Release 11.2.0.1.0 - Production on 星期五 9月 27 17:26:57 2019
+Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+DBVERIFY - 开始验证: FILE = D:\APP\ADMINISTRATOR\ORADATA\TEST1\SYSTEM01.DBF
+DBVERIFY - 验证完成
+检查的页总数: 88320
+处理的页总数 (数据): 58440
+失败的页总数 (数据): 0
+处理的页总数 (索引): 12175
+失败的页总数 (索引): 0
+处理的页总数 (其他): 3362
+处理的总页数 (段)  : 1
+失败的总页数 (段)  : 0
+空的页总数: 14343
+标记为损坏的总页数: 0
+流入的页总数: 0
+加密的总页数        : 0
+最高块 SCN            : 1201615 (0.1201615)
+</code></pre><p>当前数据文件没有坏块。</p>
+<p>获取该表的数据块号block_id和数据文件file_id</p>
+<pre><code>select dbms_rowid.rowid_object(rowid) object_id,
+   dbms_rowid.rowid_block_number(rowid) block_id,
+   dbms_rowid.rowid_relative_fno(rowid) file_id,
+   dbms_rowid.rowid_row_number(rowid) num from T;
+
+    object_id BLOCK_ID  FILE_ID      NUM
+    73699        87393        1        0
+    73699        87393        1        1
+    73699        87393        1        2
+    73699        87393        1        3
+    73699        87393        1        4
+    73699        87393        1        5
+</code></pre><p>进行人为破坏</p>
+<pre><code>C:\Users\Administrator&gt;rman target/
+
+恢复管理器: Release 11.2.0.1.0 - Production on 星期五 9月 27 17:54:55 2019
+
+Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+
+连接到目标数据库: TEST1 (DBID=1390142278)
+
+RMAN&gt; recover datafile 1 block 87393 clear;
+
+启动 recover 于 27-9月 -19
+使用目标数据库控制文件替代恢复目录
+分配的通道: ORA_DISK_1
+通道 ORA_DISK_1: SID=37 设备类型=DISK
+完成 recover 于 27-9月 -19
+</code></pre><p>进行查询</p>
+<pre><code>SQL&gt; alter system flush buffer_cache; ---使用该方法强制Oracle重新执行物理读
+
+系统已更改。
+
+SQL&gt; select * from system.T;
+select * from system.T
+                     *
+第 1 行出现错误:
+ORA-01578: ORACLE 数据块损坏 (文件号 1, 块号 87393)
+ORA-01110: 数据文件 1: &#39;D:\APP\ADMINISTRATOR\ORADATA\TEST1\SYSTEM01.DBF&#39;
+</code></pre><p>查询到坏块错误ORA-01578: ORACLE 数据块损坏 (文件号 1, 块号 87393)</p>
+<p>下面用dbv验证一下</p>
+<pre><code>C:\Users\Administrator&gt;dbv file=D:\APP\ADMINISTRATOR\ORADATA\TEST1\SYSTEM01.DBF
+
+DBVERIFY: Release 11.2.0.1.0 - Production on 星期五 9月 27 17:59:14 2019
+
+Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+
+DBVERIFY - 开始验证: FILE = D:\APP\ADMINISTRATOR\ORADATA\TEST1\SYSTEM01.DBF
+页 87393 标记为损坏
+Corrupt block relative dba: 0x00415561 (file 1, block 87393)
+Bad header found during dbv:
+Data in bad block:
+ type: 6 format: 2 rdba: 0x00415561
+ last change scn: 0x0000.0012524f seq: 0x2 flg: 0x04
+ spare1: 0xb3 spare2: 0x7a spare3: 0x0
+ consistency value in tail: 0x524f0602
+ check value in block header: 0xf53d
+ computed block checksum: 0x7ab3
+
+DBVERIFY - 验证完成
+
+检查的页总数: 88320
+处理的页总数 (数据): 58439
+失败的页总数 (数据): 0
+处理的页总数 (索引): 12175
+失败的页总数 (索引): 0
+处理的页总数 (其他): 3362
+处理的总页数 (段)  : 1
+失败的总页数 (段)  : 0
+空的页总数: 14343
+标记为损坏的总页数: 1
+流入的页总数: 0
+加密的总页数        : 0
+最高块 SCN            : 1202520 (0.1202520)
+</code></pre><p>得到结果有一个坏块信息。<br>修复坏块信息的话，有rman备份的情况下可使用blockrecover命令修复，例如本例</p>
+<pre><code>blockrecover datafile 1 block 87393;
+</code></pre><p>若是使用dbv检查asm中的数据文件，需要指定userid参数</p>
+<p><a href="../index.html">文档主页</a></p>
+
+</body>
+</html>
+<!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
