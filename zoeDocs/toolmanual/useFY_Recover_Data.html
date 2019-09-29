@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>zabbix_install_index</title>
+<title>利用FY_Recover_Data工具恢复truncate的数据</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -293,15 +293,105 @@ img {
 <body>
 <p><link href="../zoe_docs.css" rel="stylesheet" type="text/css" /></p>
 <p><a href="../index.html">文档主页</a></p>
-<h3>zabbix监控系统</h3>
+<pre><code>### 利用FY_Recover_Data工具恢复truncate的数据
+</code></pre>
+
+<blockquote>
+<p>模拟实验</p>
+</blockquote>
+<hr />
+<pre><code>一、模拟truncate操作：
+</code></pre>
+
+<hr />
 <ol>
-<li><a href="zabbix/zabbix_server_install_guide.html">zabbix部署-服务端安装</a></li>
-<li><a href="zabbix/zabbix_client_install_guide.html">zabbix部署-客户端安装</a></li>
-<li><a href="zabbix/zabbix_config_guide.html">zabbix部署-监控配置</a></li>
-<li><a href="zabbix/zabbix_oracle_config_guide.html">zabbix部署-oracle监控配置</a></li>
-<li><a href="zabbix/zabbix_mail_config_guide.html">zabbix部署-告警邮件通知配置</a></li>
-<li><a href="zabbix/zabbix_proxy_install_guide.html">zabbix部署-代理安装和配置</a></li>
+<li>create table t as select * from dba<em>data</em>files;   -----随便创建个表</li>
+<li>select * from t;</li>
+<li>select count(*) from t;</li>
 </ol>
+<h2>  COUNT(*)</h2>
+<pre><code>    5
+</code></pre>
+
+<ol>
+<li>
+<p>truncate table t;</p>
+</li>
+<li>
+<p>select count(*) from t;</p>
+</li>
+</ol>
+<h2>  COUNT(*)</h2>
+<pre><code>   0
+</code></pre>
+
+<blockquote>
+<p>二、恢复truncate表的数据</p>
+</blockquote>
+<hr />
+<p>原理:
+TRUNCATE不会逐个清除用户数据块上的数据，而仅仅重置数据字典和元数据块上的元数据（如存储段头和扩展段图）。也就是说，此时，其基本数据并未被破坏，而是被系统回收、等待被重新分配————因此，要恢复被TRUNCATE的数据，需要及时备份其所在的数据文件。</p>
+<hr />
+<p>1.下载恢复工具到数据库服务器
+Fy<em>Recover</em>Data是利用Oracle表扫描机制、数据嫁接机制恢复TRUNCATE或者损坏数据的工具包。由纯PLSQL编写</p>
+<p><strong><a href="http://note.youdao.com/yws/public/resource/c795c39bb39027c9c50f22fb6b9094c1/xmlnote/18A4A33E6487487D97B04C4DF110FF66/10377" target="_blank">(点击下载FYRecoverData.sql)</a></strong></p>
+<hr />
+<p>2.以下步操作均用sys用户执行
+SQL&gt; @D:\flashback\FY<em>Recover</em>Data.sql</p>
+<p>这个脚本实际是在sys用户下创建了一个名为FY<em>Recover</em>Data的package</p>
+<hr />
+<p>3.使用sys用户找出存放truncate表的数据文件路径，下一步会用到这个文件路径</p>
+<p>select file<em>name from dba</em>data<em>files f, dba<em>tables t where t.owner='SYS' and t.table</em>name='T' and t.tablespace</em>name = f.tablespace_name;    <br />
+---用户名和表空间大写</p>
+<p>查得结果是D:\APP\ADMINISTRATOR\ORADATA\TEST\SYSTEM01.DBF</p>
+<hr />
+<p>4.使用sys用户执行以下操作开始恢复：</p>
+<hr />
+<pre><code>declare
+  tgtowner varchar2(30);
+  tgttable varchar2(30);
+  datapath varchar2(4000);
+  datadir varchar2(30);
+  rects varchar2(30);
+  recfile varchar2(30);
+  rstts varchar2(30);
+  rstfile varchar2(30);
+ blksz number;
+ rectab varchar2(30);
+ rsttab varchar2(30);
+ copyfile varchar2(30);
+begin
+ tgtowner := 'SYS'; 
+ tgttable := 'T';  
+ datapath := 'D:\APP\ADMINISTRATOR\ORADATA\TEST\';    
+ datadir := 'FY_DATA_DIR';       
+ Fy_Recover_data.prepare_files(tgtowner, tgttable, datapath, datadir, rects, recfile, rstts, rstfile, blksz);
+ Fy_Recover_data.fill_blocks(tgtowner, tgttable, datadir, rects, recfile, rstts, 8, tgtowner, tgtowner, rectab, rsttab, copyfile);
+ Fy_Recover_data.recover_table(tgtowner, tgttable, tgtowner, rectab, tgtowner, rsttab, datadir, datadir, recfile,datadir, copyfile, blksz);
+end;
+/
+</code></pre>
+
+<hr />
+<p>注：执行上的SQL产生2个表空间FY<em>REC</em>DATA、FY<em>RST</em>DATA，还有1个copy文件。
+执行多次上述语句，表不同的情况，则会产生多个表空间。</p>
+<hr />
+<p>5.使用sys用户把恢复的数据从sys.t$$中插回sys.t表</p>
+<p>注：sys.t$$中是sys.t表truncate之前的数据,若是用户ogg，表test则生成ogg.test$$</p>
+<p>insert into sys.t select * from sys.t$$;</p>
+<p>commit;</p>
+<p>select count(*) from t;</p>
+<h2>  COUNT(*)</h2>
+<pre><code>    5
+</code></pre>
+
+<p>可以看到被truncate的数据已经恢复。</p>
+<hr />
+<p>6.使用sys用户删除恢复时产生的2个表空间及数据文件</p>
+<p>drop tablespace fy<em>rec</em>data including contents and datafiles cascade constraint;</p>
+<p>drop tablespace fy<em>rst</em>data including contents and datafiles cascade constraint;</p>
+<p>以及删除包drop package FY<em>Recover</em>Data;</p>
+<p>7、不足：无法同时恢复多张表</p>
 <p><a href="../index.html">文档主页</a></p>
 
 </body>

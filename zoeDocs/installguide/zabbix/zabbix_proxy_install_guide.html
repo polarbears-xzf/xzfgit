@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>zabbix_install_index</title>
+<title>zabbix_proxy_install_guide</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -291,18 +291,66 @@ img {
 </style>
 </head>
 <body>
-<p><link href="../zoe_docs.css" rel="stylesheet" type="text/css" /></p>
-<p><a href="../index.html">文档主页</a></p>
-<h3>zabbix监控系统</h3>
-<ol>
-<li><a href="zabbix/zabbix_server_install_guide.html">zabbix部署-服务端安装</a></li>
-<li><a href="zabbix/zabbix_client_install_guide.html">zabbix部署-客户端安装</a></li>
-<li><a href="zabbix/zabbix_config_guide.html">zabbix部署-监控配置</a></li>
-<li><a href="zabbix/zabbix_oracle_config_guide.html">zabbix部署-oracle监控配置</a></li>
-<li><a href="zabbix/zabbix_mail_config_guide.html">zabbix部署-告警邮件通知配置</a></li>
-<li><a href="zabbix/zabbix_proxy_install_guide.html">zabbix部署-代理安装和配置</a></li>
-</ol>
-<p><a href="../index.html">文档主页</a></p>
+<p><link href="zoe_docs.css" rel="stylesheet" type="text/css" /></p>
+<p><a href="../../index.html">文档主页</a>
+<a href="../zabbix_install_index.html">上一页</a></p>
+<blockquote>
+<p><em>Created in 2019.09.29 by natsume</em><br />
+<em>Copyright (c) 20xx, CHINA and/or affiliates.</em>  
+</p>
+</blockquote>
+<h4>1.	安装proxy</h4>
+<pre><code>* yum install -y  zabbix-proxy-mysql  
+</code></pre>
+
+<h4>2.	安装mysql,proxy不能跟server共用一个数据库，需要在创建一个数据库</h4>
+<pre><code>* mysql安装同zabbix sever端一样，这里不写了
+* mysql -u root -p 
+  create database proxy character set utf8 collate utf8_general_ci;    # 创建数据库
+  create user 'proxy'@'%' identified by 'proxy@44';
+  ALTER USER 'proxy'@'%' IDENTIFIED BY 'proxy@44' PASSWORD EXPIRE NEVER; #修改加密规则 
+  ALTER USER 'proxy'@'%' IDENTIFIED WITH mysql_native_password BY 'proxy@44';
+  grant all privileges on *.* to proxy@'%';
+  flush privileges;                                     
+</code></pre>
+
+<h4>3.	zabbix-proxy的数据库只需要导入一条sql语句</h4>
+<pre><code>* zcat /usr/share/doc/zabbix-proxy-mysql-4.2.4/schema.sql.gz | mysql -u proxy -p proxy
+</code></pre>
+
+<h4>4.  zabbix-proxy配置文件</h4>
+<pre><code>  修改配置文件/etc/zabbix/zabbix_proxy.conf
+  Server=192.168.1.44               #真正的服务端
+  ServerPort=10051                  #根据个人需要修改,默认端口是10051，要实现转发的话使用这个选项
+  ListenPort=18051                  #代理的端口，默认10051改了之后zabbix客户端也要修改，如ip：端口
+  Hostname=zabbixproxy              #proxy的hostname，在web端网页配置时需要用到
+  DBHost=192.168.1.44
+  DBName=proxy                      #数据库名称，创建zabbix-proxy的mysql的数据库名称
+  DBUser=proxy                      #用户
+  DBPassword=proxy@44               #密码
+  DBPort=3306                       #当DBHost填写localhost时，默认是使用socket通信的，这里配置一下也无碍
+  ConfigFrequency=600               #这个好像是同步配置文件的时间
+  DataSenderFrequency=1             #这个是proxy端向server端发送数据的时间，单位是秒，几乎等于实时同步
+</code></pre>
+
+<h4>5.	zabbbix客户端配置文件ip指向代理ip，然后zabbix web端创建proxy</h4>
+<pre><code>* 管理-agent代理程序-输入ip添加代理
+* 配置-主机-输入名称、ip、代理程序检测
+</code></pre>
+
+<h4>6.	代理网络结构图</h4>
+<pre><code>       公司            开放端口10051      客户                            
+                           |
+                           |                     
+                           |                     &lt;-----&gt;服务A
+ zabbix server &lt;---&gt; 外部防火墙&lt;----&gt;zabbix proxy &lt;-----&gt;服务B
+                           |            |        &lt;-----&gt;服务C
+                           |            |        
+                           |       zabbix server 
+</code></pre>
+
+<p><a href="../../index.html">文档主页</a>
+<a href="../zabbix_install_index.html">上一页</a></p>
 
 </body>
 </html>

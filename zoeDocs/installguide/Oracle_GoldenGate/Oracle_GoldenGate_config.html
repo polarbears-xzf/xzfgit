@@ -1,0 +1,107 @@
+<!DOCTYPE html []>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="MarkdownViewer++" />
+    <title>Oracle_GoldenGate_config.md</title>
+    <style type="text/css">
+            
+/* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
+td, h1, h2, h3, h4, h5, p, ul, ol, li {
+    page-break-inside: avoid; 
+}
+
+        </style>
+  </head>
+  <body>
+    <link href="zoe_docs.css" rel="stylesheet" type="text/css" />
+    <p>
+      <a href="../../index.html">文档主页</a>
+      <a href="../Oracle_GoldenGate_index.html">上一页</a>
+    </p>
+    <blockquote>
+      <p>_Created in 2019.09.29 by xuyinan<br /><em>Copyright (c) 20xx, CHINA and/or affiliates.</em></p>
+    </blockquote>
+    <h3 id="oracle_goldengate">Oracle_GoldenGate部署</h3>
+    <ul>
+      <li>两台虚拟机准备<br />
+源端虚拟机服务器机器名：xyn-ogg1，ip地址为：192.168.248.133<br />
+目标虚拟机服务器机器名：xyn-ogg2；ip地址为：192.168.248.136
+两台服务器均安装了Oracle版本12.2.0.1版本以及ogg（版本12.3.0.15）安装路径为：C:\app\oracle\ggs<br />
+同时创建数据库名称为test</li>
+      <li>创建用户
+<ol><li>在源端数据库创建用户ogguser1，并授于dba的权限（其实可以不需要到dba权限），同时创建表table1</li><li>在目标端数据库创建用户ogguser2，并授于dba的权限（其实可以不需要到dba权限），同时创建表table1<br />
+为了区别里面的配置，所以创建两个不同的用户<br />
+create user OGGUSER2 identified by ORACLE;<br />
+grant dba to OGGUSER2;</li></ol></li>
+      <li>查看数据库状态
+<ol><li>数据库需要开启归档模式<br />
+查询语句：select log_mode FROM v$database;<br />
+NOARCHIVELOG：未开启归档状态  ARCHIVELOG：已开启归档状态<br />
+如果未开启归档状态，请先开启归档状态<br />
+sql&gt;shutdown immediate;<br />
+sql&gt;startup mount;<br />
+sql&gt;alter database archivelog;<br />
+sql&gt;alter database open;<br />
+这个是需要关闭数据库在mount状态下改变的</li><li>查询补充日志状态<br />
+查询语句：select supplemental_log_data_min, force_logging from v$database;<br />
+开启补充日志状态<br />
+sql&gt;alter database add supplemental log data;<br />
+sql&gt;alter database force logging;<br />
+sql&gt;alter system switch logfile;</li><li>确保redo和archivelog包含supplemental log数据<br />
+sql&gt;alter system switch logfile;</li></ol></li>
+      <li>设置环境变量<br />
+在源端和目标端配置环境变量<br />
+变量名：LD_LIBRARY_PATH<br />
+变量值：C:\app\oracle\product\12.2.0\dbhome_1\lib（ogg的安装目录\lib）</li>
+      <li>在源端和目标端都创建ogg目录	
+ggsci-&gt;CREATE SUBDIRS</li>
+      <li>ogg部署
+<ol><li>配置mgr进程<br />
+ggsci-&gt;edit param mgr打开配置文件<br />
+PORT 7809</li><li>在源端配置抽取进程<br />
+ggsci-&gt;edit param exta打开配置文件，内容如下：<br />
+EXTRACT exta<br />
+setenv ( NLS_LANG = AMERICAN_AMERICA.ZHS16GBK )<br />
+setenv (ORACLE_SID = test)<br />
+USERID ogguser1, PASSWORD ORACLE--用户名为 ogguser1,密码ORACLE<br />
+EXTTRAIL ./dirdat/lc--配置的路径，C:\app\oracle\ggs\dirdat<br />
+dynamicresolution<br />
+table ogguser1.table1;--配置的表，如果全部那就是*</li><li>在源端配置投递进程<br />
+ggsci-&gt;edit param pmpa打开配置文件，内容如下：<br />
+extract pmpa<br />
+setenv ( NLS_LANG = AMERICAN_AMERICA.ZHS16GBK )<br />
+passthru<br />
+rmthost 192.168.248.136, mgrport 7809, compress--投递的目录<br />
+rmttrail ./dirdat/rc--投递的路径<br />
+dynamicresolution<br />
+table ogguser1.table1;--投递的表信息</li><li>目标端配置复制进程<br />
+ggsci-&gt;edit param repla打开配置文件，内容如下<br />
+replicat rep1a<br />
+setenv ( NLS_LANG = AMERICAN_AMERICA.ZHS16GBK )<br />
+setenv (ORACLE_SID = test)<br />
+userid ogguser2, password ORACLE--用户名为 ogguser1,密码ORACLE<br />
+reperror default,abend<br />
+discardfile ./dirrpt/rep1a.dsc,append, megabytes 10<br />
+map ogguser1.table1,target ogguser2.table1;--前面为源端过来的表，后面为目标端需要复制的表</li><li>启动停止进程<br />
+info mgr查看管理进程状态<br />
+start mgr启动管理进程<br />
+stop mgr关闭管理进程<br />
+保证所配置的进程状态位running，则配置成功，可以在源端对table1进行数据增加修改进行测试</li></ol></li>
+      <li>ogg配置常见问题
+<ol><li>日志存放路径：<br />
+C:\app\oracle\ggs\dirrpt<br />
+C:\app\oracle\ggs\ggserr.txt</li><li>在启动进程exta的时候，无法启动，<br />
+报错OGG-02091  Operation not supported because enable_goldengate_replication is not set to true<br />
+执行语句，把这个参数ENABLE_GOLDENGATE_REPLICATION设置为TRUE<br />
+ALTER SYSTEM SET ENABLE_GOLDENGATE_REPLICATION = TRUE;</li><li>如果投递数据日志文件有产生，但是数据没有被复制，那么一般是复制进程有问题<br />
+（1）查看进程是否正常运行：ggsci-&gt;info all<br />
+（2）查询复制参数文件配置的源端数据跟目标端数据是否正常<br />
+map ogguser1.table1,target ogguser2.table1;</li></ol></li>
+    </ul>
+    <p>
+      <a href="../../index.html">文档主页</a>
+      <a href="../Oracle_GoldenGate_index.html">上一页</a>
+    </p>
+  </body>
+</html>
