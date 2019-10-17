@@ -22,6 +22,7 @@
 	*	[功能变更-2019.08](database_version_release/change_2019.08.html)
 4.	数据库监控
 	*	[功能变更-2019.09](database_version_release/change_2019.09.html)
+	*	[功能变更-2019.10](database_version_release/change_2019.10.html)
 6.	标准管理
 	*	[功能变更-2019.07](standard_manage/change_2019.07.html)
 ###	数据库归档系统模块功能说明
