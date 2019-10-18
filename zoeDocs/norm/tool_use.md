@@ -3,7 +3,9 @@
 [文档主页](../index.html)
 
 ###	工具使用规范
-1.	知识库文档格式：markdown
+1.	知识库文档格式：
+	*	文档编辑格式：markdown
+	*	文档阅读格式：html
 2.	知识库搜索工具
 	*	软件名称：HUAWEI HedEx Lite 
 	*	软件版本：V200R006C00
