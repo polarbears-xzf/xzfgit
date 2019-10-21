@@ -1,0 +1,68 @@
+<!DOCTYPE html []>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="MarkdownViewer++" />
+    <title>zabbix_config.md</title>
+    <style type="text/css">
+            
+/* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
+td, h1, h2, h3, h4, h5, p, ul, ol, li {
+    page-break-inside: avoid; 
+}
+
+        </style>
+  </head>
+  <body>
+    <link href="../zoe_docs.css" rel="stylesheet" type="text/css" />
+    <p>
+      <a href="../index.html">文档主页</a>
+    </p>
+    <h3 id="zabbix-server">Zabbix Server安装规范</h3>
+    <ul>
+      <li>安装规范
+<ul><li>mysql数据库my.cnf配置参数
+<ul><li>数据库名： 	zabbix</li><li>数据库用户：zabbix</li><li>数据库密码：具备一定长度和复杂度</li><li>服务端口：	3306</li></ul></li><li>zabbix_server.conf配置参数
+<ul><li>ListenPort=10051	   # 监听端口</li><li>DBHost=192.168.1.11	   # mysql数据库IP地址</li><li>DBName=zabbix	       # mysql数据库名</li><li>DBUser=zabbix	       # mysql数据库用户</li><li>DBPassword=具备一定长度和复杂度</li><li>DBPort=3306	           # mysql数据库服务端口</li></ul></li></ul></li>
+    </ul>
+    <h3 id="zabbix-proxy">Zabbix proxy安装规范</h3>
+    <ul>
+      <li>安装规范
+<ul><li>mysql数据库my.cnf配置参数
+<ul><li>数据库名： 	zabbixproxy</li><li>数据库用户：zabbixproxy</li><li>数据库密码：具备一定长度和复杂度</li><li>服务端口：	3306</li></ul></li><li>zabbix_proxy.conf配置参数
+<ul><li>ProxyMode=0            # 优先配置0（主动模式），安全条件不允许情况下配置1（被动模式）</li><li>Server=192.168.1.11    # 管理服务器地址（注2），主动模式时为代理发送数据的管理服务器地址服务器地址，被动模式下为允许连接到代理的管理服务器地址服务器地址列表</li><li>ServerPort=10051       # Zabbix Server服务器端口</li><li>Hostname=zoezbxproxy   # Zabbix proxy名称（注1）。zabbix服务器识别代理的唯一标识，</li><li>ListenPort=10052       # Zabbix proxy端口</li><li>SourceIP=192.168.1.12  # Zabbix proxy外联IP地址</li><li>DBHost=192.168.1.12	   # mysql数据库IP地址</li><li>DBName=zabbixproxy	   # mysql数据库名</li><li>DBUser=zabbixproxy	   # mysql数据库用户</li><li>DBPassword=具备一定长度和复杂度</li><li>DBPort=3306	           # mysql数据库服务端口</li><li>ConfigFrequency=600    # 代理向服务器检索配置信息的频率，单位秒</li><li>DataSenderFrequency=1  # 代理向服务器发送采集数据的频率，单位秒</li></ul></li></ul></li>
+    </ul>
+    <h3 id="zabbix-agent">Zabbix agent安装规范</h3>
+    <ul>
+      <li>安装规范
+<ul><li>zabbix_agented.conf配置参数
+<ul><li>Server=192.168.1.12       # 被动模式（注3），允许哪台服务器连接agent,多个服务器逗号隔开</li><li>SourceIP=192.168.1.13     # Zabbix agent外联IP地址</li><li>ListenPort=10050          # 客户端监听端口</li><li>ListenIP=0.0.0.0          # 客户端监听IP</li><li>Hostname=zoezbxserver     # 客户端名称（注1）</li><li>ServerActive=192.168.1.11 # 主动模式（注4），允许向哪台服务器传送监控数据,多个服务器逗号隔开</li></ul></li></ul></li>
+    </ul>
+    <h3 id="section">注1：命名规则</h3>
+    <pre>
+      <code>*	zabbix Server客户端名称：“项目名称” + “zbxserver”
+*	Zabbix proxy名称：“项目名称” + “zbxproxy”
+*	被管服务器客户端：“项目名称” + “_ostype” + “_hostname” + “_ipaddress”
+*	被管数据库：“项目名称” + “_dbtype” + “_dbname” + “_ipaddress”
+</code>
+    </pre>
+    <h3 id="section-1">注2：管理服务器地址</h3>
+    <pre>
+      <code>*	配置公司统一管理服务器地址，使用DNS
+</code>
+    </pre>
+    <h3 id="section-2">注3：被动模式</h3>
+    <pre>
+      <code>*	被动模式配置Zabbix proxy地址，用于向公司统一管理服务器发送数据
+</code>
+    </pre>
+    <h3 id="section-3">注4：主动模式</h3>
+    <pre>
+      <code>*	主动模式配置本地Zabbix Server地址，用于本地监控服务
+</code>
+    </pre>
+    <p>
+      <a href="../index.html">文档主页</a>
+    </p>
+  </body>
+</html>
