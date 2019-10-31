@@ -1,0 +1,100 @@
+<!DOCTYPE html []>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="MarkdownViewer++" />
+    <title>oracle_silent_install_guide.md</title>
+    <style type="text/css">
+            
+/* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
+td, h1, h2, h3, h4, h5, p, ul, ol, li {
+    page-break-inside: avoid; 
+}
+
+        </style>
+  </head>
+  <body>
+    <link href="../../zoe_docs.css" rel="stylesheet" type="text/css" />
+    <p>
+      <a href="../../../index.html">文档主页</a>
+      <a href="../Oracle_12c_silent_installation_index.html">上一页</a>
+    </p>
+    <h3 id="oracle">静默安装Oracle数据库软件</h3>
+    <ol>
+      <li>解压数据库软件zip包
+<blockquote></blockquote><pre><code>unzip /home/oracle/linuxx64_12201_database.zip
+</code></pre></li>
+      <li>通过yum安装所需依赖包（root用户）
+<blockquote></blockquote><pre><code>yum install binutils compat-libcap1 compat-libstdc++-33 gcc gcc-c++ glibc glibc-devel ksh libaio libaio-devel libgcc libstdc++ libstdc++-devel libXext libXtst libX11 libXau libxcb libXi make h libaio libaio-devel libgcc libstdc++ libstdc++-devel libXex  sysstat  smartmontools
+</code></pre></li>
+      <li>编辑内核参数（root用户）
+<blockquote><p>vim /etc/sysctl.conf</p></blockquote><pre><code>fs.file-max = 6815744
+kernel.shmmni = 4096
+kernel.shmall = 1073741824
+kernel.shmmax = 4398046511104
+kernel.panic_on_oops = 1
+kernel.sem = 250 32000 100 128
+net.core.rmem_default = 262144
+net.core.rmem_max = 4194304
+net.core.wmem_default = 262144
+net.core.wmem_max = 1048576
+net.ipv4.conf.all.rp_filter = 2
+net.ipv4.conf.default.rp_filter = 2
+fs.aio-max-nr = 1048576
+net.ipv4.ip_local_port_range = 9000 65500
+</code></pre><blockquote><p>sysctl -p</p></blockquote></li>
+      <li>编辑配置参数
+<blockquote><p>vim /etc/security/limits.conf</p></blockquote><pre><code>oracle soft nproc 2047
+oracle hard nproc 16384
+oracle soft nofile 1024
+oracle hard nofile 65536
+oracle soft stack 10240
+oracle hard stack 10240
+</code></pre></li>
+      <li>配置.base_profile(oracle用户)
+<blockquote><p>vim ~/.base_profile</p></blockquote><pre><code>ORACLE_BASE=/u01/app/oracle
+export ORACLE_BASE
+ORACLE_HOME=/u01/app/oracle/product/12.1.0/db_1
+export ORACLE_HOME
+ORACLE_SID=zoecdb
+export ORACLE_SID
+ORACLE_UNQNAME=zoecdb
+export ORACLE_UNQNAME
+</code></pre></li>
+      <li>创建目录
+<blockquote></blockquote><pre><code>mkdir -p /u01/app/oracle
+chown -R oracle:oinstall /u01
+chmod -R 775 /u01
+</code></pre><blockquote></blockquote></li>
+      <li>编辑静默安装参数文件
+<blockquote><p>vim /home/oracle/database/response/db_install.rsp
+<a href="./db_install.rsp">参数文件</a></p></blockquote></li>
+      <li>静默安装Oracle软件(Oracle用户)
+<blockquote></blockquote><pre><code>./runInstaller -force -silent -noconfig -responseFile /home/oracle/database/response/db_install.rsp
+</code></pre></li>
+      <li>执行数据库脚本(root用户)
+<blockquote></blockquote><pre><code>/u01/app/oracle/oraInventory/orainstRoot.sh  
+/u01/app/oracle/product/12.2.0.1/db_1/root.sh 
+</code></pre></li>
+      <li>参数文件解释
+<blockquote></blockquote><pre><code>oracle.install.responseFileVersion=/oracle/install/rspfmt_dbinstall_response_schema_v12.2.0  //系统生成值,勿修改
+oracle.install.option=INSTALL_DB_SWONLY                     //30行,安装类型,只安装数据库软件
+UNIX_GROUP_NAME=oinstall                                    //35行,INVENTORY目录组名
+INVENTORY_LOCATION=/u01/app/oracle/oraInventory             //42行,INVENTORY目录
+ORACLE_HOME=/u01/app/oracle/product/12.2.0.1/db_1           //46行,Oracle_Home目录
+ORACLE_BASE=/u01/app/oracle                                 //51行,Oracle_Base目录
+oracle.install.db.InstallEdition=EE                         //63行,Oracle软件类型
+oracle.install.db.OSDBA_GROUP=dba                           //80行
+oracle.install.db.OSOPER_GROUP=oper                         //86行 
+oracle.install.db.OSBACKUPDBA_GROUP=dba                     //91行  
+oracle.install.db.OSDGDBA_GROUP=dba                         //96行
+oracle.install.db.OSKMDBA_GROUP=dba                         //101行
+oracle.install.db.OSRACDBA_GROUP=dba                        //106行
+</code></pre><blockquote></blockquote></li>
+    </ol>
+    <p>
+      <a href="../../../index.html">文档主页</a>
+      <a href="../Oracle_12c_silent_installation_index.html">上一页</a>
+    </p>
+  </body>
+</html>

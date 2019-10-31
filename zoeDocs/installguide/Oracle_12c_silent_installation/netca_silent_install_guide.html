@@ -1,0 +1,37 @@
+<!DOCTYPE html []>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="MarkdownViewer++" />
+    <title>netca_silent_install_guide.md</title>
+    <style type="text/css">
+            
+/* Avoid page breaks inside the most common attributes, especially for exports (i.e. PDF) */
+td, h1, h2, h3, h4, h5, p, ul, ol, li {
+    page-break-inside: avoid; 
+}
+
+        </style>
+  </head>
+  <body>
+    <link href="../../zoe_docs.css" rel="stylesheet" type="text/css" />
+    <p>
+      <a href="../../../index.html">文档主页</a>
+      <a href="../Oracle_12c_silent_installation_index.html">上一页</a>
+    </p>
+    <h3 id="oracle">静默创建Oracle监听</h3>
+    <ol>
+      <li>静默创建Oracle监听(Oracle用户)
+<blockquote></blockquote><pre><code>netca -silent -responsefile /home/oracle/database/response/netca.rsp
+</code></pre></li>
+      <li>注意事项
+<ol><li>找不到netca命令
+<ul><li>需配置环境变量中ORACLE_HOME变量</li></ul></li><li>客户端无法连接
+<ul><li>需配置hosts将IP与hostname关联</li></ul></li></ol></li>
+    </ol>
+    <p>
+      <a href="../../../index.html">文档主页</a>
+      <a href="../Oracle_12c_silent_installation_index.html">上一页</a>
+    </p>
+  </body>
+</html>
