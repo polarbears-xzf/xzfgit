@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>审计功能介绍</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+/* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
+/* Author: Nicolas Hery - http://nicolashery.com */
+/* Version: b13fe65ca28d2e568c6ed5d7f06581183df8f2ff */
+/* Source: https://github.com/nicolahery/markdownpad-github */
+
+/* RESET
+=============================================================================*/
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* BODY
+=============================================================================*/
+
+body {
+  font-family: Helvetica, arial, freesans, clean, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  background-color: #fff;
+  padding: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+body>*:first-child {
+  margin-top: 0 !important;
+}
+
+body>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* BLOCKS
+=============================================================================*/
+
+p, blockquote, ul, ol, dl, table, pre {
+  margin: 15px 0;
+}
+
+/* HEADERS
+=============================================================================*/
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 20px 0 10px;
+  padding: 0;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 tt, h1 code, h2 tt, h2 code, h3 tt, h3 code, h4 tt, h4 code, h5 tt, h5 code, h6 tt, h6 code {
+  font-size: inherit;
+}
+
+h1 {
+  font-size: 28px;
+  color: #000;
+}
+
+h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #ccc;
+  color: #000;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+h5 {
+  font-size: 14px;
+}
+
+h6 {
+  color: #777;
+  font-size: 14px;
+}
+
+body>h2:first-child, body>h1:first-child, body>h1:first-child+h2, body>h3:first-child, body>h4:first-child, body>h5:first-child, body>h6:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+h1+p, h2+p, h3+p, h4+p, h5+p, h6+p {
+  margin-top: 10px;
+}
+
+/* LINKS
+=============================================================================*/
+
+a {
+  color: #4183C4;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* LISTS
+=============================================================================*/
+
+ul, ol {
+  padding-left: 30px;
+}
+
+ul li > :first-child, 
+ol li > :first-child, 
+ul li ul:first-of-type, 
+ol li ol:first-of-type, 
+ul li ol:first-of-type, 
+ol li ul:first-of-type {
+  margin-top: 0px;
+}
+
+ul ul, ul ol, ol ol, ol ul {
+  margin-bottom: 0;
+}
+
+dl {
+  padding: 0;
+}
+
+dl dt {
+  font-size: 14px;
+  font-weight: bold;
+  font-style: italic;
+  padding: 0;
+  margin: 15px 0 5px;
+}
+
+dl dt:first-child {
+  padding: 0;
+}
+
+dl dt>:first-child {
+  margin-top: 0px;
+}
+
+dl dt>:last-child {
+  margin-bottom: 0px;
+}
+
+dl dd {
+  margin: 0 0 15px;
+  padding: 0 15px;
+}
+
+dl dd>:first-child {
+  margin-top: 0px;
+}
+
+dl dd>:last-child {
+  margin-bottom: 0px;
+}
+
+/* CODE
+=============================================================================*/
+
+pre, code, tt {
+  font-size: 12px;
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+}
+
+code, tt {
+  margin: 0 0px;
+  padding: 0px 0px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px;
+}
+
+pre>code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent;
+}
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px;
+}
+
+pre code, pre tt {
+  background-color: transparent;
+  border: none;
+}
+
+kbd {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #DDDDDD;
+    background-image: linear-gradient(#F1F1F1, #DDDDDD);
+    background-repeat: repeat-x;
+    border-color: #DDDDDD #CCCCCC #CCCCCC #DDDDDD;
+    border-image: none;
+    border-radius: 2px 2px 2px 2px;
+    border-style: solid;
+    border-width: 1px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    line-height: 10px;
+    padding: 1px 4px;
+}
+
+/* QUOTES
+=============================================================================*/
+
+blockquote {
+  border-left: 4px solid #DDD;
+  padding: 0 15px;
+  color: #777;
+}
+
+blockquote>:first-child {
+  margin-top: 0px;
+}
+
+blockquote>:last-child {
+  margin-bottom: 0px;
+}
+
+/* HORIZONTAL RULES
+=============================================================================*/
+
+hr {
+  clear: both;
+  margin: 15px 0;
+  height: 0px;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+  border-bottom: 4px solid #ddd;
+  padding: 0;
+}
+
+/* TABLES
+=============================================================================*/
+
+table th {
+  font-weight: bold;
+}
+
+table th, table td {
+  border: 1px solid #ccc;
+  padding: 6px 13px;
+}
+
+table tr {
+  border-top: 1px solid #ccc;
+  background-color: #fff;
+}
+
+table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+
+/* IMAGES
+=============================================================================*/
+
+img {
+  max-width: 100%
+}
+</style>
+<style type="text/css">
+.highlight  { background: #ffffff; }
+.highlight .c { color: #999988; font-style: italic } /* Comment */
+.highlight .err { color: #a61717; background-color: #e3d2d2 } /* Error */
+.highlight .k { font-weight: bold } /* Keyword */
+.highlight .o { font-weight: bold } /* Operator */
+.highlight .cm { color: #999988; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #999999; font-weight: bold } /* Comment.Preproc */
+.highlight .c1 { color: #999988; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #999999; font-weight: bold; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #000000; background-color: #ffdddd } /* Generic.Deleted */
+.highlight .gd .x { color: #000000; background-color: #ffaaaa } /* Generic.Deleted.Specific */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #aa0000 } /* Generic.Error */
+.highlight .gh { color: #999999 } /* Generic.Heading */
+.highlight .gi { color: #000000; background-color: #ddffdd } /* Generic.Inserted */
+.highlight .gi .x { color: #000000; background-color: #aaffaa } /* Generic.Inserted.Specific */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #555555 } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #aaaaaa } /* Generic.Subheading */
+.highlight .gt { color: #aa0000 } /* Generic.Traceback */
+.highlight .kc { font-weight: bold } /* Keyword.Constant */
+.highlight .kd { font-weight: bold } /* Keyword.Declaration */
+.highlight .kp { font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #445588; font-weight: bold } /* Keyword.Type */
+.highlight .m { color: #009999 } /* Literal.Number */
+.highlight .s { color: #d14 } /* Literal.String */
+.highlight .na { color: #008080 } /* Name.Attribute */
+.highlight .nb { color: #0086B3 } /* Name.Builtin */
+.highlight .nc { color: #445588; font-weight: bold } /* Name.Class */
+.highlight .no { color: #008080 } /* Name.Constant */
+.highlight .ni { color: #800080 } /* Name.Entity */
+.highlight .ne { color: #990000; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #990000; font-weight: bold } /* Name.Function */
+.highlight .nn { color: #555555 } /* Name.Namespace */
+.highlight .nt { color: #000080 } /* Name.Tag */
+.highlight .nv { color: #008080 } /* Name.Variable */
+.highlight .ow { font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #009999 } /* Literal.Number.Float */
+.highlight .mh { color: #009999 } /* Literal.Number.Hex */
+.highlight .mi { color: #009999 } /* Literal.Number.Integer */
+.highlight .mo { color: #009999 } /* Literal.Number.Oct */
+.highlight .sb { color: #d14 } /* Literal.String.Backtick */
+.highlight .sc { color: #d14 } /* Literal.String.Char */
+.highlight .sd { color: #d14 } /* Literal.String.Doc */
+.highlight .s2 { color: #d14 } /* Literal.String.Double */
+.highlight .se { color: #d14 } /* Literal.String.Escape */
+.highlight .sh { color: #d14 } /* Literal.String.Heredoc */
+.highlight .si { color: #d14 } /* Literal.String.Interpol */
+.highlight .sx { color: #d14 } /* Literal.String.Other */
+.highlight .sr { color: #009926 } /* Literal.String.Regex */
+.highlight .s1 { color: #d14 } /* Literal.String.Single */
+.highlight .ss { color: #990073 } /* Literal.String.Symbol */
+.highlight .bp { color: #999999 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #008080 } /* Name.Variable.Class */
+.highlight .vg { color: #008080 } /* Name.Variable.Global */
+.highlight .vi { color: #008080 } /* Name.Variable.Instance */
+.highlight .il { color: #009999 } /* Literal.Number.Integer.Long */
+.pl-c {
+    color: #969896;
+}
+
+.pl-c1,.pl-mdh,.pl-mm,.pl-mp,.pl-mr,.pl-s1 .pl-v,.pl-s3,.pl-sc,.pl-sv {
+    color: #0086b3;
+}
+
+.pl-e,.pl-en {
+    color: #795da3;
+}
+
+.pl-s1 .pl-s2,.pl-smi,.pl-smp,.pl-stj,.pl-vo,.pl-vpf {
+    color: #333;
+}
+
+.pl-ent {
+    color: #63a35c;
+}
+
+.pl-k,.pl-s,.pl-st {
+    color: #a71d5d;
+}
+
+.pl-pds,.pl-s1,.pl-s1 .pl-pse .pl-s2,.pl-sr,.pl-sr .pl-cce,.pl-sr .pl-sra,.pl-sr .pl-sre,.pl-src,.pl-v {
+    color: #df5000;
+}
+
+.pl-id {
+    color: #b52a1d;
+}
+
+.pl-ii {
+    background-color: #b52a1d;
+    color: #f8f8f8;
+}
+
+.pl-sr .pl-cce {
+    color: #63a35c;
+    font-weight: bold;
+}
+
+.pl-ml {
+    color: #693a17;
+}
+
+.pl-mh,.pl-mh .pl-en,.pl-ms {
+    color: #1d3e81;
+    font-weight: bold;
+}
+
+.pl-mq {
+    color: #008080;
+}
+
+.pl-mi {
+    color: #333;
+    font-style: italic;
+}
+
+.pl-mb {
+    color: #333;
+    font-weight: bold;
+}
+
+.pl-md,.pl-mdhf {
+    background-color: #ffecec;
+    color: #bd2c00;
+}
+
+.pl-mdht,.pl-mi1 {
+    background-color: #eaffea;
+    color: #55a532;
+}
+
+.pl-mdr {
+    color: #795da3;
+    font-weight: bold;
+}
+
+.pl-mo {
+    color: #1d3e81;
+}
+.task-list {
+padding-left:10px;
+margin-bottom:0;
+}
+
+.task-list li {
+    margin-left: 20px;
+}
+
+.task-list-item {
+list-style-type:none;
+padding-left:10px;
+}
+
+.task-list-item label {
+font-weight:400;
+}
+
+.task-list-item.enabled label {
+cursor:pointer;
+}
+
+.task-list-item+.task-list-item {
+margin-top:3px;
+}
+
+.task-list-item-checkbox {
+display:inline-block;
+margin-left:-20px;
+margin-right:3px;
+vertical-align:1px;
+}
+</style>
+</head>
+<body>
+<link href="../zoe_docs.css" rel="stylesheet" type="text/css" />
+
+<p><a href="../index.html">文档主页</a></p>
+<h2 id="-">审计功能的介绍</h2>
+<hr>
+<h2 id="1-">1、审计的相关概念</h2>
+<p>1.1    审计的相关概念</p>
+<blockquote>
+<p>审计（Audit)用于监视用户所执行的数据库操作，审计记录可存在数据字典表（称为审计记录:存储在system表空间中的 SYS.AUD$表中，可通过视图dba_audit_trail查看）或操作系统审计记录中(默认位置$ORACLE_BASE/admin/$ORACLE_SID/adump/).。默认情况下审计是没有开启的。<br>当数据库的审计是开启的，在语句执行阶段产生审计记录。审计记录包含有审计的操作、用户执行的操作、操作的日期和时间等信息。不管你是否打开数据库的审计功能，以下这些操作系统会强制记录：用管理员权限连接Instance、启动数据库、关闭数据库。</p>
+</blockquote>
+<hr>
+<p>1.2    Oracle审计功能</p>
+<blockquote>
+<p>审计是对选定的用户动作的监控和记录，通常用于：<br>审查可疑的活动。例如：数据被非授权用户所删除，此时安全管理员可决定对该数据库的所有连接进行审计，以及对数据库的所有表的成功地或不成功地删除进行审计。<br>监视和收集关于指定数据库活动的数据。例如：DBA可收集哪些被修改、执行了多少次逻辑的I/O等统计数据。</p>
+</blockquote>
+<hr>
+<p>1.3    ORACLE所允许的审计选择限于下列方面：</p>
+<blockquote>
+<p>审计语句的成功执行、不成功执行，或者其两者。对每一用户会话审计语句执行一次或者对语句每次执行审计一次。对全部用户或指定用户的活动的审计。</p>
+</blockquote>
+<hr>
+<p>1.4    审计相关的表安装</p>
+<blockquote>
+<p>SQLPLUS&gt; connect / AS SYSDBA<br> SQLPLUS&gt; select <em> from sys.aud$;     --没有记录返回<br> SQLPLUS&gt; select </em> from dba_audit_trail;   - 没有记录返回<br>     如果做上述查询的时候发现表不存在，说明审计相关的表还没有安装，需要安装。<br> SQLPLUS&gt; connect / as sysdba<br> SQLPLUS&gt; @$ORACLE_HOME/rdbms/admin/cataudit.sql<br>     审计表安装在SYSTEM表空间。所以要确保SYSTEM表空间又足够的空间存放审计信息。<br>    安装后要重启数据库</p>
+</blockquote>
+<hr>
+<p>1.5    将审计相关的表移动到其他表空间</p>
+<blockquote>
+<p>由于AUD$表等审计相关的表存放在SYSTEM表空间，因此为了不影响系统的性能，保护SYSTEM表空间，最好把AUD$移动到其他的表空间上。可以使用下面的语句来进行移动：</p>
+<pre><code>create tablespace  audit_tab  datafile &#39;*/ audit_tab _tab01.ora&#39; size 300M autoextend on next 10m maxsize 8000m;
+
+
+DBMS_AUDIT_MGMT.SET_AUDIT_TRAIL_LOCATION(AUDIT_TRAIL_TYPE=&gt; 
+
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_DB_STD,AUDIT_TRAIL_LOCATION=&gt;’AUDIT_TAB’)
+</code></pre><p>有三种迁移审计表的方式<br>（单独迁移AUD$）</p>
+<pre><code>DBMS_AUDIT_MGMT.AUDIT_TRAIL_AUD_STD: Standard audit trail table, AUD$.
+</code></pre><p>（单独迁移FGA_LOG$）</p>
+<pre><code>DBMS_AUDIT_MGMT.AUDIT_TRAIL_FGA_STD: Fine-grained audit trail table, FGA_LOG$.
+</code></pre><p>（迁移AUD$,FGA_LOG$）</p>
+<pre><code>DBMS_AUDIT_MGMT.AUDIT_TRAIL_DB_STD: Both standard and fine-grained audit trail tables 
+</code></pre></blockquote>
+<hr>
+<p>1.6    truncate 或者 delete sys.aud$ 表</p>
+<blockquote>
+<p>sql&gt;truncate table sys.aud$<br>11g默认启用强大的审计选项，AUDIT_TRAIL参数的缺省值为DB，这意为着审计数据将记录在数据库中的AUD$审计字典基表上。Oracle官方宣称默认启用的审计日志不会对绝大多数产品数据库的性能带来过大的负面影响，同时Oracle公司还推荐使用基于OS文件的审计日志记录方式(OS audit trail files)。<br>注意因为在11g中CREATE SESSION将被作为受审计的权限来被记录，因此当SYSTEM表空间因磁盘空间而无法扩展时将导致这部分审计记录无法生成，这将最终导致普通用户的新会话将无法正常创建，普通用户将无法登陆数据库。在这种场景中仍可以使用SYSDBA身份的用户创建会话，在将审计数据合适备份后删除一部分记录，或者干脆TRUNCATE AUD$都可以解决上述问题。<br>当AUDIT_TRAIL设置为OS时，审计记录文件将在AUDIT_FILE_DEST参数所指定的目录中生成。全部这些文件均可以随时被删除或复制。</p>
+</blockquote>
+<hr>
+<h2 id="2-">2、查看审计设置</h2>
+<blockquote>
+<p>SQL&gt; show parameter audit;<br>SQL&gt; show  parameter  AUDIT_SYS_OPERATIONS;<br>参数说明<br>AUDIT_TRAIL = { none | os | db | db,extended | xml | xml,extended }<br>None：是默认值，不做审计；<br>DB：将audit trail 记录在数据库的审计相关表中，如aud$，审计的结果只有连接信息；<br>DB,Extended：这样审计结果里面除了连接信息还包含了当时执行的具体语句；( 注意如果audit_trail=db，不记录SQL_BIND和SQL_TEXT)<br>OS：将audit trail 记录在操作系统文件中，文件名由audit_file_dest参数指定；<br>XML：10g里新增的。启动审计，并且所有的审计记录以XML格式存在在OS系统文件中<br>注：这两个参数是static参数，需要重新启动数据库才能生效。<br>AUDIT_SYS_OPERATIONS== = {false|true}<br>默认为false，当设置为true时，所有sys用户（包括以sysdba, sysoper身份登录的用户）的操作都会被记录，audit trail不会写在aud$表中，这个很好理解，如果数据库还未启动aud$不可用，那么像conn /as sysdba这样的连接信息，只能记录在其它地方。如果是windows平台，audti trail会记录在windows的事件管理中，如果是linux/unix平台则会记录在audit_file_dest参数指定的文件中。<br>重新设置审计参数后，需要重启数据库才能生效。</p>
+</blockquote>
+<hr>
+<h2 id="3-">3、审计相关视图</h2>
+<p>3.1 审计配置查询</p>
+<blockquote>
+<pre><code>DBA_PRIV_AUDIT_OPTS                         -------视图设置的权限将对所有用户审计
+DBA_STMT_AUDIT_OPTS                        --------视图设置的权限将对所有用户审计
+DBA_OBJ_AUDIT_OPTS
+DBA_AUDIT_POLICIES
+DBA_AUDIT_POLICY_COLUMNS
+AUDIT_ACTIONS
+</code></pre></blockquote>
+<p>3.2 审计记录管理查询</p>
+<blockquote>
+<pre><code>DBA_AUDIT_MGMT_CLEAN_EVENTS
+DBA_AUDIT_MGMT_CLEANUP_JOBS
+DBA_AUDIT_MGMT_CONFIG_PARAMS
+DBA_AUDIT_MGMT_LAST_ARCH_TS
+</code></pre></blockquote>
+<p>3.3 审计记录查询</p>
+<blockquote>
+<pre><code>DBA_AUDIT_TRAIL
+DBA_COMMON_AUDIT_TRAIL
+DBA_FGA_AUDIT_TRAIL
+DBA_AUDIT_OBJECT
+DBA_AUDIT_SESSION
+DBA_AUDIT_STATEMENT
+</code></pre></blockquote>
+<p>3.4 视图说明</p>
+<blockquote>
+<p>SYS.AUD$<br>审计功能的底层视图,如果需要对数据进行删除,只需要对aud$视图进行删除既可,其他视图里的数据都是由aud$所得.</p>
+</blockquote>
+<pre><code>  DBA_AUDIT_EXISTS
+</code></pre><p>列出audit not exists和audit exists产生的审计跟踪,我们默认的都是audit exists.</p>
+<pre><code>  DBA_AUDIT_TRAIL
+</code></pre><p>可以在里面查处所有审计所跟踪的信息. 保存所有的audit trail，实际上它只是一个基于aud$的视图。其它的视图dba_audit_session,dba_audit_object,dba_audit_statement都只是dba_audit_trail的一个子集</p>
+<pre><code>  DBA_AUDIT_OBJECT
+</code></pre><p>可以查询所有对象跟踪信息.(例如,对grant,revoke等不记录),信息完全包含于dba_audit_trail</p>
+<pre><code>DBA_AUDIT_SESSION
+</code></pre><p>所得到的数据都是有关logon或者logoff的信息.</p>
+<pre><code>DBA_AUDIT_STATEMENT
+</code></pre><p>列出grant ,revoke ,audit ,noaudit ,alter system语句的审计跟踪信息.</p>
+<pre><code>DBA_PRIV_AUDIT_OPTS
+</code></pre><p>通过系统和由用户审计的当前系统特权</p>
+<pre><code>DBA_OBJ_AUDIT_OPTS
+</code></pre><p>可以查询到所有用户所有对象的设计选项</p>
+<pre><code>ALL_DEF_AUDIT_OPTS
+AUDIT_ACTIONS
+</code></pre><p>可以查询出在aud$等视图中actions列的含义</p>
+<pre><code>SYSTEM_PRIVILEGE_MAP
+</code></pre><p>可以查询出aud$等视图中priv$used列的含义(注意前面加&#39;-&#39;)</p>
+<p>常用视图：</p>
+<pre><code>DBA_AUDIT_TRAIL
+DBA_FGA_AUDIT_TRAIL
+DBA_COMMON_AUDIT_TRAIL
+</code></pre><hr>
+<h2 id="4-">4、审计级别</h2>
+<p>当开启审计功能后，可在三个级别对数据库进行审计：Statement(语句)、Privilege（权限）、object（对象）。<br>4.1 Statement</p>
+<blockquote>
+<p>语句审计，对某种类型的SQL语句审计，不指定结构或对象。比如audit table 会审计数据库中所有的create table,droptable,truncate table语句，alter session by cmy会审计cmy用户所有的数据库连接。</p>
+</blockquote>
+<p>4.2 Privilege</p>
+<blockquote>
+<p>权限审计，当用户使用了该权限则被审计，如执行grant selectany table to a，当执行了auditselect any table语句后，当用户a 访问了用户b的表时（如select * from b.t）会用到select any table权限，故会被审计。注意用户是自己表的所有者，所以用户访问自己的表不会被审计。</p>
+</blockquote>
+<p>4.3 Object</p>
+<blockquote>
+<p>对象审计，对一特殊模式对象上的指定语句的审计. 如审计on关键字指定对象的相关操作，如aduitalter,delete,drop,insert on cmy.t by scott; 这里会对cmy用户的t表进行审计，但同时使用了by子句，所以只会对scott用户发起的操作进行审计。<br>注意：Oracle没有提供对schema中所有对象的审计功能，只能一个一个对象审计，对于后面创建的对象，Oracle则提供on default子句来实现自动审计，比如执行audit drop on default by access;后，对于随后创建的对象的drop操作都会审计。但这个default会对之后创建的所有数据库对象有效，似乎没办法指定只对某个用户创建的对象有效，想比 trigger可以对schema的DDL进行“审计”，这个功能稍显不足。</p>
+</blockquote>
+<p>4.4 审计的一些其他选项</p>
+<blockquote>
+<p>by access  每一个被审计的操作都会生成一条audit trail。<br>by session 一个会话里面同类型的操作只会生成一条audit trail，默认为by session。<br>whenever successful 操作成功(dba_audit_trail中returncode字段为0) 才审计,<br>whenever not successful 反之。省略该子句的话，不管操作成功与否都会审计。<br>1、密码口令设置不过期属性</p>
+<pre><code>SQL&gt;ALTER PROFILE DEFAULT LIMIT PASSWORD_LIFE_TIME UNLIMITED;-----修改之后不需要重启动数据库，会立即生效
+</code></pre><p>2、密码口令输入错误不锁定属性</p>
+<pre><code>SQL&gt;ALTER PROFILE DEFAULT LIMIT FAILED_LOGIN_ATTEMPTS UNLIMITED;-----修改之后不需要重启动数据库，会立即生效
+</code></pre></blockquote>
+<hr>
+<h2 id="5-">5 设置审计</h2>
+<pre><code>SQL&gt; audit select table by test by access; 
+如果在命令后面添加by user则只对user的操作进行审计,如果省去by用户,则对系统中所有的用户进行审计(不包含sys用户).
+audit delete any table; --审计删除表的操作
+audit delete any table whenever notsuccessful; --只审计删除失败的情况
+audit delete any table whenever successful;--只审计删除成功的情况
+audit delete,update,insert on user.table by system; --审计system用户对表user.table的delete,update,insert操作
+</code></pre><hr>
+<h2 id="6-">6 撤销审计</h2>
+<pre><code>SQL&gt; noaudit all on OBJECT_NMAE;
+SQL&gt; noaudit create session;
+</code></pre><hr>
+<h2 id="7-">7 清理审计记录</h2>
+<p>7.1 查询当前的审计记录</p>
+<blockquote>
+<pre><code>SQL〉select action_name,count(*) from dba_audit_trail group by action_name;
+ACTION_NAME                    COUNT(*)
+---------------------------- ----------
+SYSTEM REVOKE                         1
+LOGON                                90
+DROP DATABASE LINK                    5
+LOGOFF                               59
+ALTER SYSTEM                          5
+CREATE PUBLIC SYNONYM                 2
+ALTER DATABASE                        3
+DROP PUBLIC SYNONYM                   2
+CREATE DATABASE LINK                  5
+9 rows selected.
+</code></pre></blockquote>
+<p>7.2 初始化清理操作</p>
+<blockquote>
+<pre><code>exec dbms_audit_mgmt.init_cleanup(audit_trail_type =&gt; dbms_audit_mgmt.audit_trail_db_std,default_cleanup_interval =&gt; 720)
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_AUD_STD: Standard audit trail table, AUD$.
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_FGA_STD: Fine-grained audit trail table, FGA_LOG$.
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_DB_STD: Both standard and fine-grained audit trail tables.
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_OS: Operating system audit trail files with the .aud extension. (This setting does not apply to Windows Event Log entries.)
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_XML: XML Operating system audit trail files.
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_FILES: Both operating system and XML audit trail files.
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_ALL: All audit trail records, that is, both database audit trail and operating system audit trail types.
+DEFAULT_CLEANUP_INTERVAL:  default hourly purge interval.
+</code></pre></blockquote>
+<p>7.3设置最后清理时间（可选），没有设置时清理所有记录</p>
+<blockquote>
+<pre><code>exec dbms_audit_mgmt.set_last_archive_timestamp(audit_trail_type =&gt; dbms_audit_mgmt.audit_trail_aud_std,  last_archive_time =&gt; &#39;28-mar-13 10:00:00.00 PM&#39;, rac_instance_number =&gt; 1)
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_AUD_STD: Specified the standard audit trail table, AUD$.
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_FGA_STD: Specifies the fine-grained audit trail table, FGA_LOG$.
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_OS: Operating system audit trail files with the .aud extension. (This setting does not apply to Windows Event Log entries.)
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_XML: Specifies XML audit trail files.
+LAST_ARCHIVE_TIME:  Enter the timestamp in YYYY-MM-DD HH:MI:SS.FF UTC (Coordinated Universal Time) format
+RAC_INSTANCE_NUMBER:  the default is 0 当使用非数据库记录时，在RAC环境需要指定清理的实例
+</code></pre></blockquote>
+<p>7.4 检查最后清理时间设置</p>
+<blockquote>
+<pre><code>select * from DBA_AUDIT_MGMT_LAST_ARCH_TS
+建立和计划清理job
+exec dbms_audit_mgmt.drop_purge_job(audit_trail_purge_name =&gt; &#39;db_audit_trial_cc&#39;)
+exec dbms_audit_mgmt.create_purge_job(audit_trail_type =&gt; dbms_audit_mgmt.audit_trail_db_std,
+                  audit_trail_purge_interval =&gt; 1,
+                  audit_trail_purge_name =&gt; &#39;db_audit_trial_cc&#39;,
+                  use_last_arch_timestamp =&gt; true)
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_AUD_STD: Standard audit trail table, AUD$
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_FGA_STD: Fine-grained audit trail table, FGA_LOG$
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_DB_STD: Both standard and fine-grained audit trail tables
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_OS: Operating system audit trail files with the .aud extension. (This setting does not apply to Windows Event Log entries.)
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_XML: XML audit trail files
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_FILES: Both operating system and XML audit trail files
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_ALL: All audit trail records, that is, both database audit trail and operating system audit trail types
+AUDIT_TRAIL_PURGE_INTERVAL: Specify the hourly interval for this purge job to run. The timing begins when you run the DBMS_AUDIT_MGMT.CREATE_PURGE_JOB procedure, in this case, 12 hours after you run this procedure. Later on, if you want to update this value, run the DBMS_AUDIT_MGMT.SET_PURGE_JOB_INTERVAL procedure.
+USE_LAST_ARCH_TIMESTAMP: Enter either of the following settings:
+TRUE: Deletes audit records created before the last archive timestamp. To check the last recorded timestamp, query the LAST_ARCHIVE_TS column of the DBA_AUDIT_MGMT_LAST_ARCH_TS data dictionary view. The default value is TRUE. Oracle recommends that you set USE_LAST_ARCH_TIMESTAMP to TRUE.
+FALSE: Deletes all audit records without considering last archive timestamp. Be careful about using this setting, in case you inadvertently delete audit records that should have been deleted.
+</code></pre></blockquote>
+<p>7.5 设置清理批处理删除属性</p>
+<blockquote>
+<pre><code>Optionally, Configure the Audit Trail Records to be Deleted in Batches
+By default, the DBMS_AUDIT_MGMT package procedures delete the database and operating system audit trail records in batches of 10000 database audit records, or 1000 operating system audit files. You can set this batch size to a different value if you want. Later on, when Oracle Database runs the purge job, it deletes each batch, rather than all records together. If the audit trail is very large (and they can grow quite large), deleting the records in batches facilitates the purge operation.
+To find the current batch setting, you can query the PARAMETER_NAME and PARAMETER_VALUE columns of the DBA_AUDIT_MGMT_CONFIG_PARAMS data dictionary view. To set the batch size, use the DBMS_AUDIT_MGMT.SET_AUDIT_TRAIL_PROPERTY procedure. If you later want to clear this setting, see &quot;Clearing the Database Audit Trail Batch Size&quot;.
+For example:
+ BEGIN
+ DBMS_AUDIT_MGMT.SET_AUDIT_TRAIL_PROPERTY(
+  AUDIT_TRAIL_TYPE            =&gt; DBMS_AUDIT_MGMT.AUDIT_TRAIL_AUD_STD,
+  AUDIT_TRAIL_PROPERTY        =&gt; DBMS_AUDIT_MGMT.DB_DELETE_BATCH_SIZE,
+  AUDIT_TRAIL_PROPERTY_VALUE  =&gt; 100000);
+END;
+/
+In this example:
+AUDIT_TRAIL_TYPE: Specifies the audit trail type, which in this case is the database system audit trail. Enter one of the following values:
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_AUD_STD: Standard audit trail table, AUD$.
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_FGA_STD: Fine-grained audit trail table, FGA_LOG$.
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_OS: Operating system audit files.
+DBMS_AUDIT_MGMT.AUDIT_TRAIL_XML: XML audit files.
+AUDIT_TRAIL_PROPERTY: Uses the DBMS_AUDIT_MGMT.DB_DELETE_BATCH_SIZE property to indicate the database audit trail batch size setting. If you want to batch the operating system audit trail, then use the FILE_DELETE_BATCH_SIZE property.
+AUDIT_TRAIL_PROPERTY_VALUE: Sets the number of audit record files to be 100,000 for each batch. Enter a value between 100 and 1000000. To determine this number, consider the total number of records being purged, and the time interval in which the purge operation is performed. The default is 10000 for the database audit trail and 1000 for the operating system audit trail records.
+</code></pre></blockquote>
+<p>7.6手工清理</p>
+<blockquote>
+<pre><code>dbms_audit_mgmt.clean_audit_trail(audit_trail_type =&gt; dbms_audit_mgmt.audit_trail_db_std,use_last_arch_timestamp =&gt; true)
+</code></pre></blockquote>
+<hr>
+<h2 id="8-">8、例子</h2>
+<p>比如对某张表进行增删改的审计记录</p>
+<pre><code>1、审计模式需要开启
+alter system set audit_trail=DB,EXTENDED scope=spfile;
+2、audit delete,update,insert on test by user WHENEVER SUCCESSFUL; 
+3、insert into test select * from dba_data_files;
+  delete from  test;
+4、select distinct y.sessionid,
+   y.userid,
+   y.userhost,
+   y.obj$creator,
+   y.obj$name,
+   t.owner,
+   t.obj_name,
+   t.action_name,
+   t.sql_text,
+   t.timestamp
+  from sys.aud$ y, DBA_AUDIT_TRAIL t
+ where y.sessionid = t.sessionid
+   and t.action_name = &#39;SESSION REC&#39;
+and y.obj$name=&#39;TEST&#39;;
+或者这句：
+SELECT OBJ_NAME,ACTION_NAME ,to_char(timestamp,&#39;dd/mm/yyyy , HH:MM:SS&#39;),sql_text,sql_bind from sys.dba_audit_object; 
+5、取消对test表的审计
+noaudit all on test;
+</code></pre><p><a href="../index.html">文档主页</a></p>
+
+</body>
+</html>
+<!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

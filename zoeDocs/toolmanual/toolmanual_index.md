@@ -14,5 +14,6 @@
 10.	[利用FY_Recover_Data工具恢复truncate的数据](useFY_Recover_Data.html)
 11.	[dbv工具的介绍与使用](manual_dbv.html)
 12.	[LVM的介绍与使用](manual_lvm.html)
+13.	[审计功能的介绍与使用](审计功能介绍.html)
 
 [文档主页](../index.html)
