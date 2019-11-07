@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>dailymanual_index</title>
+<title>oracle_rac_bond</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -293,11 +293,97 @@ img {
 <body>
 <p><link href="../zoe_docs.css" rel="stylesheet" type="text/css" /></p>
 <p><a href="../index.html">文档主页</a></p>
+<h3>Oracle rac 单网卡改双网卡绑定</h3>
 <ol>
-<li><a href="oracle_rac_switch_ip.html">Oracle RAC IP切换</a></li>
-<li><a href="oracle_rac_cdp_switch.html">Oracle RAC 存储CDP容灾切换测试</a></li>
-<li><a href="copy_pdb.html">Oracle 12C 克隆pdb操作手册</a></li>
-<li><a href="oracle_rac_bond.html">Oracle RAC 单网卡改双网卡绑定</a></li>
+<li>
+<p>关闭集群服务</p>
+<ul>
+<li>srvctl stop database -d dyyy</li>
+<li>srvctl stop asm -n hisrac1</li>
+<li>srvctl stop asm -n hisrac2</li>
+<li>srvctl stop nodeapps -n hisrac1</li>
+<li>srvctl stop nodeapps -n hisrac2</li>
+</ul>
+</li>
+<li>
+<p>修改网crs网卡设备信息</p>
+<p>查看设备名信息</p>
+<p>[root@hisrac1 bin]# ./oifcfg getif</p>
+<p>eth0  192.0.1.0  global  public</p>
+<p>eth2  192.168.123.0  global  cluster_interconnect</p>
+<p>增加新设备名信息</p>
+<p>[root@hisrac1 bin]# ./oifcfg setif -global bond0/192.0.1.0:public</p>
+<p>[root@hisrac1 bin]# ./oifcfg setif -global bond1/192.168.123.0:cluster_interconnect</p>
+<p>删除旧设备名信息</p>
+<p>[root@hisrac1 bin]# ./oifcfg delif -global eth0</p>
+<p>[root@hisrac1 bin]# ./oifcfg delif -global eth2</p>
+</li>
+<li>
+<p>修改VIP配置信息</p>
+<p>查看VIP配置信息</p>
+<p>[root@hisrac1 bin]# ./srvctl config nodeapps -n hisrac1 -a</p>
+<p>VIP exists.: /hisrac1-vip/192.0.1.85/255.255.255.0/eth0</p>
+<p>[root@hisrac1 bin]# ./srvctl config nodeapps -n hisrac2 -a</p>
+<p>VIP exists.: /hisrac1-vip/192.0.1.18/255.255.255.0/eth0</p>
+<p>修改VIP配置信息</p>
+<p>[root@hisrac1 bin]# ./srvctl modify nodeapps -n hisrac1 -A 192.0.1.85/255.255.255.0/bond0</p>
+<p>[root@hisrac1 bin]# ./srvctl modify nodeapps -n hisrac2 -A 192.0.1.18/255.255.255.0/bond0</p>
+</li>
+<li>
+<p>关闭crs服务</p>
+<p>hisrac1:</p>
+<p>[root@hisrac1 bin]# ./crsctl stop crs</p>
+<p>hisrac2:</p>
+<p>[root@hisrac2 bin]# ./crsctl stop crs</p>
+</li>
+<li>
+<p>网卡绑定配置</p>
+<p>[root@hisrac1 ~]# vi  /etc/modprobe.conf，添加以下几行：</p>
+<p>alias bond0 bonding</p>
+<p>alias bond1 bonding</p>
+<p>options bonding  max_bonds=2</p>
+<p>[root@hisrac1 ~]# vi /etc/sysconfig/network-scripts/ifconfig-bond0</p>
+<p>DEVICE=bond0</p>
+<p>ONBOOT=yes</p>
+<p>BOOTPROTO=static</p>
+<p>IPADDR=192.0.1.12</p>
+<p>NETMASK=255.255.255.0</p>
+<p>USERCTL=no</p>
+<p>TYPE=Ethernet</p>
+<p>BONGING=OPTS=&quot;mode=1 miimon=100&quot;</p>
+<p>[root@hisrac1 ~]# vi /etc/sysconfig/network-scripts/ifconfig-eth0</p>
+<p>DEVICE=eth0</p>
+<p>ONBOOT=yes</p>
+<p>BOOTPROTO=none</p>
+<p>USERCTL=no</p>
+<p>TYPE=Ethernet</p>
+<p>MASTER=bond0</p>
+<p>SLAVE=yes</p>
+<p>[root@hisrac1 ~]# vi /etc/sysconfig/network-scripts/ifconfig-eth1</p>
+<p>DEVICE=eth1</p>
+<p>ONBOOT=yes</p>
+<p>BOOTPROTO=none</p>
+<p>USERCTL=no</p>
+<p>TYPE=Ethernet</p>
+<p>MASTER=bond0</p>
+<p>SLAVE=yes</p>
+<p>BOND1配置除了ip改下其他按照bond0一样设置，bond1网卡要对应eth2，eth3</p>
+<p>网络重启</p>
+<p>[root@hisrac1 ~]# service network restart </p>
+<p>查看bond0状态</p>
+<p>[root@hisrac1 ~]# cat /proc/net/bonding/bond0</p>
+<p>查看bond1状态</p>
+<p>[root@hisrac1 ~]# cat /proc/net/bonding/bond1</p>
+<p>另一台服务器hisrac2也按以上步骤设置网卡绑定，ip要设置对，网卡也要对应。</p>
+</li>
+<li>
+<p>启动crs服务</p>
+<p>hisrac1:</p>
+<p>[root@hisrac1 bin]# ./crsctl start crs</p>
+<p>hisrac2:</p>
+<p>[root@hisrac2 bin]# ./crsctl start crs</p>
+<p>由于没有修改IP，因此hosts和监听文件不需要调整。</p>
+</li>
 </ol>
 <p><a href="../index.html">文档主页</a></p>
 
