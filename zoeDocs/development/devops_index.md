@@ -17,6 +17,7 @@
 6.	[标准管理](standard_manage_design.html)
 ###	运维管理系统功能变更记录
 1.	基础组件
+	*	[功能变更-2019.11](database_version_release/change_2019.11.html)
 2.	数据库版本与发布管理
 	*	[功能变更-2019.07](database_version_release/change_2019.07.html)
 	*	[功能变更-2019.08](database_version_release/change_2019.08.html)
