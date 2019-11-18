@@ -98,7 +98,7 @@ AS
     lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER''),SYSDATE,';
     lv_sql := lv_sql || ' SYS_CONTEXT(''USERENV'',''SESSION_USER''),SYSDATE,OBJECT_ID';
     lv_sql := lv_sql || ' FROM DBA_OBJECTS@'||in_db_link||' A , ZOESTD.META_USER$ B';
-    lv_sql := lv_sql || ' WHERE A.OWNER=B.USERNAME AND (A.OWNER LIKE ''ZOE%'' OR A.OWNER = ''QUERY'') ';
+    lv_sql := lv_sql || ' WHERE A.OWNER=B.USERNAME AND (A.OWNER LIKE ''ZOE%'' OR A.OWNER IN (''QUERY'',''SICKVIEW'')) ';
     lv_sql := lv_sql || ' AND OBJECT_TYPE IN (''TABLE'',''VIEW'',''SEQUENCE'')';
     lv_sql := lv_sql || ' AND B.USERNAME NOT IN (''ZOETMP'')';
     lv_sql := lv_sql || ' AND B.DB_ID#='''||in_db_id||'''';
