@@ -8,9 +8,9 @@ CREATE OR REPLACE PROCEDURE send_mail(
        --下面四个变量请根据实际邮件服务器进行赋值
        v_mailhost  VARCHAR2(30) := 'smtp.exmail.qq.com';    --SMTP服务器地址
 	   v_mailport  NUMBER       := 25;
-       v_user      VARCHAR2(30) := 'xuzhifeng@zoesoft.com.cn';            --登录SMTP服务器的用户名
-       v_pass      VARCHAR2(20) := 'Xzf7757$zm';             --登录SMTP服务器的密码
-       v_sender    VARCHAR2(50) := 'xuzhifeng@zoesoft.com.cn';    --发送者邮箱，一般与 ps_user 对应
+       v_user      VARCHAR2(30) := 'zytest@zoesoft.com.cn';            --登录SMTP服务器的用户名
+       v_pass      VARCHAR2(20) := 'zytest';             --登录SMTP服务器的密码
+       v_sender    VARCHAR2(50) := 'zytest@zoesoft.com.cn';    --发送者邮箱，一般与 ps_user 对应
         
        v_conn  UTL_SMTP.connection ; --到邮件服务器的连接
        v_msg varchar2(4000);  --邮件内容
